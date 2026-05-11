@@ -1,0 +1,11 @@
+app.js:document.getElementById(`chk-diff-${d}`)
+app.js:document.getElementById(`chk-type-${t}`)
+app.js:document.getElementById(id)
+app.js:document.getElementById(modalId)
+bool_answer
+match-pairs-container
+mcq_opt_0
+mcq_opt_1
+mcq_opt_2
+mcq_opt_3
+written_keywords
