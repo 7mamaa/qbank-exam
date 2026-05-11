@@ -1,0 +1,47 @@
+src/ui/components.js:        ul.innerHTML = '';
+src/ui/components.js:        container.innerHTML = '';
+src/ui/components.js:            container.innerHTML = `<p style="color:var(--text-secondary); font-size:0.9rem;">${i18n.t('no_data_yet')}</p>`;
+src/ui/components.js:            bar.innerHTML = `
+src/ui/components.js:        container.innerHTML = '';
+src/ui/components.js:            container.innerHTML = `<p style="color:var(--text-secondary); font-size:0.9rem;">${i18n.t('no_data_yet')}</p>`;
+src/ui/components.js:            bar.innerHTML = `
+src/ui/components.js:        toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message"></span>`;
+src/modules/export.js:                container.innerHTML = bodyHtml;
+src/modules/notebooks.js:        if (qSelect) qSelect.innerHTML = options;
+src/modules/notebooks.js:        if (fSelect) fSelect.innerHTML = filterOptions;
+src/modules/notebooks.js:        if (imSelect) imSelect.innerHTML = options;
+src/modules/notebooks.js:        if (qzSelect) qzSelect.innerHTML = filterOptions;
+src/modules/notebooks.js:        if (prSelect) prSelect.innerHTML = options;
+src/modules/notebooks.js:            bulkSelect.innerHTML = bulkOptions;
+src/modules/notebooks.js:            container.innerHTML = '';
+src/modules/notebooks.js:            container.innerHTML = `<div class="notebooks-grid">
+src/modules/questions.js:        row.innerHTML = `
+src/modules/questions.js:        container.innerHTML = html;
+src/modules/questions.js:                if (msgEl) msgEl.innerHTML = i18n.t('q_duplicate_found', { percent: highestMatch });
+src/modules/questions.js:            datalist.innerHTML = Array.from(allTags).map(t => `<option value="${Helpers.sanitize(t)}">`).join('');
+src/modules/questions.js:        catSelect.innerHTML = catHtml;
+src/modules/questions.js:        tagSelect.innerHTML = tagHtml;
+src/modules/questions.js:        container.innerHTML = "";
+src/modules/questions.js:        card.innerHTML = `
+src/modules/quiz.js:        container.innerHTML = html;
+src/utils/helpers.js:        return div.innerHTML;
+app.js:            nbContainer.innerHTML = filtered.map(nb => `
+app.js:            catContainer.innerHTML = html;
+app.js:            tagContainer.innerHTML = html;
+app.js:            summaryEl.innerHTML = `
+app.js:        const originalText = btn.innerHTML;
+app.js:            btn.innerHTML = 'جاري التحميل... ⏳';
+app.js:        finally { btn.innerHTML = originalText; btn.disabled = false; }
+app.js:            container.innerHTML = html;
+app.js:            container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--success-color);">🎉 جميع الوسوم تبدو منظمة ولا توجد تكرارات واضحة.</div>';
+app.js:        container.innerHTML = suggestions.map((s, idx) => `
+app.js:            container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--success-color);">🎉 جميع التصنيفات تبدو منظمة ولا توجد تكرارات واضحة.</div>';
+app.js:        container.innerHTML = suggestions.map((s, idx) => `
+app.js:        const originalText = btn.innerHTML;
+app.js:        btn.innerHTML = 'جاري المعالجة... ⏳';
+app.js:            btn.innerHTML = originalText;
+app.js:        const originalText = btn.innerHTML;
+app.js:        btn.innerHTML = 'جاري المعالجة... ⏳';
+app.js:            btn.innerHTML = originalText;
+app.js:            container.innerHTML = `<div class="changelog-rendered" dir="rtl" style="text-align:right;">${html}</div>`;
+app.js:            container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--danger-color);">
