@@ -1,0 +1,45 @@
+/* --- Print & PDF Engine Styles --- */
+@media print {
+    @page { margin: 1.0cm; size: auto; }
+    
+    body { 
+        background: #fff !important; 
+        color: #000 !important; 
+        overflow: visible !important; 
+        height: auto !important; 
+        display: block !important; /* Fix flex issue */
+        width: 100% !important;
+    }
+
+    /* Hide everything except the print container */
+    aside, header, .header, .sidebar, .sidebar-overlay, .nav-links, .nav-group-title, 
+    .header-actions, .main-content, .modal-overlay, .btn, .filter-bar, 
+    #pagination-controls, .floating-undo-redo, .footer-note, #btn-undo, #btn-redo { 
+        display: none !important; 
+    }
+
+    #print-container { 
+        display: block !important; 
+        visibility: visible !important; 
+        position: static !important; 
+        width: 100% !important; 
+        background: #fff !important; 
+        color: #000 !important; 
+        z-index: 9999;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 30px; padding-bottom: 15px; }
+    .print-question { margin-bottom: 25px; page-break-inside: avoid; padding: 20px; border: 1px solid #ccc; border-radius: 12px; }
+    .print-question h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.2rem; color: #000; font-weight: 700; }
+    .print-question img { max-width: 400px; max-height: 250px; display: block; margin: 15px auto; border: 1px solid #999; border-radius: 4px; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; border: 1.5px solid #000; }
+    th, td { border: 1px solid #000 !important; padding: 10px; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 8px; }
+    [dir="rtl"] .print-question { text-align: right; }
+    [dir="ltr"] .print-question { text-align: left; }
+    .page-break { page-break-before: always; }
+}
+#print-container { display: none; }

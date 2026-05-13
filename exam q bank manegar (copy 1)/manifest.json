@@ -1,0 +1,33 @@
+{
+    "name": "QBank — مدير بنك الأسئلة",
+    "short_name": "QBank",
+    "description": "نظام متكامل لإدارة بنوك الأسئلة الامتحانية بدون إنترنت",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#0f0e17",
+    "theme_color": "#4361ee",
+    "lang": "ar",
+    "dir": "rtl",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234361ee'/><text y='.9em' font-size='80' x='10'>📚</text></svg>",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["education", "productivity"],
+    "shortcuts": [
+        {
+            "name": "لوحة التحكم",
+            "url": "./index.html#dashboard",
+            "description": "الانتقال إلى لوحة التحكم"
+        },
+        {
+            "name": "الأسئلة",
+            "url": "./index.html#questions",
+            "description": "إدارة بنك الأسئلة"
+        }
+    ]
+}
