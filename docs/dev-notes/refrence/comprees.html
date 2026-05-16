@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدير ملفات JSON الاحترافي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pako library for Gzip compression -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'IBM+Plex+Sans+Arabic', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        textarea {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 mb-2">
+                إدارة وضغط ملفات JSON
+            </h1>
+            <p class="text-slate-400 text-lg">قم بمعالجة، ضغط، وفك ضغط بياناتك بكل سهولة وأمان</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Sidebar: Controls -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="glass-card p-6 rounded-2xl shadow-xl">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        التحكم بالملفات
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <label class="block">
+                            <span class="sr-only">اختر ملف</span>
+                            <input type="file" id="fileInput" accept=".json,.gz" class="block w-full text-sm text-slate-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-500 file:text-white
+                                hover:file:bg-blue-600 cursor-pointer
+                            "/>
+                        </label>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="handleBeautify()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg transition text-sm">تنسيق (Beautify)</button>
+                            <button onclick="handleMinify()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg transition text-sm">ضغط نصي (Minify)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl shadow-xl">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 text-emerald-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        تقنيات Gzip
+                    </h2>
+                    <div class="space-y-3">
+                        <button onclick="handleGzipCompress()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-medium transition flex items-center justify-center gap-2">
+                            تحويل إلى Gzip (.gz)
+                        </button>
+                        <button onclick="handleGzipDecompress()" class="w-full border border-emerald-500 text-emerald-400 hover:bg-emerald-500 hover:text-white py-3 rounded-xl font-medium transition">
+                            فك ضغط Gzip
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Card -->
+                <div id="statsCard" class="hidden glass-card p-6 rounded-2xl border-blue-500/30">
+                    <h3 class="text-sm font-medium text-slate-400 uppercase mb-3 tracking-wider">إحصائيات الملف</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span>الحجم الأصلي:</span>
+                            <span id="originalSize" class="font-mono text-blue-300">-</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>الحجم الحالي:</span>
+                            <span id="currentSize" class="font-mono text-emerald-300">-</span>
+                        </div>
+                        <div class="pt-2 border-t border-slate-700">
+                            <div class="flex justify-between font-bold">
+                                <span>نسبة التوفير:</span>
+                                <span id="compressionRatio" class="text-emerald-400">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Editor Area -->
+            <div class="lg:col-span-2 flex flex-col gap-4">
+                <div class="relative flex-grow">
+                    <div class="absolute top-4 left-4 flex gap-2">
+                        <button onclick="copyToClipboard()" class="p-2 bg-slate-800 rounded-md hover:bg-slate-700 transition" title="نسخ">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                        </button>
+                        <button onclick="clearAll()" class="p-2 bg-rose-900/50 text-rose-300 rounded-md hover:bg-rose-800 transition" title="مسح">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    <textarea id="jsonEditor" placeholder="الصق نص JSON هنا أو قم برفع ملف..." 
+                        class="w-full h-[600px] bg-slate-900/50 p-6 pt-14 rounded-2xl border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono text-sm resize-none"></textarea>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button id="downloadBtn" onclick="handleDownload()" disabled class="bg-blue-600 disabled:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2">
+                        تحميل الملف المعالج
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Notification Toast -->
+        <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 text-white px-6 py-3 rounded-full shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
+            تمت العملية بنجاح!
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('jsonEditor');
+        const fileInput = document.getElementById('fileInput');
+        const statsCard = document.getElementById('statsCard');
+        const originalSizeSpan = document.getElementById('originalSize');
+        const currentSizeSpan = document.getElementById('currentSize');
+        const ratioSpan = document.getElementById('compressionRatio');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let originalSizeInBytes = 0;
+        let isBinaryData = false;
+        let binaryBlob = null;
+
+        // --- Core Functions ---
+
+        // Handle File Upload
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            originalSizeInBytes = file.size;
+            updateStats(file.size, file.size);
+
+            if (file.name.endsWith('.gz')) {
+                // Read as ArrayBuffer for Gzip
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const uint8Array = new Uint8Array(this.result);
+                    try {
+                        const decompressed = pako.ungzip(uint8Array, { to: 'string' });
+                        editor.value = decompressed;
+                        showToast("تم فك ضغط ملف Gzip بنجاح");
+                        updateStats(originalSizeInBytes, decompressed.length);
+                        isBinaryData = false;
+                        downloadBtn.disabled = false;
+                    } catch (err) {
+                        showToast("خطأ في فك ضغط الملف", true);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                // Read as text
+                const reader = new FileReader();
+                reader.onload = function() {
+                    editor.value = this.result;
+                    isBinaryData = false;
+                    downloadBtn.disabled = false;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function handleBeautify() {
+            try {
+                const obj = JSON.parse(editor.value);
+                const beautified = JSON.stringify(obj, null, 4);
+                editor.value = beautified;
+                updateStats(originalSizeInBytes || beautified.length, beautified.length);
+                isBinaryData = false;
+                showToast("تم تنسيق النص");
+            } catch (e) {
+                showToast("تنسيق JSON غير صالح", true);
+            }
+        }
+
+        function handleMinify() {
+            try {
+                const obj = JSON.parse(editor.value);
+                const minified = JSON.stringify(obj);
+                editor.value = minified;
+                updateStats(originalSizeInBytes || editor.value.length, minified.length);
+                isBinaryData = false;
+                showToast("تم الضغط النصي");
+            } catch (e) {
+                showToast("تنسيق JSON غير صالح", true);
+            }
+        }
+
+        function handleGzipCompress() {
+            if (!editor.value.trim()) return showToast("المحرر فارغ", true);
+            try {
+                const binary = pako.gzip(editor.value);
+                binaryBlob = new Blob([binary], { type: 'application/gzip' });
+                isBinaryData = true;
+                updateStats(editor.value.length, binaryBlob.size);
+                showToast("تم ضغط البيانات بصيغة Gzip");
+                downloadBtn.disabled = false;
+            } catch (e) {
+                showToast("خطأ أثناء عملية الضغط", true);
+            }
+        }
+
+        function handleGzipDecompress() {
+            // This is handled via file upload mostly, but if user pastes binary hex (not likely)
+            // Logic would go here. For this app, we assume they upload .gz
+            showToast("قم برفع ملف .gz مباشرة لفك ضغطه");
+        }
+
+        function handleDownload() {
+            let blob, filename;
+            if (isBinaryData && binaryBlob) {
+                blob = binaryBlob;
+                filename = "data_compressed.json.gz";
+            } else {
+                blob = new Blob([editor.value], { type: 'application/json' });
+                filename = "formatted_data.json";
+            }
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- Utilities ---
+
+        function updateStats(oldSize, newSize) {
+            statsCard.classList.remove('hidden');
+            originalSizeSpan.textContent = formatBytes(oldSize);
+            currentSizeSpan.textContent = formatBytes(newSize);
+            
+            const saved = ((oldSize - newSize) / oldSize * 100).toFixed(1);
+            ratioSpan.textContent = saved > 0 ? `${saved}% توفير` : `${Math.abs(saved)}% زيادة`;
+            ratioSpan.className = saved > 0 ? 'text-emerald-400' : 'text-rose-400';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-50 ${isError ? 'bg-rose-600' : 'bg-blue-600'}`;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+            }, 3000);
+        }
+
+        function copyToClipboard() {
+            const text = editor.value;
+            if (!text) return;
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast("تم النسخ إلى الحافظة");
+        }
+
+        function clearAll() {
+            editor.value = '';
+            fileInput.value = '';
+            statsCard.classList.add('hidden');
+            downloadBtn.disabled = true;
+            isBinaryData = false;
+            binaryBlob = null;
+            originalSizeInBytes = 0;
+            showToast("تم مسح البيانات");
+        }
+
+        // Listen for input to enable download
+        editor.addEventListener('input', () => {
+            downloadBtn.disabled = !editor.value.trim();
+            isBinaryData = false;
+        });
+
+    </script>
+</body>
+</html>
