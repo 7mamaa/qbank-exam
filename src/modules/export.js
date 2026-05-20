@@ -24,20 +24,51 @@ export const ExportModule = {
     },
 
     renderExportOptions(format) {
-        const jsonCard = document.getElementById('json-advanced-card');
+        // Inject missing localization keys dynamically to keep surgical modifications localized to src/modules/export.js
+        if (typeof i18n !== 'undefined' && i18n.locales) {
+            if (i18n.locales.ar && !i18n.locales.ar['json_advanced_settings']) {
+                i18n.locales.ar['json_advanced_settings'] = '⚙️ إعدادات JSON المتقدمة';
+                i18n.locales.ar['export_opt_beautify'] = 'تنسيق الملف الجمالي (Beautify)';
+                i18n.locales.ar['export_opt_compress'] = 'تفعيل ضغط GZIP';
+            }
+            if (i18n.locales.en && !i18n.locales.en['json_advanced_settings']) {
+                i18n.locales.en['json_advanced_settings'] = '⚙️ Advanced JSON Settings';
+                i18n.locales.en['export_opt_beautify'] = 'Beautify JSON';
+                i18n.locales.en['export_opt_compress'] = 'Enable GZIP Compression';
+            }
+        }
+
+        let jsonCard = document.getElementById('json-advanced-card');
+        if (!jsonCard) {
+            const actionCard = document.querySelector('.export-action-card');
+            if (actionCard) {
+                jsonCard = document.createElement('div');
+                jsonCard.id = 'json-advanced-card';
+                jsonCard.className = 'stat-card';
+                jsonCard.style.display = 'none';
+                jsonCard.style.border = '2px solid var(--primary)';
+                jsonCard.style.background = 'rgba(67, 97, 238, 0.02)';
+                actionCard.parentNode.insertBefore(jsonCard, actionCard);
+            }
+        }
+
         if (jsonCard) {
             jsonCard.style.display = (format === 'json') ? 'block' : 'none';
             if (format === 'json' && !jsonCard.innerHTML.trim()) {
                 jsonCard.innerHTML = `
-                    <div class="mt-4 p-4 border rounded bg-gray-50 dark:bg-gray-800">
-                        <h4 class="font-bold mb-2">${i18n.t('json_advanced_settings') || 'JSON Settings'}</h4>
-                        <label class="flex items-center space-x-2 mb-2 rtl:space-x-reverse">
-                            <input type="checkbox" id="exportBeautify" class="form-checkbox">
-                            <span>${i18n.t('export_opt_beautify') || 'Beautify JSON'}</span>
+                    <h3 style="margin-bottom:15px; color:var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <span data-i18n="json_advanced_settings">${i18n.t('json_advanced_settings')}</span>
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="exportBeautify">
+                            <span class="checkmark"></span>
+                            <span data-i18n="export_opt_beautify">${i18n.t('export_opt_beautify')}</span>
                         </label>
-                        <label class="flex items-center space-x-2 mb-4 rtl:space-x-reverse">
-                            <input type="checkbox" id="exportCompress" checked class="form-checkbox text-blue-600">
-                            <span>${i18n.t('export_opt_compress') || 'Enable GZIP Compression'}</span>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="exportCompress" checked>
+                            <span class="checkmark"></span>
+                            <span data-i18n="export_opt_compress">${i18n.t('export_opt_compress')}</span>
                         </label>
                     </div>
                 `;
@@ -56,19 +87,27 @@ export const ExportModule = {
         const ts = Date.now();
 
         if (fmt === 'json') {
-            const isBeautify = document.getElementById('exportBeautify')?.checked;
-            const isCompress = document.getElementById('exportCompress')?.checked;
+            try {
+                const beautifyEl = document.getElementById('exportBeautify');
+                const compressEl = document.getElementById('exportCompress');
+                const isBeautify = beautifyEl ? beautifyEl.checked : false;
+                const isCompress = compressEl ? compressEl.checked : true;
 
-            const clean = pool.map(q => { const temp = { ...q }; delete temp.id; return temp; }); // Export clean schema
-            const jsonString = isBeautify ? JSON.stringify(clean, null, 4) : JSON.stringify(clean);
+                const clean = pool.map(q => { const temp = { ...q }; delete temp.id; return temp; }); // Export clean schema
+                const jsonString = isBeautify ? JSON.stringify(clean, null, 4) : JSON.stringify(clean);
 
-            if (isCompress && typeof pako !== 'undefined') {
-                const compressedData = pako.gzip(jsonString);
-                const blob = new Blob([compressedData], { type: 'application/gzip' });
-                this.downloadFile(blob, `qbank_${Date.now()}.json.gz`);
-            } else {
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                this.downloadFile(blob, `qbank_${Date.now()}.json`);
+                if (isCompress && typeof pako !== 'undefined') {
+                    const uint8Array = new TextEncoder().encode(jsonString);
+                    const compressedData = pako.gzip(uint8Array);
+                    const blob = new Blob([compressedData], { type: 'application/gzip' });
+                    this.downloadFile(blob, `qbank_${Date.now()}.json.gz`);
+                } else {
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    this.downloadFile(blob, `qbank_${Date.now()}.json`);
+                }
+            } catch (err) {
+                Logger.error('ExportModule', 'Failed to export JSON', err);
+                alert((i18n.t('err_export_failed') ? i18n.t('err_export_failed', { message: err.message }) : `فشل التصدير: ${err.message}`));
             }
             return;
 
@@ -677,6 +716,254 @@ export const ExportModule = {
             if (showToastCallback) showToastCallback(bridgeData.length);
         } catch (e) {
             if (handleErrorCallback) handleErrorCallback(e, "Export Bridge Failed");
+        }
+    },
+
+    referencesList: [],
+    loadedReferenceData: null,
+
+    initReferenceHub() {
+        // Inject missing localization keys dynamically to keep surgical modifications localized to src/modules/export.js
+        if (typeof i18n !== 'undefined' && i18n.locales) {
+            if (i18n.locales.ar && !i18n.locales.ar['import_ref_title']) {
+                i18n.locales.ar['import_ref_title'] = 'استيراد المراجع الطبية المعتمدة';
+                i18n.locales.ar['select_ref_placeholder'] = '--- اختر المرجع الطبي المطلوب ---';
+                i18n.locales.ar['btn_preview_ref'] = 'فحص ومعاينة المرجع 📡';
+                i18n.locales.ar['ref_preview_title'] = '🔍 معاينة أول 3 أسئلة:';
+                i18n.locales.ar['btn_confirm_ref_import'] = 'تأكيد الاستيراد الآمن 🚀';
+                i18n.locales.ar['select_ref_first'] = 'يرجى اختيار مرجع أولاً.';
+                i18n.locales.ar['err_fetch_manifest_failed'] = 'فشل جلب ملف المراجع المعتمدة.';
+                i18n.locales.ar['err_fetch_ref_failed'] = 'فشل جلب ملف المرجع المختار.';
+                i18n.locales.ar['msg_import_success'] = 'تم الاستيراد بنجاح وبدون أي تكرار!';
+            }
+            if (i18n.locales.en && !i18n.locales.en['import_ref_title']) {
+                i18n.locales.en['import_ref_title'] = 'Import Approved Medical References';
+                i18n.locales.en['select_ref_placeholder'] = '--- Select Medical Reference ---';
+                i18n.locales.en['btn_preview_ref'] = 'Inspect & Preview Reference 📡';
+                i18n.locales.en['ref_preview_title'] = '🔍 Previewing first 3 questions:';
+                i18n.locales.en['btn_confirm_ref_import'] = 'Confirm Safe Import 🚀';
+                i18n.locales.en['select_ref_first'] = 'Please select a reference first.';
+                i18n.locales.en['err_fetch_manifest_failed'] = 'Failed to load references manifest.';
+                i18n.locales.en['err_fetch_ref_failed'] = 'Failed to load selected reference.';
+                i18n.locales.en['msg_import_success'] = 'Successfully imported without duplicates!';
+            }
+        }
+
+        // Fetch references manifest
+        fetch('docs/dev-notes/refrence/references-manifest.json')
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                ExportModule.referencesList = data;
+                ExportModule.populateReferencesSelector();
+            })
+            .catch(err => {
+                console.error('[Reference Hub] Failed to fetch manifest:', err);
+                // Fallback to local hardcoded manifest if file fetch fails
+                ExportModule.referencesList = [
+                    {
+                        "id": "ref-v0",
+                        "name": "بنك الأسئلة الطبي - الإصدار v0",
+                        "path": "docs/dev-notes/refrence/v0.json",
+                        "version": "1.0.0",
+                        "description": "مرجع شامل لأسئلة طب العيون والجراحة العامة والباطنة."
+                    },
+                    {
+                        "id": "ref-v1",
+                        "name": "بنك أسئلة الأنف والأذن والحنجرة - الإصدار v1",
+                        "path": "docs/dev-notes/refrence/v1.json",
+                        "version": "1.1.0",
+                        "description": "أسئلة مخصصة لمادة الأنف والأذن والحنجرة لطلاب مرحلة البكالوريوس."
+                    },
+                    {
+                        "id": "ref-v2",
+                        "name": "بنك الأسئلة المطور - الإصدار v2",
+                        "path": "docs/dev-notes/refrence/v2.json",
+                        "version": "1.2.0",
+                        "description": "تحديثات أسئلة التخصصات الطبية الإضافية والامتحانات الإكلينيكية الحالية."
+                    }
+                ];
+                ExportModule.populateReferencesSelector();
+            });
+
+        // Bind events
+        const previewBtn = document.getElementById('btn-preview-ref');
+        const confirmBtn = document.getElementById('btn-confirm-ref-import');
+        
+        if (previewBtn) {
+            previewBtn.onclick = (e) => {
+                e.preventDefault();
+                const selector = document.getElementById('reference-selector');
+                const selectedId = selector ? selector.value : '';
+                if (!selectedId) {
+                    alert(i18n.t('select_ref_first'));
+                    return;
+                }
+                const ref = ExportModule.referencesList.find(r => r.id === selectedId);
+                if (ref) {
+                    ExportModule.loadAndPreviewReference(ref.path);
+                }
+            };
+        }
+
+        if (confirmBtn) {
+            confirmBtn.onclick = (e) => {
+                e.preventDefault();
+                ExportModule.executeReferenceImport();
+            };
+        }
+    },
+
+    populateReferencesSelector() {
+        const selector = document.getElementById('reference-selector');
+        if (selector) {
+            selector.innerHTML = `<option value="">--- ${i18n.t('select_ref_placeholder')} ---</option>`;
+            ExportModule.referencesList.forEach(ref => {
+                const opt = document.createElement('option');
+                opt.value = ref.id;
+                opt.textContent = `${ref.name} (v${ref.version})`;
+                selector.appendChild(opt);
+            });
+
+            // Bind change listener
+            selector.onchange = (e) => {
+                const selectedId = e.target.value;
+                const panel = document.getElementById('reference-details-panel');
+                const previewArea = document.getElementById('ref-preview-area');
+                const confirmBtn = document.getElementById('btn-confirm-ref-import');
+                
+                if (!selectedId) {
+                    if (panel) panel.style.display = 'none';
+                    if (confirmBtn) {
+                        confirmBtn.disabled = true;
+                        confirmBtn.style.opacity = '0.5';
+                        confirmBtn.style.cursor = 'not-allowed';
+                    }
+                    ExportModule.loadedReferenceData = null;
+                    return;
+                }
+                
+                const ref = ExportModule.referencesList.find(r => r.id === selectedId);
+                if (ref && panel) {
+                    document.getElementById('ref-detail-name').textContent = ref.name;
+                    document.getElementById('ref-detail-desc').textContent = ref.description;
+                    document.getElementById('ref-detail-version').textContent = `v${ref.version}`;
+                    panel.style.display = 'block';
+                    
+                    if (previewArea) previewArea.style.display = 'none';
+                    if (confirmBtn) {
+                        confirmBtn.disabled = true;
+                        confirmBtn.style.opacity = '0.5';
+                        confirmBtn.style.cursor = 'not-allowed';
+                    }
+                    ExportModule.loadedReferenceData = null;
+                }
+            };
+        }
+    },
+
+    loadAndPreviewReference: async function(path) {
+        const previewBtn = document.getElementById('btn-preview-ref');
+        const originalText = previewBtn ? previewBtn.textContent : '';
+        if (previewBtn) {
+            previewBtn.disabled = true;
+            previewBtn.textContent = '...📡...';
+        }
+
+        try {
+            const res = await fetch(path);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            
+            const questions = Array.isArray(data) ? data : [data];
+            ExportModule.loadedReferenceData = questions;
+            
+            const previewArea = document.getElementById('ref-preview-area');
+            const questionsList = document.getElementById('ref-preview-questions-list');
+            const confirmBtn = document.getElementById('btn-confirm-ref-import');
+            
+            if (questionsList) {
+                questionsList.innerHTML = '';
+                const previewItems = questions.slice(0, 3);
+                
+                previewItems.forEach((q, idx) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.borderBottom = idx < previewItems.length - 1 ? '1px solid var(--border)' : 'none';
+                    itemDiv.style.paddingBottom = '5px';
+                    itemDiv.style.marginBottom = '5px';
+                    
+                    const qType = q.type ? q.type.toUpperCase() : 'MCQ';
+                    itemDiv.innerHTML = `
+                        <div style="font-weight: bold; color: var(--primary);">${idx + 1}. [${qType}] ${Helpers.sanitize(q.question || '')}</div>
+                        <div style="color: var(--text-secondary); margin-top: 2px;">${i18n.t('answer_label') || 'الإجابة'}: ${Helpers.sanitize(String(q.answer || ''))}</div>
+                    `;
+                    questionsList.appendChild(itemDiv);
+                });
+                
+                if (previewArea) previewArea.style.display = 'block';
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
+                confirmBtn.style.cursor = 'pointer';
+            }
+            
+        } catch (error) {
+            console.error('[Reference Hub] Error loading reference file:', error);
+            alert(i18n.t('err_fetch_ref_failed'));
+            
+            const confirmBtn = document.getElementById('btn-confirm-ref-import');
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = '0.5';
+                confirmBtn.style.cursor = 'not-allowed';
+            }
+            ExportModule.loadedReferenceData = null;
+        } finally {
+            if (previewBtn) {
+                previewBtn.disabled = false;
+                previewBtn.textContent = originalText;
+            }
+        }
+    },
+
+    executeReferenceImport: async function() {
+        if (!ExportModule.loadedReferenceData) {
+            alert(i18n.t('select_ref_first'));
+            return;
+        }
+
+        const confirmBtn = document.getElementById('btn-confirm-ref-import');
+        if (confirmBtn) confirmBtn.disabled = true;
+
+        try {
+            await ExportModule.processStrictImport(ExportModule.loadedReferenceData, () => {
+                ExportModule.loadedReferenceData = null;
+                const selector = document.getElementById('reference-selector');
+                if (selector) selector.value = '';
+                
+                const panel = document.getElementById('reference-details-panel');
+                if (panel) panel.style.display = 'none';
+                
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = '0.5';
+                    confirmBtn.style.cursor = 'not-allowed';
+                }
+                
+                if (window.app && typeof window.app.syncData === 'function') {
+                    window.app.syncData();
+                }
+                
+                alert(i18n.t('msg_import_success'));
+            });
+        } catch (err) {
+            console.error('[Reference Hub] Import failed:', err);
+            alert(i18n.t('err_import_failed', { message: err.message }));
+            if (confirmBtn) confirmBtn.disabled = false;
         }
     }
 };

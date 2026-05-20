@@ -4,7 +4,7 @@ export const ThemeManager = {
     initTheme(updateSoundIcon) {
         const validThemes = ['cream-earthy', 'gray-orange', 'tech-violet', 'deep-orange'];
         if (!validThemes.includes(state.theme)) {
-            state.theme = 'cream-earthy';
+            state.theme = 'deep-orange';
         }
         document.documentElement.setAttribute('data-theme', state.theme);
         // Sync dropdown selector

@@ -133,6 +133,12 @@ export const app = {
                 setTimeout(() => this.editQuestion(editId), 500);
             }
 
+            // Initialize local/dynamic references hub
+            if (ExportModule && typeof ExportModule.initReferenceHub === 'function') {
+                ExportModule.initReferenceHub();
+            }
+            this.applyReferenceHubHints();
+
         } catch (e) {
             this.handleError(e, "App Initialization failed");
         }
@@ -250,6 +256,7 @@ export const app = {
         document.addEventListener('languageChanged', () => {
             if (this.state.currentView === 'questions') this.renderQuestions();
             this.updateBulkSelectionUI();
+            this.applyReferenceHubHints();
         });
     },
     setLanguage(lang) { 
@@ -257,6 +264,7 @@ export const app = {
         this.renderQuestions(); 
         this.updateDirectionButtons();
         this.updateDashboard();
+        this.applyReferenceHubHints();
     },
 
     // ── Feature 3: Font Size Control ─────────────────────────────────────────
@@ -603,13 +611,24 @@ export const app = {
         // Trigger view-specific rendering
         const viewInitializers = {
             'notebooks': () => this.renderNotebooks(),
-            'questions': () => this.renderQuestions(),
+            'questions': () => {
+                this.renderQuestions();
+                this.applyReferenceHubHints();
+            },
             'dashboard': () => this.updateDashboard(),
             'quiz': () => this.updateNotebookDropdowns(),
             'export-hub': () => {
                 this.updateNotebookDropdowns();
                 this.renderSelectionHub();
                 this.updateExportScopeCounts();
+                if (typeof ExportModule !== 'undefined' && ExportModule.renderExportOptions) {
+                    ExportModule.renderExportOptions(this.exportSelectedFormat || 'json');
+                }
+                this.applyReferenceHubHints();
+            },
+            'import-hub': () => {
+                this.updateNotebookDropdowns();
+                this.applyReferenceHubHints();
             },
             'settings': () => this.updateNotebookDropdowns()
         };
@@ -1651,6 +1670,9 @@ export const app = {
         
         const countEl = document.getElementById('selection-main-count');
         if (countEl) countEl.textContent = pool.length;
+        
+        this.updateBulkSelectionUI();
+        this.updateExportScopeCounts();
     },
 
     /**
@@ -1778,6 +1800,53 @@ export const app = {
         if (elSelected) elSelected.textContent = poolSelected;
         if (elFiltered) elFiltered.textContent = poolFiltered;
         if (elCustom) elCustom.textContent = poolFiltered; // In case both IDs are used interchangeably
+    },
+
+    /**
+     * Injects small hint texts below the main actions and references buttons.
+     */
+    applyReferenceHubHints() {
+        const smartBtn = document.querySelector('button[onclick*="renderSelectionHub"][onclick*="selection-modal"]');
+        const examBtn = document.querySelector('button[onclick*="bridgeToExam"]');
+        const deleteBtn = document.querySelector('button[onclick*="bulkDelete"]');
+        const previewBtn = document.getElementById('btn-preview-ref');
+        const confirmBtn = document.getElementById('btn-confirm-ref-import');
+
+        const wrapAndAddHint = (btn, hintKey) => {
+            if (!btn) return;
+            const existingHint = btn.parentNode.querySelector(`small[data-i18n="${hintKey}"]`);
+            if (existingHint) {
+                existingHint.textContent = i18n.t(hintKey);
+                return;
+            }
+            if (btn.parentNode && !btn.parentNode.classList.contains('btn-hint-wrapper')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'btn-hint-wrapper';
+                wrapper.style.display = 'flex';
+                wrapper.style.flexDirection = 'column';
+                wrapper.style.alignItems = 'stretch';
+                wrapper.style.gap = '4px';
+                
+                btn.parentNode.insertBefore(wrapper, btn);
+                wrapper.appendChild(btn);
+                
+                const hint = document.createElement('small');
+                hint.className = 'text-xs text-gray-500 block mt-1';
+                hint.style.fontSize = '0.75rem';
+                hint.style.opacity = '0.85';
+                hint.style.display = 'block';
+                hint.style.marginTop = '2px';
+                hint.setAttribute('data-i18n', hintKey);
+                hint.textContent = i18n.t(hintKey);
+                wrapper.appendChild(hint);
+            }
+        };
+
+        wrapAndAddHint(smartBtn, 'hint_smart_select');
+        wrapAndAddHint(examBtn, 'hint_test_simulation');
+        wrapAndAddHint(deleteBtn, 'hint_bulk_delete');
+        wrapAndAddHint(previewBtn, 'hint_preview_ref');
+        wrapAndAddHint(confirmBtn, 'hint_confirm_ref_import');
     },
 
     /**

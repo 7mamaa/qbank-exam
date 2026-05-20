@@ -18,7 +18,7 @@ export const state = {
     selectedIds: new Set(),
 
     /** @type {string} Visual theme of the application */
-    theme: localStorage.getItem('qbank_theme') || 'cream-earthy',
+    theme: localStorage.getItem('qbank_theme') || 'deep-orange',
 
     /** @type {string} UI direction (rtl/ltr) */
     direction: localStorage.getItem('qbank_direction') || 'rtl',

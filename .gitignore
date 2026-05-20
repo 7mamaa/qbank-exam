@@ -27,10 +27,14 @@ yarn-error.log*
 scratch/
 docs/dev-notes/scratch/
 qbank_export_*.json
+qbank_export_*.csv
+qbank_export_*.docx
 *.log
 temp/
 tree_output.txt
 *.zip
+.opencode/
+.agy-worktree/
 
 # IDEs
 .vscode/

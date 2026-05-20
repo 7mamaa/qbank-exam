@@ -14,7 +14,8 @@ export const UIComponents = {
         const selects = [
             'filter-notebook', 'filter-category', 'filter-tag', 'filter-type', 'filter-difficulty', 
             'export-sort-order', 'pdf-direction', 'pdf-layout',
-            'quiz-notebook', 'import-notebook', 'bulk-notebook-move', 'notebook-parent'
+            'quiz-notebook', 'import-notebook', 'bulk-notebook-move', 'notebook-parent',
+            'question-type', 'theme-selector'
         ];
         selects.forEach(id => {
             const selectEl = document.getElementById(id);
