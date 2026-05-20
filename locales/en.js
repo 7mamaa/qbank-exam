@@ -549,5 +549,11 @@ Important technical notes for standard JSON compliance:
     "msg_share_link_copied": "Auto-import link copied to clipboard! Ready to share 📋",
     "msg_auto_importing_ref": "Auto-importing medical reference... 📡",
     "msg_auto_import_success": "Reference {name} imported successfully! ✅🩺",
-    "msg_ref_already_exists": "This medical reference is already imported and secured! 📁✨"
+    "msg_ref_already_exists": "This medical reference is already imported and secured! 📁✨",
+    "btn_gen_direct_share_link": "Generate Direct Import Link 🔗",
+    "msg_enter_url_first": "Please enter the external file URL first! ⚠️",
+    "msg_direct_share_copied": "Smart import link for external file copied! 📋",
+    "msg_universal_import_confirm": "⚠️ Security Warning: You are about to import and merge {count} new questions into your question bank. Do you agree to update your database?",
+    "msg_import_canceled": "Import process canceled successfully, your current database is untouched 🛡️",
+    "msg_no_data_found": "No valid data found for import 📭"
 };

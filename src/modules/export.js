@@ -305,6 +305,20 @@ export const ExportModule = {
      * المعالجة الصارمة للاستيراد: تمنع تمرير المراجع (References) وتمنع تصادم الـ IDs
      */
     async processStrictImport(parsedData, successCallback) {
+        if (!parsedData || (Array.isArray(parsedData) && parsedData.length === 0)) {
+            UIComponents.showToast(i18n.t('msg_no_data_found'), 'warning');
+            return;
+        }
+
+        const questionCount = Array.isArray(parsedData) ? parsedData.length : 1;
+
+        const userConfirmed = confirm(i18n.t('msg_universal_import_confirm', { count: questionCount }));
+
+        if (!userConfirmed) {
+            UIComponents.showToast(i18n.t('msg_import_canceled'), 'info');
+            return;
+        }
+
         // 1. ضمان أن البيانات مصفوفة
         const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
         const cleanQuestions = [];
@@ -823,6 +837,37 @@ export const ExportModule = {
                 ExportModule.copyReferenceShareLink();
             };
         }
+
+        // Bind direct link share button
+        const copyDirectBtn = document.getElementById('btn-copy-direct-link');
+        if (copyDirectBtn) {
+            copyDirectBtn.onclick = (e) => {
+                e.preventDefault();
+                const inputField = document.getElementById('import-url');
+                const inputUrl = inputField ? inputField.value.trim() : "";
+                if (!inputUrl) {
+                    UIComponents.showToast(i18n.t('msg_enter_url_first'), 'warning');
+                    return;
+                }
+                const baseUrl = window.location.origin + window.location.pathname;
+                const fullDirectUrl = `${baseUrl}?direct_url=${encodeURIComponent(inputUrl)}`;
+                ExportModule.copyTextToClipboard(fullDirectUrl, 'msg_direct_share_copied');
+            };
+        }
+
+        // Auto-fill import URL from ?direct_url= query param
+        const urlParams = new URLSearchParams(window.location.search);
+        const directUrl = urlParams.get('direct_url');
+        if (directUrl) {
+            const decodedUrl = decodeURIComponent(directUrl);
+            const inputField = document.getElementById('import-url');
+            const importBtn = document.getElementById('btn-import-url');
+            if (inputField && importBtn) {
+                inputField.value = decodedUrl;
+                window.history.replaceState({}, document.title, window.location.pathname);
+                importBtn.click();
+            }
+        }
     },
 
     populateReferencesSelector() {
@@ -983,17 +1028,35 @@ export const ExportModule = {
             return;
         }
         const baseUrl = window.location.origin + window.location.pathname;
-        const fullShareUrl = `${baseUrl}?import_ref=${selector.value}`;
-        navigator.clipboard.writeText(fullShareUrl).then(() => {
-            if (window.app && typeof window.app.showToast === 'function') {
-                window.app.showToast(i18n.t('msg_share_link_copied'), 'success');
-            } else {
-                alert(i18n.t('msg_share_link_copied'));
-            }
-        }).catch(() => {
-            if (window.app && typeof window.app.showToast === 'function') {
-                window.app.showToast(i18n.t('msg_copy_fail'), 'error');
-            }
-        });
+        const fullUrl = `${baseUrl}?import_ref=${selector.value}`;
+        this.copyTextToClipboard(fullUrl, 'msg_share_link_copied');
+    },
+
+    copyTextToClipboard(text, successMessageKey) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(() => UIComponents.showToast(i18n.t(successMessageKey), 'success'))
+                .catch(() => this.fallbackCopyEngine(text, successMessageKey));
+        } else {
+            this.fallbackCopyEngine(text, successMessageKey);
+        }
+    },
+
+    fallbackCopyEngine(text, successMessageKey) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            if (document.execCommand('copy')) {
+                UIComponents.showToast(i18n.t(successMessageKey), 'success');
+            } else { throw new Error(); }
+        } catch (e) {
+            console.error("Copy failed", e);
+        }
+        document.body.removeChild(textArea);
     }
 };

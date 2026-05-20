@@ -607,8 +607,11 @@
                                 </label>
                                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                                     <input type="url" id="import-url" class="form-control" style="flex: 1; min-width: 200px; height: 48px; background: var(--card-bg);" placeholder="https://example.com/questions.json">
-                                    <button class="btn" onclick="app.importFromUrl(event)" style="flex: 1; min-width: 140px; height: 48px; padding: 0 25px; background: var(--primary); color: white; border: none; font-weight: 600; box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);">
+                                    <button class="btn" id="btn-import-url" onclick="app.importFromUrl(event)" style="flex: 1; min-width: 140px; height: 48px; padding: 0 25px; background: var(--primary); color: white; border: none; font-weight: 600; box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);">
                                         <span data-i18n="import_fetch">جلب البيانات 📡</span>
+                                    </button>
+                                    <button class="btn" id="btn-copy-direct-link" style="flex: 1; min-width: 160px; height: 48px; padding: 0 20px; background: linear-gradient(135deg,#f4a261,#e76f51); color: white; border: none; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 10px rgba(231, 111, 81, 0.2); cursor: pointer; gap: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                                        <span data-i18n="btn_gen_direct_share_link">صناعة رابط استيراد مباشر 🔗</span>
                                     </button>
                                 </div>
                                 <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);" data-i18n="import_url_hint">يدعم روابط JSON المباشرة (مثل Google Drive, Dropbox, Catbox, GitHub).</div>
