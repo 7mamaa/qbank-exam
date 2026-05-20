@@ -139,6 +139,51 @@ export const app = {
             }
             this.applyReferenceHubHints();
 
+            // Auto-import from share link (?import_ref=...)
+            const refId = urlParams.get('import_ref');
+            if (refId) {
+                const alreadyImported = this.state.questions.some(q => q.fromReferenceId === refId) ||
+                                        localStorage.getItem(`imported_ref_${refId}`) === "true";
+
+                if (alreadyImported) {
+                    console.log(`[Import Safeguard] Reference ${refId} is already injected. Aborting.`);
+                    this.showToast(i18n.t('msg_ref_already_exists'), 'info');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    this.showLoading(i18n.t('msg_auto_importing_ref'));
+                    setTimeout(async () => {
+                        try {
+                            const response = await fetch('docs/dev-notes/refrence/references-manifest.json');
+                            if (!response.ok) throw new Error("Manifest load failed");
+                            const manifest = await response.json();
+
+                            const targetRef = manifest.find(r => r.id === refId);
+                            if (targetRef) {
+                                const refRes = await fetch(targetRef.path);
+                                if (!refRes.ok) throw new Error("Reference file load failed");
+                                const refData = await refRes.json();
+
+                                const updatedData = (Array.isArray(refData) ? refData : [refData]).map(q => {
+                                    q.fromReferenceId = refId;
+                                    return q;
+                                });
+
+                                await ExportModule.processStrictImport(updatedData, async () => {
+                                    localStorage.setItem(`imported_ref_${refId}`, "true");
+                                    await this.syncData();
+                                    this.showToast(i18n.t('msg_auto_import_success', { name: targetRef.name }), 'success');
+                                    window.history.replaceState({}, document.title, window.location.pathname);
+                                });
+                            }
+                        } catch (e) {
+                            this.handleError(e, "Auto Import Error");
+                        } finally {
+                            this.hideLoading();
+                        }
+                    }, 800);
+                }
+            }
+
         } catch (e) {
             this.handleError(e, "App Initialization failed");
         }

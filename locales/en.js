@@ -546,5 +546,8 @@ Important technical notes for standard JSON compliance:
     "app_version_badge": "v16.6.0 pro",
     "app_version_label": "Stable Version",
     "btn_copy_share_link": "Copy Direct Import Link 🔗",
-    "msg_share_link_copied": "Auto-import link copied to clipboard! Ready to share 📋"
+    "msg_share_link_copied": "Auto-import link copied to clipboard! Ready to share 📋",
+    "msg_auto_importing_ref": "Auto-importing medical reference... 📡",
+    "msg_auto_import_success": "Reference {name} imported successfully! ✅🩺",
+    "msg_ref_already_exists": "This medical reference is already imported and secured! 📁✨"
 };

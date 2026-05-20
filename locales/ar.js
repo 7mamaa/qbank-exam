@@ -546,5 +546,8 @@ export const ar = {
     "app_version_badge": "v16.6.0 pro",
     "app_version_label": "الإصدار المستقر",
     "btn_copy_share_link": "نسخ رابط الاستيراد السريع 🔗",
-    "msg_share_link_copied": "تم نسخ رابط المشاركة التلقائي بنجاح! جاهز للإرسال لزملائك 📋"
+    "msg_share_link_copied": "تم نسخ رابط المشاركة التلقائي بنجاح! جاهز للإرسال لزملائك 📋",
+    "msg_auto_importing_ref": "جاري استيراد المرجع الطبي تلقائياً... 📡",
+    "msg_auto_import_success": "تم استيراد المرجع {name} بنجاح! ✅🩺",
+    "msg_ref_already_exists": "هذا المرجع الطبي مستورد ومؤمّن لديك بالفعل مسبقاً! 📁✨"
 };
