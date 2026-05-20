@@ -1033,9 +1033,18 @@ export const ExportModule = {
     },
 
     copyTextToClipboard(text, successMessageKey) {
+        const showSuccess = () => {
+            if (typeof UIComponents !== 'undefined') {
+                UIComponents.showToast(i18n.t(successMessageKey), 'success');
+            } else if (typeof app !== 'undefined' && app.showToast) {
+                app.showToast(i18n.t(successMessageKey), 'success');
+            } else {
+                console.log(i18n.t(successMessageKey));
+            }
+        };
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text)
-                .then(() => UIComponents.showToast(i18n.t(successMessageKey), 'success'))
+                .then(() => showSuccess())
                 .catch(() => this.fallbackCopyEngine(text, successMessageKey));
         } else {
             this.fallbackCopyEngine(text, successMessageKey);
@@ -1052,7 +1061,16 @@ export const ExportModule = {
         textArea.select();
         try {
             if (document.execCommand('copy')) {
-                UIComponents.showToast(i18n.t(successMessageKey), 'success');
+                const showSuccess = () => {
+                    if (typeof UIComponents !== 'undefined') {
+                        UIComponents.showToast(i18n.t(successMessageKey), 'success');
+                    } else if (typeof app !== 'undefined' && app.showToast) {
+                        app.showToast(i18n.t(successMessageKey), 'success');
+                    } else {
+                        console.log(i18n.t(successMessageKey));
+                    }
+                };
+                showSuccess();
             } else { throw new Error(); }
         } catch (e) {
             console.error("Copy failed", e);
