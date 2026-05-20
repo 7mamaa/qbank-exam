@@ -544,5 +544,7 @@ Important technical notes for standard JSON compliance:
     "theme_orange_dark": "Orange Dark 🍊",
     "theme_cream_earthy": "Cream Earthy ☕",
     "app_version_badge": "v16.6.0 pro",
-    "app_version_label": "Stable Version"
+    "app_version_label": "Stable Version",
+    "btn_copy_share_link": "Copy Direct Import Link 🔗",
+    "msg_share_link_copied": "Auto-import link copied to clipboard! Ready to share 📋"
 };

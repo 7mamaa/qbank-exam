@@ -814,6 +814,15 @@ export const ExportModule = {
                 ExportModule.executeReferenceImport();
             };
         }
+
+        // Bind share link button
+        const shareBtn = document.getElementById('btn-copy-ref-link');
+        if (shareBtn) {
+            shareBtn.onclick = (e) => {
+                e.preventDefault();
+                ExportModule.copyReferenceShareLink();
+            };
+        }
     },
 
     populateReferencesSelector() {
@@ -965,5 +974,26 @@ export const ExportModule = {
             alert(i18n.t('err_import_failed', { message: err.message }));
             if (confirmBtn) confirmBtn.disabled = false;
         }
+    },
+
+    copyReferenceShareLink() {
+        const selector = document.getElementById('reference-selector');
+        if (!selector || !selector.value) {
+            alert(i18n.t('select_ref_first'));
+            return;
+        }
+        const baseUrl = window.location.origin + window.location.pathname;
+        const fullShareUrl = `${baseUrl}?import_ref=${selector.value}`;
+        navigator.clipboard.writeText(fullShareUrl).then(() => {
+            if (window.app && typeof window.app.showToast === 'function') {
+                window.app.showToast(i18n.t('msg_share_link_copied'), 'success');
+            } else {
+                alert(i18n.t('msg_share_link_copied'));
+            }
+        }).catch(() => {
+            if (window.app && typeof window.app.showToast === 'function') {
+                window.app.showToast(i18n.t('msg_copy_fail'), 'error');
+            }
+        });
     }
 };

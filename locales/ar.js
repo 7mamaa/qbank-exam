@@ -544,5 +544,7 @@ export const ar = {
     "theme_orange_dark": "البرتقالي الليلي 🍊",
     "theme_cream_earthy": "الأرضي الدافئ ☕",
     "app_version_badge": "v16.6.0 pro",
-    "app_version_label": "الإصدار المستقر"
+    "app_version_label": "الإصدار المستقر",
+    "btn_copy_share_link": "نسخ رابط الاستيراد السريع 🔗",
+    "msg_share_link_copied": "تم نسخ رابط المشاركة التلقائي بنجاح! جاهز للإرسال لزملائك 📋"
 };
