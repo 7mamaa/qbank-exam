@@ -3,6 +3,27 @@
  * @description Web Worker for high-performance duplicate detection using MinHash + LSH.
  */
 
+/**
+ * دالة التطهير العميق لقطع أية محاولات لتسميم كائنات الجافا سكربت أو حقن أكواد خبيثة
+ */
+function deepSanitizeAndClean(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    // كسر الحلقات التكرارية الملوثة وتحييد البروتوتيب
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+            return undefined; // حذف ثغرات الحقن فوراً
+        }
+        if (typeof value === 'string') {
+            // كبح حجم النص للسؤال الواحد (حد أقصى 5000 حرف) لمنع إنهاك الـ CPU
+            let safeStr = value.length > 5000 ? value.substring(0, 5000) + "... [Truncated for Security]" : value;
+            // تنظيف وسوم الـ HTML لحماية المتصفح من الـ XSS
+            return safeStr.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+        return value;
+    }));
+}
+
 let questionsPool = [];
 let exactMatchMap = new Map();
 let trigramMap = new Map(); // id -> Set of trigrams
@@ -21,16 +42,50 @@ for (let i = 0; i < HASH_COUNT; i++) {
     hashSeedsB[i] = Math.floor(Math.random() * PRIME);
 }
 
-globalThis.onmessage = async function(e) {
-    const { type, payload, threshold } = e.data;
+let workerStartTime = 0;
+const maxAllowedDuration = 3000; // سقف زمني صارم 3 ثوانٍ كحد أقصى للمعالجة بالخلفية
 
-    if (type === 'RESET') {
-        resetState();
-    } else if (type === 'CHUNK') {
-        processBatch(payload);
-    } else if (type === 'FINISH') {
-        const groups = finalize(threshold || 0.9);
-        globalThis.postMessage({ type: 'COMPLETE', groups });
+globalThis.onmessage = async function(e) {
+    try {
+        if (!e || !e.data) throw new Error("حمولة البيانات فارغة تماماً.");
+        const { type, payload, threshold } = e.data;
+
+        if (type === 'RESET') {
+            resetState();
+            workerStartTime = performance.now();
+        } else if (type === 'CHUNK') {
+            if (!workerStartTime) workerStartTime = performance.now();
+
+            if (performance.now() - workerStartTime > maxAllowedDuration) {
+                throw new Error("TIMEOUT_LIMIT_EXCEEDED: تم إلغاء معالجة الملف لحماية معالج الجهاز نتيجة تعقيد أو ضخامة النصوص المفرطة عمداً.");
+            }
+
+            if (!payload || !Array.isArray(payload)) {
+                throw new Error("البيانات الممررة للـ Worker ليست مصفوفة صالحة.");
+            }
+
+            const sanitizedPayload = payload.map(q => {
+                if (performance.now() - workerStartTime > maxAllowedDuration) {
+                    throw new Error("TIMEOUT_LIMIT_EXCEEDED: تم إلغاء معالجة الملف لحماية معالج الجهاز نتيجة تعقيد أو ضخامة النصوص المفرطة عمداً.");
+                }
+                return deepSanitizeAndClean(q);
+            });
+
+            processBatch(sanitizedPayload);
+        } else if (type === 'FINISH') {
+            if (!workerStartTime) workerStartTime = performance.now();
+
+            if (performance.now() - workerStartTime > maxAllowedDuration) {
+                throw new Error("TIMEOUT_LIMIT_EXCEEDED: تم إلغاء معالجة الملف لحماية معالج الجهاز نتيجة تعقيد أو ضخامة النصوص المفرطة عمداً.");
+            }
+
+            const groups = finalize(threshold || 0.9);
+            globalThis.postMessage({ type: 'COMPLETE', groups });
+        }
+    } catch (error) {
+        console.error("[Worker Core Blocked]:", error.message);
+        globalThis.postMessage({ action: 'error', type: 'ERROR', message: error.message });
+        throw error;
     }
 };
 
@@ -161,6 +216,9 @@ function finalize(threshold) {
     let processedBuckets = 0;
     const totalBuckets = bucketMap.size;
     for (const [, ids] of bucketMap) {
+        if (workerStartTime && (performance.now() - workerStartTime > maxAllowedDuration)) {
+            throw new Error("TIMEOUT_LIMIT_EXCEEDED: تم إلغاء معالجة الملف لحماية معالج الجهاز نتيجة تعقيد أو ضخامة النصوص المفرطة عمداً.");
+        }
         if (ids.length > 1 && ids.length < 100) {
             for (let i = 0; i < ids.length; i++) {
                 for (let j = i + 1; j < ids.length; j++) {

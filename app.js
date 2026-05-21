@@ -239,16 +239,24 @@ export const app = {
             
             // Pre-calculate unique categories and tags for Selection Hub performance
             this.state.availableCategories = [...new Set(loadedQuestions.map(q => q.category).filter(Boolean))].sort((a, b) => {
-                const numA = Number(a);
-                const numB = Number(b);
-                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                return String(a).localeCompare(String(b), undefined, { numeric: true });
+                const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
+                const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
+                const numA = Number(valA);
+                const numB = Number(valB);
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return numA - numB;
+                }
+                return String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' });
             });
             this.state.availableTags = [...new Set(loadedQuestions.flatMap(q => q.tags || []).filter(Boolean))].sort((a, b) => {
-                const numA = Number(a);
-                const numB = Number(b);
-                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                return String(a).localeCompare(String(b), undefined, { numeric: true });
+                const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
+                const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
+                const numA = Number(valA);
+                const numB = Number(valB);
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return numA - numB;
+                }
+                return String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' });
             });
 
             // Always reset filteredQuestions to the full loaded set so undo/redo never
@@ -1224,7 +1232,48 @@ export const app = {
     },
     updateNotebookDropdowns() { NotebookModule.updateNotebookDropdowns((id) => this.syncCustomDropdown(id)); },
 
-    startQuiz() { QuizModule.startQuiz(() => this.renderQuizQuestion()); },
+    startQuiz() {
+        const nbId = document.getElementById('quiz-notebook')?.value;
+        const limit = parseInt(document.getElementById('quiz-count')?.value) || 20;
+
+        let pool = this.state.questions;
+        if (nbId) {
+            if (nbId === 'orphaned') {
+                pool = pool.filter(q => !this.state.notebooks.some(n => String(n.id) === String(q.notebookId)));
+            } else {
+                const descendantIds = NotebookModule.getAllDescendantIds(nbId, this.state.notebooks);
+                const allowedIds = [nbId, ...descendantIds].map(String);
+                pool = pool.filter(q => allowedIds.includes(String(q.notebookId)));
+            }
+        }
+
+        if (pool.length === 0) return alert(i18n.t('quiz_err_empty'));
+
+        // Shuffle and limit
+        pool = [...pool].sort(() => Math.random() - 0.5).slice(0, limit);
+
+        const timeLimit = parseInt(document.getElementById('quiz-time')?.value) || 15;
+        
+        this.state.quizState = {
+            pool: pool,
+            currentIdx: 0,
+            answers: {},
+            startTime: Date.now(),
+            endTime: Date.now() + (timeLimit * 60 * 1000),
+            timerInterval: null,
+            isFinished: false
+        };
+
+        const totalEl = document.getElementById('quiz-total');
+        if (totalEl) totalEl.textContent = pool.length;
+        
+        QuizModule.startTimer();
+        this.renderQuizQuestion();
+        
+        // Switch view
+        document.getElementById('quiz-setup').style.display = 'none';
+        document.getElementById('quiz-active').style.display = 'block';
+    },
     updateQuizTimer() { QuizModule.updateQuizTimer(); },
     renderQuizQuestion() { QuizModule.renderQuizQuestion(); },
     saveQuizAnswer(qId, val) { QuizModule.saveQuizAnswer(qId, val); },
@@ -1446,7 +1495,7 @@ export const app = {
                 'edit_notebook': async (d) => { await db.put('notebooks', d); UIComponents.showToast(i18n.t('msg_nb_edit_success'), 'success'); },
                 'delete_notebook': async (id) => {
                     await db.delete('notebooks', id);
-                    const associated = this.state.questions.filter(q => q.notebookId === id);
+                    const associated = this.state.questions.filter(q => String(q.notebookId) === String(id));
                     for (let q of associated) await db.delete('questions', q.id);
                     UIComponents.showToast(i18n.t('msg_nb_delete_success', { count: associated.length }), 'success');
                 },
@@ -1685,10 +1734,14 @@ export const app = {
                 if (q.tags) q.tags.forEach(t => tagsInPool.add(t));
             });
             tags = Array.from(tagsInPool).sort((a, b) => {
-                const numA = Number(a);
-                const numB = Number(b);
-                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                return String(a).localeCompare(String(b), undefined, { numeric: true });
+                const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
+                const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
+                const numA = Number(valA);
+                const numB = Number(valB);
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return numA - numB;
+                }
+                return String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' });
             });
         }
 
@@ -1985,10 +2038,13 @@ export const app = {
      */
     async copyRawStructure() {
         this.playSound('click');
+        if (!this.state.questions || this.state.questions.length === 0) {
+            UIComponents.showToast(i18n.t('msg_bank_empty_copy'), 'warning');
+            return;
+        }
         try {
             const data = JSON.stringify(this.state.questions, null, 2);
-            await navigator.clipboard.writeText(data);
-            this.showToast('✅ ' + i18n.t('msg_copy_success'), 'success');
+            ExportModule.copyTextToClipboard(data, 'msg_raw_bank_copied');
         } catch (e) {
             this.handleError(e, 'Clipboard Copy Failed');
         }
@@ -2035,57 +2091,81 @@ export const app = {
 
     /**
      * Copies a clean, empty schema template for AI prompting.
-     * Includes all supported question types (MCQ, Boolean, Written, Matching).
+     * Includes all supported question types (MCQ, Boolean, Written, Matching)
+     * with mandatory v16.6.0 fields: UUIDv4 id, notebookId, qNumber.
      */
     async copyRawJson() {
         this.playSound('click');
         try {
             const template = [
                 {
-                    "id": "",
-                    "question": "",
-                    "options": ["", "", "", ""],
-                    "answer": "",
+                    "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
+                    "notebookId": "NOTEBOOK_UUID_HERE",
+                    "qNumber": 1,
+                    "question": "نص السؤال هنا",
+                    "options": ["الخيار أ", "الخيار ب", "الخيار ج", "الخيار د"],
+                    "answer": "الخيار أ",
                     "type": "mcq",
                     "difficulty": "medium",
-                    "category": "",
-                    "tags": []
+                    "category": "التصنيف الرئيسي",
+                    "tags": ["وسم1", "وسم2"],
+                    "explain": "شرح تعليمي للإجابة الصحيحة",
+                    "pairs": [],
+                    "keywords": [],
+                    "image": null
                 },
                 {
-                    "id": "",
-                    "question": "",
-                    "options": ["", ""],
-                    "answer": "",
+                    "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
+                    "notebookId": "NOTEBOOK_UUID_HERE",
+                    "qNumber": 2,
+                    "question": "هل العبارة التالية صحيحة أم خاطئة؟",
+                    "options": [],
+                    "answer": true,
                     "type": "boolean",
                     "difficulty": "easy",
-                    "category": "",
-                    "tags": []
+                    "category": "التصنيف الرئيسي",
+                    "tags": [],
+                    "explain": "شرح لماذا الإجابة صح أو خطأ",
+                    "pairs": [],
+                    "keywords": [],
+                    "image": null
                 },
                 {
-                    "id": "",
-                    "question": "",
+                    "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
+                    "notebookId": "NOTEBOOK_UUID_HERE",
+                    "qNumber": 3,
+                    "question": "اكتب الإجابة النموذجية الكاملة",
                     "options": [],
-                    "answer": "",
+                    "answer": "الإجابة النموذجية كجملة طبية كاملة",
                     "type": "written",
                     "difficulty": "hard",
-                    "category": "",
-                    "tags": []
+                    "category": "التصنيف الرئيسي",
+                    "tags": [],
+                    "explain": "شرح تفصيلي للإجابة النموذجية",
+                    "pairs": [],
+                    "keywords": ["كلمة مفتاحية 1", "كلمة مفتاحية 2"],
+                    "image": null
                 },
                 {
-                    "id": "",
-                    "question": "",
-                    "options": ["", ""],
+                    "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
+                    "notebookId": "NOTEBOOK_UUID_HERE",
+                    "qNumber": 4,
+                    "question": "صل بين العمود الأيمن والعمود الأيسر",
+                    "options": [],
                     "answer": "",
                     "type": "match",
                     "difficulty": "medium",
-                    "category": "",
-                    "tags": []
+                    "category": "التصنيف الرئيسي",
+                    "tags": [],
+                    "explain": "شرح العلاقة بين الأزواج",
+                    "pairs": [{"left": "العنصر 1", "right": "النظير 1"}, {"left": "العنصر 2", "right": "النظير 2"}],
+                    "keywords": [],
+                    "image": null
                 }
             ];
             
             const data = JSON.stringify(template, null, 2);
-            await navigator.clipboard.writeText(data);
-            UIComponents.showToast('✅ ' + (i18n.t('msg_template_copied') || "Template Copied"), 'success');
+            ExportModule.copyTextToClipboard(data, 'msg_schema_template_copied');
         } catch (e) {
             this.handleError(e, 'Template Copy Failed');
         }
@@ -2228,11 +2308,11 @@ export const app = {
         const nbId = document.getElementById('print-notebook').value;
         const mode = document.getElementById('print-mode').value;
         const direction = document.getElementById('print-direction')?.value || 'rtl';
-        const notebook = this.state.notebooks.find(n => n.id === nbId);
+        const notebook = this.state.notebooks.find(n => String(n.id) === String(nbId));
         
         if (!notebook) return alert(i18n.t('err_select_notebook'));
 
-        const qList = this.state.questions.filter(q => q.notebookId === nbId);
+        const qList = this.state.questions.filter(q => String(q.notebookId) === String(nbId));
         if (qList.length === 0) return alert(i18n.t('err_notebook_empty'));
 
         this.showLoading();
@@ -2486,11 +2566,11 @@ export const app = {
             let quizPool = this.state.questions;
             if (nbId) {
                 if (nbId === 'orphaned') {
-                    quizPool = quizPool.filter(q => !this.state.notebooks.some(n => n.id === q.notebookId));
+                    quizPool = quizPool.filter(q => !this.state.notebooks.some(n => String(n.id) === String(q.notebookId)));
                 } else {
                     const descendantIds = NotebookModule.getAllDescendantIds(nbId, this.state.notebooks);
-                    const allowedIds = [nbId, ...descendantIds];
-                    quizPool = quizPool.filter(q => allowedIds.includes(q.notebookId));
+                    const allowedIds = [nbId, ...descendantIds].map(String);
+                    quizPool = quizPool.filter(q => allowedIds.includes(String(q.notebookId)));
                 }
             }
             pool = [...quizPool].sort(() => Math.random() - 0.5).slice(0, limit);

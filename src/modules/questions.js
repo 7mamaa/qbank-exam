@@ -159,10 +159,10 @@ export const QuestionModule = {
 
         // Logic for qNumber assignment
         const originalQ = idInput ? state.questions.find(x => x.id === idInput) : null;
-        const notebookChanged = originalQ && originalQ.notebookId !== qData.notebookId;
+        const notebookChanged = originalQ && String(originalQ.notebookId) !== String(qData.notebookId);
 
         if (!idInput || notebookChanged) {
-            const nbQs = state.questions.filter(q => q.notebookId === qData.notebookId);
+            const nbQs = state.questions.filter(q => String(q.notebookId) === String(qData.notebookId));
             qData.qNumber = nbQs.length + (idInput ? 0 : 1);
         } else {
             qData.qNumber = originalQ.qNumber;
@@ -329,16 +329,24 @@ export const QuestionModule = {
         if (!catSelect || !tagSelect) return;
 
         const categories = [...new Set(state.questions.map(q => q.category))].filter(Boolean).sort((a, b) => {
-            const numA = Number(a);
-            const numB = Number(b);
-            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-            return String(a).localeCompare(String(b), undefined, { numeric: true });
+            const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
+            const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
+            const numA = Number(valA);
+            const numB = Number(valB);
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            return String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' });
         });
         const tags = [...new Set(state.questions.flatMap(q => q.tags || []))].filter(Boolean).sort((a, b) => {
-            const numA = Number(a);
-            const numB = Number(b);
-            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-            return String(a).localeCompare(String(b), undefined, { numeric: true });
+            const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
+            const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
+            const numA = Number(valA);
+            const numB = Number(numB);
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            return String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' });
         });
 
         let catHtml = `<option value="">${i18n.t('all_categories')}</option>`;
@@ -493,9 +501,12 @@ export const QuestionModule = {
 
         let filtered = state.questions.filter(q => {
             if (filters.notebook === 'orphaned') {
-                if (state.notebooks.some(n => n.id === q.notebookId)) return false;
+                if (state.notebooks.some(n => String(n.id) === String(q.notebookId))) return false;
             } else if (filters.notebook) {
-                if (q.notebookId !== filters.notebook && !descendantIds.includes(q.notebookId)) return false;
+                const qNbId = String(q.notebookId);
+                const targetNbId = String(filters.notebook);
+                const mappedDescendantIds = (descendantIds || []).map(String);
+                if (qNbId !== targetNbId && !mappedDescendantIds.includes(qNbId)) return false;
             }
             
             if (filters.category === '__none__') {
@@ -519,7 +530,14 @@ export const QuestionModule = {
         filtered.sort((a, b) => {
             if (a.isPinned && !b.isPinned) return -1;
             if (!a.isPinned && b.isPinned) return 1;
-            return (a.qNumber || 0) - (b.qNumber || 0);
+            const valA = a.qNumber ?? a.id;
+            const valB = b.qNumber ?? b.id;
+            const numA = Number(valA);
+            const numB = Number(valB);
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            return String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' });
         });
 
         state.virtual.filteredQuestions = filtered;

@@ -6,6 +6,89 @@ import { i18n } from '../core/i18n.js?v=16.6.0';
 import { Helpers } from '../utils/helpers.js?v=16.6.0';
 import { Logger } from '../utils/logger.js?v=16.6.0';
 
+function validateIncomingPayload(payload, existingNotebookIds = []) {
+    const errors = [];
+    const seenIds = new Set();
+    const seenQNumbers = new Map(); // notebookId -> Set of qNumbers
+
+    if (!Array.isArray(payload)) {
+        throw new Error(i18n.t('err_import_not_array'));
+    }
+
+    for (let i = 0; i < payload.length; i++) {
+        const q = payload[i];
+        const ctx = `${i18n.t('err_at_question')} ${i + 1}: `;
+
+        // 1. فحص البنية الأساسية والهوية (Scenario 1)
+        if (!q.id || typeof q.id !== 'string' || q.id.trim() === '') {
+            errors.push(`${ctx}${i18n.t('err_invalid_id')}`);
+        } else {
+            if (seenIds.has(q.id)) {
+                errors.push(`${ctx}${i18n.t('err_id_collision')} [${q.id}]`);
+            }
+            seenIds.add(q.id);
+        }
+
+        if (!q.question || typeof q.question !== 'string' || q.question.trim() === '') {
+            errors.push(`${ctx}${i18n.t('err_empty_question')}`);
+        }
+
+        const validTypes = ['mcq', 'boolean', 'match', 'written'];
+        if (!q.type || !validTypes.includes(q.type)) {
+            errors.push(`${ctx}${i18n.t('err_unknown_type')} [${q.type || 'N/A'}]`);
+        }
+
+        // 2. فحص التناقض المنطقي بين الأنواع والخيارات (Scenario 2)
+        if (q.type === 'mcq') {
+            if (!Array.isArray(q.options) || q.options.length < 2) {
+                errors.push(`${ctx}${i18n.t('err_mcq_options_min')}`);
+            }
+        }
+        if (q.type === 'written' && q.options && q.options.length > 0) {
+            errors.push(`${ctx}${i18n.t('err_written_has_options')}`);
+        }
+        if (q.type === 'boolean') {
+            if (typeof q.answer !== 'boolean' && q.answer !== 'true' && q.answer !== 'false') {
+                errors.push(`${ctx}${i18n.t('err_boolean_answer_mismatch')}`);
+            }
+        }
+
+        // 3. حماية البيانات من فخ الدفاتر اليتيمة (Scenario 3)
+        if (!q.notebookId || typeof q.notebookId !== 'string') {
+            errors.push(`${ctx}${i18n.t('err_missing_notebook_id')}`);
+        } else if (existingNotebookIds.length > 0 && !existingNotebookIds.includes(q.notebookId)) {
+            errors.push(`${ctx}${i18n.t('err_orphan_notebook')} [${q.notebookId}]`);
+        }
+
+        // 4. فحص سلامة هيكل أسئلة التوصيل (Scenario 4)
+        if (q.type === 'match') {
+            if (!Array.isArray(q.pairs) && (!q.options || typeof q.options !== 'object')) {
+                errors.push(`${ctx}${i18n.t('err_malformed_match_structure')}`);
+            }
+        }
+
+        // 5. حماية تسلسل وترقيم الأسئلة الفئوية (Scenario 5)
+        if (typeof q.qNumber !== 'number' || isNaN(q.qNumber)) {
+            errors.push(`${ctx}${i18n.t('err_invalid_qnumber')}`);
+        } else if (q.notebookId) {
+            if (!seenQNumbers.has(q.notebookId)) {
+                seenQNumbers.set(q.notebookId, new Set());
+            }
+            const currentNotebookSet = seenQNumbers.get(q.notebookId);
+            if (currentNotebookSet.has(q.qNumber)) {
+                errors.push(`${ctx}${i18n.t('err_qnumber_collision')} (${q.qNumber})`);
+            }
+            currentNotebookSet.add(q.qNumber);
+        }
+    }
+
+    if (errors.length > 0) {
+        // دمج كافة الأخطاء المكتشفة في استجابة موحدة لمنع الكتابة الجزئية
+        throw new Error(errors.join('\n'));
+    }
+    return true;
+}
+
 export const ExportModule = {
     updateExportScopeCounts() {
         const pool = QueryEngine.getQueryPool();
@@ -235,6 +318,18 @@ export const ExportModule = {
     async importData(jsonText, syncCallback) {
         let importedCount = 0;
         try {
+            let parsed;
+            try {
+                parsed = JSON.parse(jsonText);
+                const existingNotebookIds = globalThis.app?.state?.notebooks?.map(n => n.id) || [];
+                validateIncomingPayload(parsed, existingNotebookIds);
+            } catch (validationError) {
+                console.error("[Security Gate Abort]:", validationError.message);
+                alert("❌ " + validationError.message);
+                if (globalThis.app?.hideLoading) globalThis.app.hideLoading();
+                return;
+            }
+
             const { data, manualTargetNb, autoDistribute } = this.validateImportPayload(jsonText);
             const questionsToSave = [];
             const qNumberCache = {}; 
@@ -310,6 +405,16 @@ export const ExportModule = {
      * المعالجة الصارمة للاستيراد: تمنع تمرير المراجع (References) وتمنع تصادم الـ IDs
      */
     async processStrictImport(parsedData, successCallback) {
+        try {
+            const existingNotebookIds = globalThis.app?.state?.notebooks?.map(n => n.id) || [];
+            validateIncomingPayload(parsedData, existingNotebookIds);
+        } catch (validationError) {
+            console.error("[Security Gate Abort]:", validationError.message);
+            alert("❌ " + validationError.message);
+            if (globalThis.app?.hideLoading) globalThis.app.hideLoading();
+            return;
+        }
+
         if (!parsedData || (Array.isArray(parsedData) && parsedData.length === 0)) {
             UIComponents.showToast(i18n.t('msg_no_data_found'), 'warning');
             return;

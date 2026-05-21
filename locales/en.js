@@ -375,7 +375,7 @@ export const en = {
     "err_notebook_exists": "⚠️ Another notebook exists with name {name}.",
     "notebook_delete_confirm": "Are you sure you want to delete this notebook? All associated questions will be permanently deleted.",
     "no_desc": "No description.",
-    "ai_prompt_template": `You are a professional educational curriculum and question bank designer for the global QBank platform. I want you to generate a professional question matrix in JSON format about the topic "{topic}".
+    "ai_prompt_template": `You are a professional curriculum and question bank designer. Output a clean, direct JSON array inside a code block [ ... ] containing the requested questions about the topic "{topic}".
 
 Technical Specifications Required:
 - Total number of questions: {totalCount}.
@@ -384,19 +384,22 @@ Technical Specifications Required:
 - Educational level: {level}.
 - Difficulty level: {difficulty}.
 
-Object Structure for each question (must be strictly followed to ensure system integration):
-1. "type": exclusively one of the following values (mcq | boolean | match | written).
-2. "question": text of the question with high scientific accuracy.
-3. "difficulty": difficulty level (easy | medium | hard).
-4. "tags": array of strings containing sub-categories.
-5. "explain": detailed and clear educational explanation of the correct answer.
-6. "category": main classification of the topic (e.g., "{topic}").
-7. "notebookName": name of the notebook this question will automatically belong to (e.g., "{topic}").
+The following steel-grade structure must be strictly followed for every question:
+1. "id": unique UUIDv4 identifier for each question.
+2. "type": exclusively one of the following values (mcq | boolean | match | written).
+3. "question": text of the question with high scientific accuracy.
+4. "difficulty": difficulty level (easy | medium | hard).
+5. "tags": array of strings containing sub-categories.
+6. "explain": detailed and clear educational explanation of the correct answer.
+7. "category": main classification of the topic (e.g., "{topic}").
+8. "notebookId": unique identifier of the parent notebook this question belongs to.
+9. "qNumber": explicit sequential numeric numbering starting from 1 per notebook.
+10. "options": array of options for MCQ questions only, empty array [] for all other types.
 
 Database rules for each type:
 - (mcq): requires "options" (4 text options) and "answer" (text exactly matching the correct option).
-- (boolean): requires "answer" (boolean value true or false).
-- (written): requires "answer" (model answer as a full, grammatically correct medical sentence, not just keywords. The answer must be "Structured" and direct for easy parsing by simple evaluation engines).
+- (boolean): requires "answer" as a pure boolean value true or false — NO quotation marks around the value.
+- (written): requires "answer" (full, grammatically correct model answer sentence).
 - (match): requires "pairs" (array of objects containing "left" and "right").
 
 Important technical notes for standard JSON compliance:
@@ -559,5 +562,22 @@ Important technical notes for standard JSON compliance:
     "msg_transfer_simulator": "🚀 Successfully transferred {count} questions to the exam simulation!",
     "msg_theme_applied": "🎨 Custom theme applied successfully!",
     "msg_theme_reset": "🔄 Theme reset to standard default.",
-    "theme_custom": "Custom Theme 🎨"
+    "theme_custom": "Custom Theme 🎨",
+    "err_import_not_array": "Invalid import format! Payload must be a pure JSON array [ ... ].",
+    "err_at_question": "At question number",
+    "err_invalid_id": "Question ID is missing or has a corrupted non-string UUIDv4 value.",
+    "err_id_collision": "Detected duplicate ID collision inside the file, which threatens to override active questions:",
+    "err_empty_question": "Question core text content is empty or missing and cannot be rendered.",
+    "err_unknown_type": "Question type is not supported within the current architecture:",
+    "err_mcq_options_min": "Multiple choice questions (mcq) must contain at least 2 distinct options.",
+    "err_written_has_options": "Written/essay questions must not contain an interactive options array.",
+    "err_boolean_answer_mismatch": "True/False questions must have a strict boolean answer type (true/false).",
+    "err_missing_notebook_id": "The notebookId foreign key is completely missing from this question object.",
+    "err_orphan_notebook": "Aborted: The associated notebook ID does not exist in your database. Please create it first:",
+    "err_malformed_match_structure": "Matchmaking question structure is corrupted and lacks a valid pairs array.",
+    "err_invalid_qnumber": "The sequential tracking sequence (qNumber) is missing or is not a valid integer.",
+    "err_qnumber_collision": "Detected a sequence tracking collision (qNumber) within the same notebook domain:",
+    "msg_raw_bank_copied": "✅ Full question bank copied to clipboard as raw JSON! Ready to paste into any editor or AI tool.",
+    "msg_bank_empty_copy": "⚠️ Question bank is currently empty! Add questions first and try again.",
+    "msg_schema_template_copied": "✅ Schema template (v16.6.0) copied successfully! Paste it into ChatGPT or any AI generator for compatible question output."
 };
