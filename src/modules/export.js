@@ -1,4 +1,4 @@
-/* global pako, React, ReactPDF */
+/* global pako, React, ReactPDF, UIComponents, app */
 import { state } from '../core/state.js?v=16.6.0';
 import { db } from '../core/db.js?v=16.6.0';
 import { QueryEngine } from '../core/query.js?v=16.6.0';
@@ -209,28 +209,33 @@ export const ExportModule = {
         link.download = filename;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
         URL.revokeObjectURL(url);
+    },
+
+    validateImportPayload(jsonText) {
+        let data;
+        try {
+            data = JSON.parse(jsonText);
+        } catch (e) {
+            Logger.error('ExportModule', 'Aborted: JSON data-payload is malformed or corrupted', e);
+            throw new Error(i18n.t('err_invalid_format'), { cause: e });
+        }
+
+        if (!Array.isArray(data)) throw new Error(i18n.t('err_must_be_array'));
+
+        const manualTargetNb = document.getElementById('import-notebook').value;
+        const autoDistribute = document.getElementById('import-auto-distribute')?.checked;
+
+        if (!manualTargetNb && !autoDistribute) throw new Error(i18n.t('err_import_no_target'));
+
+        return { data, manualTargetNb, autoDistribute };
     },
 
     async importData(jsonText, syncCallback) {
         let importedCount = 0;
         try {
-            let data;
-            try {
-                data = JSON.parse(jsonText);
-            } catch (e) {
-                Logger.error('ExportModule', 'Aborted: JSON data-payload is malformed or corrupted', e);
-                throw new Error(i18n.t('err_invalid_format'), { cause: e });
-            }
-
-            if (!Array.isArray(data)) throw new Error(i18n.t('err_must_be_array'));
-
-            const manualTargetNb = document.getElementById('import-notebook').value;
-            const autoDistribute = document.getElementById('import-auto-distribute')?.checked;
-
-            if (!manualTargetNb && !autoDistribute) throw new Error(i18n.t('err_import_no_target'));
-
+            const { data, manualTargetNb, autoDistribute } = this.validateImportPayload(jsonText);
             const questionsToSave = [];
             const qNumberCache = {}; 
 
@@ -365,7 +370,7 @@ export const ExportModule = {
             return alert(i18n.t('export_err_word_lib'));
         }
 
-        const { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, Table, TableRow, TableCell, WidthType } = window.docx;
+        const { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, Table, TableRow, TableCell, WidthType } = globalThis.docx;
 
         const layout = document.getElementById('word-layout')?.value || 'questions-only';
         const customHeader = document.getElementById('word-custom-header')?.value || i18n.t('default_word_header');
@@ -537,7 +542,7 @@ export const ExportModule = {
         });
 
         const blob = await Packer.toBlob(doc);
-        window.saveAs(blob, `qbank_export_${Date.now()}.docx`);
+        globalThis.saveAs(blob, `qbank_export_${Date.now()}.docx`);
         if (showToastCallback) showToastCallback(i18n.t('export_word_success'));
     },
 
@@ -651,7 +656,7 @@ export const ExportModule = {
                     
                     // Final yield before print to ensure layout is ready
                     setTimeout(() => {
-                        window.print();
+                        globalThis.print();
                     }, 300);
                 });
             }
@@ -662,7 +667,10 @@ export const ExportModule = {
 
     getQuestionTypeLabel(type) {
         const key = `type_${type}`;
-        return i18n.t(key);
+        const label = i18n.t(key);
+        const selfHealed = String(key).split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+        if (label === selfHealed) return type;
+        return label;
     },
 
     /**
@@ -726,7 +734,7 @@ export const ExportModule = {
             console.log(`🚀 Export Bridge: Sending ${bridgeData.length} items to simulation.`);
             localStorage.setItem(storageKey, JSON.stringify(bridgeData));
             const url = `examwebsite/index.html?session_id=${sessionId}`;
-            window.open(url, '_blank');
+            globalThis.open(url, '_blank');
             if (showToastCallback) showToastCallback(bridgeData.length);
         } catch (e) {
             if (handleErrorCallback) handleErrorCallback(e, "Export Bridge Failed");
@@ -849,14 +857,62 @@ export const ExportModule = {
                     UIComponents.showToast(i18n.t('msg_enter_url_first'), 'warning');
                     return;
                 }
-                const baseUrl = window.location.origin + window.location.pathname;
+                const baseUrl = globalThis.location.origin + globalThis.location.pathname;
                 const fullDirectUrl = `${baseUrl}?direct_url=${encodeURIComponent(inputUrl)}`;
                 ExportModule.copyTextToClipboard(fullDirectUrl, 'msg_direct_share_copied');
             };
         }
 
+        // Bind direct link import button click to handle CORS and protect against HTML injection
+        const importBtn = document.getElementById('btn-import-url');
+        if (importBtn) {
+            importBtn.onclick = async (e) => {
+                e.preventDefault();
+                const urlInput = document.getElementById('import-url');
+                let targetUrl = urlInput ? urlInput.value.trim() : '';
+                if (!targetUrl) return alert(i18n.t('err_invalid_url'));
+
+                const originalText = importBtn.innerHTML;
+                try {
+                    importBtn.innerHTML = `${i18n.t('loading') || 'Loading...'} ⏳`;
+                    importBtn.disabled = true;
+
+                    // إذا كان الرابط من جوجل درايف أو يحتوي على جوجل، نستخدم البروكسي الآمن لتخطي حظر CORS مجاناً
+                    if (targetUrl.includes('drive.google.com') || targetUrl.includes('google.com')) {
+                        targetUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                    }
+
+                    const response = await fetch(targetUrl);
+                    if (!response.ok) throw new Error("Fetch failed");
+
+                    const responseText = await response.text();
+                    // خط دفاع فوري لمنع قراءة صفحات الـ HTML كـ JSON
+                    if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<')) {
+                        UIComponents.showToast("الرابط الممرر يؤدي لصفحة ويب وليس لملف أسئلة JSON صالح! ⚠️", 'warning');
+                        return;
+                    }
+
+                    const refData = JSON.parse(responseText);
+                    if (typeof app !== 'undefined' && typeof app.processImportedJSON === 'function') {
+                        await app.processImportedJSON(JSON.stringify(refData));
+                    } else {
+                        await ExportModule.importData(JSON.stringify(refData), () => {
+                            app?.syncData?.();
+                        });
+                    }
+
+                    if (urlInput) urlInput.value = '';
+                } catch (err) {
+                    alert((i18n.t('err_read_data', {msg: err.message}) || 'Error: ' + err.message).replace('حدث خطأ أثناء قراءة البيانات: ', 'Error: '));
+                } finally {
+                    importBtn.innerHTML = originalText;
+                    importBtn.disabled = false;
+                }
+            };
+        }
+
         // Auto-fill import URL from ?direct_url= query param
-        const urlParams = new URLSearchParams(window.location.search);
+        const urlParams = new URLSearchParams(globalThis.location.search);
         const directUrl = urlParams.get('direct_url');
         if (directUrl) {
             const decodedUrl = decodeURIComponent(directUrl);
@@ -864,7 +920,7 @@ export const ExportModule = {
             const importBtn = document.getElementById('btn-import-url');
             if (inputField && importBtn) {
                 inputField.value = decodedUrl;
-                window.history.replaceState({}, document.title, window.location.pathname);
+                globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
                 importBtn.click();
             }
         }
@@ -1008,9 +1064,7 @@ export const ExportModule = {
                     confirmBtn.style.cursor = 'not-allowed';
                 }
                 
-                if (window.app && typeof window.app.syncData === 'function') {
-                    window.app.syncData();
-                }
+                globalThis.app?.syncData?.();
                 
                 alert(i18n.t('msg_import_success'));
             });
@@ -1027,7 +1081,7 @@ export const ExportModule = {
             alert(i18n.t('select_ref_first'));
             return;
         }
-        const baseUrl = window.location.origin + window.location.pathname;
+        const baseUrl = globalThis.location.origin + globalThis.location.pathname;
         const fullUrl = `${baseUrl}?import_ref=${selector.value}`;
         this.copyTextToClipboard(fullUrl, 'msg_share_link_copied');
     },
@@ -1036,8 +1090,8 @@ export const ExportModule = {
         const showSuccess = () => {
             if (typeof UIComponents !== 'undefined') {
                 UIComponents.showToast(i18n.t(successMessageKey), 'success');
-            } else if (typeof app !== 'undefined' && app.showToast) {
-                app.showToast(i18n.t(successMessageKey), 'success');
+            } else if (typeof app !== 'undefined') {
+                app?.showToast?.(i18n.t(successMessageKey), 'success');
             } else {
                 console.log(i18n.t(successMessageKey));
             }
@@ -1064,8 +1118,8 @@ export const ExportModule = {
                 const showSuccess = () => {
                     if (typeof UIComponents !== 'undefined') {
                         UIComponents.showToast(i18n.t(successMessageKey), 'success');
-                    } else if (typeof app !== 'undefined' && app.showToast) {
-                        app.showToast(i18n.t(successMessageKey), 'success');
+                    } else if (typeof app !== 'undefined') {
+                        app?.showToast?.(i18n.t(successMessageKey), 'success');
                     } else {
                         console.log(i18n.t(successMessageKey));
                     }
@@ -1075,6 +1129,6 @@ export const ExportModule = {
         } catch (e) {
             console.error("Copy failed", e);
         }
-        document.body.removeChild(textArea);
+        textArea.remove();
     }
 };

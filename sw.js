@@ -34,17 +34,17 @@ const APP_SHELL = [
 ];
 
 // ── Install: pre-cache the app shell ──────────────────────────
-self.addEventListener('install', (event) => {
+globalThis.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             console.log('[SW] Pre-caching app shell v4...');
             return cache.addAll(APP_SHELL);
-        }).then(() => self.skipWaiting())
+        }).then(() => globalThis.skipWaiting())
     );
 });
 
 // ── Activate: purge old caches ────────────────────────────────
-self.addEventListener('activate', (event) => {
+globalThis.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) =>
             Promise.all(
@@ -55,12 +55,23 @@ self.addEventListener('activate', (event) => {
                         return caches.delete(key);
                     })
             )
-        ).then(() => self.clients.claim())
+        ).then(() => globalThis.clients.claim())
     );
 });
 
 // ── Fetch: smart strategy per request type ────────────────────
-self.addEventListener('fetch', (event) => {
+globalThis.addEventListener('fetch', (event) => {
+    const requestUrl = event.request.url;
+    
+    // استثناء روابط جوجل درايف والـ CDNs الخارجية تماماً من الكاش لمنع حظر CORS والـ Integrity
+    if (requestUrl.includes('drive.google.com') || 
+        requestUrl.includes('cdnjs.cloudflare.com') || 
+        requestUrl.includes('cdn.tailwindcss.com') || 
+        requestUrl.includes('jsdelivr.net') ||
+        requestUrl.includes('unpkg.com')) {
+        return; // اترك المتصفح يجلبها مباشرة من الإنترنت النظيف
+    }
+
     const url = new URL(event.request.url);
 
     // Skip non-GET and cross-origin tracking requests entirely
@@ -84,24 +95,26 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Network-first for versioned JS/CSS (?v=x.x) so bumped versions always load fresh
-    if (url.search && url.origin === self.location.origin) {
+    if (url.search && url.origin === globalThis.location.origin) {
         event.respondWith(
-            fetch(event.request).catch(() => caches.match(event.request))
+            fetch(event.request).catch((err) => {
+                console.warn('[SW] Versioned fetch failed, serving from cache:', err);
+                return caches.match(event.request);
+            })
         );
         return;
     }
 
     // Cache-First for same-origin static assets (fonts, images, unversioned JS)
-    if (url.origin === self.location.origin) {
+    if (url.origin === globalThis.location.origin) {
         event.respondWith(
             caches.match(event.request).then((cached) => {
                 if (cached) return cached;
                 return fetch(event.request).then((response) => {
-                    if (!response || response.status !== 200 || response.type === 'error') {
-                        return response;
+                    if (response && response.status === 200 && response.type !== 'error') {
+                        const toCache = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, toCache));
                     }
-                    const toCache = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, toCache));
                     return response;
                 });
             })

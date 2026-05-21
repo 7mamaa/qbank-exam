@@ -7,9 +7,9 @@ import { ExportModule } from '../src/modules/export.js';
 import { QueryEngine } from '../src/core/query.js';
 import { state } from '../src/core/state.js';
 
-// Mock the state module
-vi.mock('../src/core/state.js', () => ({
-    state: {
+// Mock the state module with query parameters support
+const { mockSharedState } = vi.hoisted(() => ({
+    mockSharedState: {
         questions: [],
         selectionCriteria: {
             notebooks: new Set(),
@@ -22,6 +22,14 @@ vi.mock('../src/core/state.js', () => ({
         },
         selectedIds: new Set()
     }
+}));
+
+vi.mock('../src/core/state.js', () => ({
+    state: mockSharedState
+}));
+
+vi.mock('../src/core/state.js?v=16.6.0', () => ({
+    state: mockSharedState
 }));
 describe('QBank Core Logic Tests', () => {
     

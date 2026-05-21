@@ -63,7 +63,7 @@
     --sidebar-bg: #16161a;
     --text-title: #fffffe;
     --text-body: #94a1b2;
-    --text-secondary: #72778a;
+    --text-secondary: #9ea3b9;
     --primary: #7f5af0;
     --btn-text: #fffffe;
     --border: #72757e;
@@ -77,13 +77,14 @@
     --sidebar-bg: #0f0e17;
     --text-title: #fffffe;
     --text-body: #a7a9be;
-    --text-secondary: #7f8198;
+    --text-secondary: #a3a5c0;
     --primary: #ff8906;
-    --btn-text: #fffffe;
+    --btn-text: #0f0e17;
     --border: #f25f4c;
     --accent: #e53170;
     --surface-color: #1a1a24;
 }
+
 
 * {
     margin: 0;
@@ -3081,7 +3082,7 @@ kbd {
     width: 18px;
     border-inline-start: 2px solid var(--border);
     border-bottom: 2px solid var(--border);
-    border-bottom-inline-start-radius: 6px;
+    border-end-start-radius: 6px;
     opacity: 0.8;
 }
 

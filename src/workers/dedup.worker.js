@@ -5,7 +5,6 @@
 
 let questionsPool = [];
 let exactMatchMap = new Map();
-let signatureMap = new Map(); // id -> Uint32Array(80)
 let trigramMap = new Map(); // id -> Set of trigrams
 let bucketMap = new Map(); // bandIndex_bucketHash -> Array<ids>
 
@@ -22,7 +21,7 @@ for (let i = 0; i < HASH_COUNT; i++) {
     hashSeedsB[i] = Math.floor(Math.random() * PRIME);
 }
 
-self.onmessage = async function(e) {
+globalThis.onmessage = async function(e) {
     const { type, payload, threshold } = e.data;
 
     if (type === 'RESET') {
@@ -31,14 +30,13 @@ self.onmessage = async function(e) {
         processBatch(payload);
     } else if (type === 'FINISH') {
         const groups = finalize(threshold || 0.9);
-        self.postMessage({ type: 'COMPLETE', groups });
+        globalThis.postMessage({ type: 'COMPLETE', groups });
     }
 };
 
 function resetState() {
     questionsPool = [];
     exactMatchMap = new Map();
-    signatureMap = new Map();
     trigramMap = new Map();
     bucketMap = new Map();
 }
@@ -69,7 +67,7 @@ function computeSignature(trigrams) {
     for (const trigram of trigrams) {
         let h = 0;
         for (let i = 0; i < trigram.length; i++) {
-            h = (Math.imul(31, h) + trigram.charCodeAt(i)) | 0;
+            h = Math.trunc(Math.imul(31, h) + trigram.charCodeAt(i));
         }
         const val = h >>> 0;
 
@@ -94,14 +92,13 @@ function processBatch(batch) {
         const trigrams = getTrigrams(norm);
         const sig = computeSignature(trigrams);
         
-        signatureMap.set(q.id, sig);
         trigramMap.set(q.id, trigrams);
         questionsPool.push(q);
 
         for (let b = 0; b < BANDS; b++) {
             let bucketHash = 0;
             for (let r = 0; r < ROWS_PER_BAND; r++) {
-                bucketHash = (Math.imul(31, bucketHash) + sig[b * ROWS_PER_BAND + r]) | 0;
+                bucketHash = Math.trunc(Math.imul(31, bucketHash) + sig[b * ROWS_PER_BAND + r]);
             }
             const bucketKey = `${b}_${bucketHash}`;
             if (!bucketMap.has(bucketKey)) {
@@ -111,7 +108,22 @@ function processBatch(batch) {
         }
     });
 
-    self.postMessage({ type: 'PROGRESS', count: questionsPool.length });
+    globalThis.postMessage({ type: 'PROGRESS', count: questionsPool.length });
+}
+
+function calculateJaccardSimilarity(idA, idB) {
+    const setA = trigramMap.get(idA);
+    const setB = trigramMap.get(idB);
+    if (!setA || !setB) return 0;
+    let intersection = 0;
+    for (const t of setA) {
+        if (setB.has(t)) intersection++;
+    }
+    return intersection / (setA.size + setB.size - intersection);
+}
+
+function areQuestionsIdentical(idA, idB, threshold) {
+    return calculateJaccardSimilarity(idA, idB) >= threshold;
 }
 
 function finalize(threshold) {
@@ -156,13 +168,7 @@ function finalize(threshold) {
                     const idB = ids[j];
                     if (find(idA) === find(idB)) continue;
 
-                    const setA = trigramMap.get(idA);
-                    const setB = trigramMap.get(idB);
-                    let intersection = 0;
-                    for (const t of setA) if (setB.has(t)) intersection++;
-                    const jaccard = intersection / (setA.size + setB.size - intersection);
-
-                    if (jaccard >= threshold) {
+                    if (areQuestionsIdentical(idA, idB, threshold)) {
                         union(idA, idB);
                     }
                 }
@@ -170,7 +176,7 @@ function finalize(threshold) {
         }
         processedBuckets++;
         if (processedBuckets % 1000 === 0) {
-            self.postMessage({ type: 'PROGRESS_PHASE', label: 'Clustering...', progress: Math.round((processedBuckets / totalBuckets) * 100) });
+            globalThis.postMessage({ type: 'PROGRESS_PHASE', label: 'Clustering...', progress: Math.round((processedBuckets / totalBuckets) * 100) });
         }
     }
 
@@ -191,11 +197,7 @@ function finalize(threshold) {
             const original = qMap.get(ids[0]);
             const duplicates = ids.slice(1).map(id => {
                 const q = qMap.get(id);
-                const setA = trigramMap.get(ids[0]);
-                const setB = trigramMap.get(id);
-                let intersection = 0;
-                for (const t of setA) if (setB.has(t)) intersection++;
-                const jaccard = intersection / (setA.size + setB.size - intersection);
+                const jaccard = calculateJaccardSimilarity(ids[0], id);
 
                 return {
                     question: q,

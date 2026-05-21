@@ -4,6 +4,8 @@ import { Helpers } from '../utils/helpers.js';
 import { i18n } from '../core/i18n.js';
 import { QuestionModule } from './questions.js';
 
+import { NotebookModule } from './notebooks.js';
+
 /**
  * @module QuizModule
  * @description Logic for the interactive quiz system, timer, and scoring.
@@ -18,7 +20,15 @@ export const QuizModule = {
         const limit = parseInt(document.getElementById('quiz-count').value) || 20;
 
         let pool = state.questions;
-        if (nbId) pool = pool.filter(q => q.notebookId === nbId);
+        if (nbId) {
+            if (nbId === 'orphaned') {
+                pool = pool.filter(q => !state.notebooks.some(n => n.id === q.notebookId));
+            } else {
+                const descendantIds = NotebookModule.getAllDescendantIds(nbId, state.notebooks);
+                const allowedIds = [nbId, ...descendantIds];
+                pool = pool.filter(q => allowedIds.includes(q.notebookId));
+            }
+        }
 
         if (pool.length === 0) return alert(i18n.t('quiz_err_empty'));
 

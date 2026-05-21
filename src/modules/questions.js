@@ -328,8 +328,18 @@ export const QuestionModule = {
         const tagSelect = document.getElementById('filter-tag');
         if (!catSelect || !tagSelect) return;
 
-        const categories = [...new Set(state.questions.map(q => q.category))].filter(Boolean).sort();
-        const tags = [...new Set(state.questions.flatMap(q => q.tags || []))].filter(Boolean).sort();
+        const categories = [...new Set(state.questions.map(q => q.category))].filter(Boolean).sort((a, b) => {
+            const numA = Number(a);
+            const numB = Number(b);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return String(a).localeCompare(String(b), undefined, { numeric: true });
+        });
+        const tags = [...new Set(state.questions.flatMap(q => q.tags || []))].filter(Boolean).sort((a, b) => {
+            const numA = Number(a);
+            const numB = Number(b);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return String(a).localeCompare(String(b), undefined, { numeric: true });
+        });
 
         let catHtml = `<option value="">${i18n.t('all_categories')}</option>`;
         catHtml += `<option value="__none__" style="color:var(--danger-color); font-weight:bold;">${i18n.t('q_no_cat')}</option>`;

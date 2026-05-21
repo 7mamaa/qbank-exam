@@ -7,10 +7,10 @@
     <meta name="description" content="Exam System Pro — Run interactive exams offline with instant scoring and review.">
     <title>Exam System Pro</title>
     <!-- Tracking beacon removed: conflicted with offline-first design and collected user data without consent -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha384-6S9+K1mZ8P2Vq9f+A9p9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f" crossorigin="anonymous"></script>
-    <script src="https://cdn.tailwindcss.com/3.3.3" integrity="sha384-fV6K1mZ8P2Vq9f+A9p9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoCc98ZpBofCHSk67vBqOnWIn9kE8uQ9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
@@ -431,7 +431,7 @@
                         <i class="fa-solid fa-times"></i>
                     </button>
                     <h3 class="font-bold text-gray-800 mb-3 text-sm mt-2 md:mt-0">تنقل الاختبار</h3>
-                    <div id="moodle-nav-list" class="flex flex-col gap-1 mb-4" dir="ltr">
+                    <div id="moodle-nav-list" class="flex flex-col gap-1 mb-4 max-h-[350px] md:max-h-[500px] overflow-y-auto pr-1" dir="ltr">
                         <!-- Nav items injected here -->
                     </div>
                     <button id="moodle-finish-btn"
@@ -718,7 +718,7 @@ Example:
     </div>
 
     <!-- XLSX Library -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" integrity="sha384-M6V6K1mZ8P2Vq9f+A9p9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f9f" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script type="module" src="js/main.js"></script>
 

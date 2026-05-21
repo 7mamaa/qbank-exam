@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect } from 'vitest';
 import { Helpers } from '../src/utils/helpers.js';
 
@@ -27,7 +30,7 @@ Line 2",
         }`;
         const repaired = Helpers.sanitizeJsonString(brokenJson);
         expect(() => JSON.parse(repaired)).not.toThrow();
-        expect(JSON.parse(repaired).question).toBe("Line 1\\nLine 2");
+        expect(JSON.parse(repaired).question).toBe("Line 1\nLine 2");
     });
 
     it('should perform fuzzy matching', () => {

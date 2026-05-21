@@ -125,20 +125,30 @@ export const Helpers = {
         // 2. State-based escaping for unescaped control characters inside strings
         let result = '';
         let inString = false;
-        let escapeNext = false;
         const validEscapes = ['"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u'];
 
         for (let i = 0; i < clean.length; i++) {
             const char = clean[i];
-            if (escapeNext) {
-                result += validEscapes.includes(char) ? char : char; // Keep as is, but could drop \
-                escapeNext = false;
+            
+            if (char === '"') {
+                // Check if the double quote is escaped
+                let isEscaped = false;
+                let j = i - 1;
+                while (j >= 0 && clean[j] === '\\') {
+                    isEscaped = !isEscaped;
+                    j--;
+                }
+                if (!isEscaped) {
+                    inString = !inString;
+                }
+                result += char;
             } else if (char === '\\') {
-                result += char;
-                escapeNext = true;
-            } else if (char === '"') {
-                inString = !inString;
-                result += char;
+                const nextChar = clean[i + 1];
+                if (validEscapes.includes(nextChar)) {
+                    result += char;
+                } else {
+                    // Skip this backslash because it's not a valid JSON escape code (e.g. \')
+                }
             } else if (inString && (char === '\n' || char === '\r')) {
                 result += '\\n'; // Normalize multi-line AI strings
             } else if (inString && char === '\t') {
@@ -180,8 +190,8 @@ export const Helpers = {
                     difficulty: 'medium',
                     tags: ['smart_import']
                 };
-            } else if (line.match(/^([أبجدabcd])\s*[()-.]\s*(.*)/i)) {
-                const m = line.match(/^([أبجدabcd])\s*[()-.]\s*(.*)/i);
+            } else if (line.match(/^([أبجدabcd])\s*[()\-.]\s*(.*)/i)) {
+                const m = line.match(/^([أبجدabcd])\s*[()\-.]\s*(.*)/i);
                 if (currentQ && currentQ.options.length < 4) currentQ.options.push(m[2].trim());
             } else if ((line.includes('💡') || line.includes('الجواب:') || line.includes('Answer:'))) {
                 if (currentQ) currentQ.explain = line.replace(/💡|الجواب:|Answer:/g, '').trim();
@@ -264,7 +274,7 @@ export const Helpers = {
         const dm = decimals < 0 ? 0 : decimals;
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     },
 
     /**
@@ -294,4 +304,4 @@ export const Helpers = {
     }
 };
 
-window.Helpers = Helpers;
+globalThis.Helpers = Helpers;

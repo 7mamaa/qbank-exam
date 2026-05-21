@@ -555,5 +555,9 @@ Important technical notes for standard JSON compliance:
     "msg_direct_share_copied": "Smart import link for external file copied! 📋",
     "msg_universal_import_confirm": "⚠️ Security Warning: You are about to import and merge {count} new questions into your question bank. Do you agree to update your database?",
     "msg_import_canceled": "Import process canceled successfully, your current database is untouched 🛡️",
-    "msg_no_data_found": "No valid data found for import 📭"
+    "msg_no_data_found": "No valid data found for import 📭",
+    "msg_transfer_simulator": "🚀 Successfully transferred {count} questions to the exam simulation!",
+    "msg_theme_applied": "🎨 Custom theme applied successfully!",
+    "msg_theme_reset": "🔄 Theme reset to standard default.",
+    "theme_custom": "Custom Theme 🎨"
 };

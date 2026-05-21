@@ -17,12 +17,12 @@ import { Helpers } from './src/utils/helpers.js?v=16.6.0';
 import { Logger } from './src/utils/logger.js?v=16.6.0';
 
 // Central Telemetry & Global Error Radar
-window.onerror = (msg, url, line, col, error) => {
+globalThis.onerror = (msg, url, line, col, error) => {
     Logger.error('GlobalWindow', `Crash at ${line}:${col} in ${url}`, error || msg);
     return false; // Let browser handle default logging too
 };
 
-window.addEventListener('unhandledrejection', (event) => {
+globalThis.addEventListener('unhandledrejection', (event) => {
     Logger.warn('GlobalAsync', 'Broken promise chain detected', event.reason);
 });
 
@@ -97,7 +97,7 @@ export const app = {
         this.exportSelectedFormat = 'json';
 
         // Request persistent storage so the browser never evicts IndexedDB data under pressure
-        if (navigator.storage && navigator.storage.persist) {
+        if (navigator.storage?.persist) {
             navigator.storage.persist().then(granted => {
                 console.log(`[PWA] Persistent storage granted: ${granted}`);
             });
@@ -122,11 +122,11 @@ export const app = {
             if (migrationResult) await this.loadQuestions();
 
             // Global Error Handlers
-            window.addEventListener('error', (event) => this.handleError(event.error, 'Global Runtime Error'));
-            window.addEventListener('unhandledrejection', (event) => this.handleError(event.reason, 'Unhandled Promise Rejection'));
+            globalThis.addEventListener('error', (event) => this.handleError(event.error, 'Global Runtime Error'));
+            globalThis.addEventListener('unhandledrejection', (event) => this.handleError(event.reason, 'Unhandled Promise Rejection'));
 
             // Handle Deep Linking (e.g., index.html?edit=123)
-            const urlParams = new URLSearchParams(window.location.search);
+            const urlParams = new URLSearchParams(globalThis.location.search);
             const editId = urlParams.get('edit');
             if (editId) {
                 this.navigate('questions');
@@ -134,59 +134,62 @@ export const app = {
             }
 
             // Initialize local/dynamic references hub
-            if (ExportModule && typeof ExportModule.initReferenceHub === 'function') {
-                ExportModule.initReferenceHub();
-            }
+            ExportModule?.initReferenceHub?.();
             this.applyReferenceHubHints();
 
             // Auto-import from share link (?import_ref=...)
             const refId = urlParams.get('import_ref');
             if (refId) {
-                const alreadyImported = this.state.questions.some(q => q.fromReferenceId === refId) ||
-                                        localStorage.getItem(`imported_ref_${refId}`) === "true";
-
-                if (alreadyImported) {
-                    console.log(`[Import Safeguard] Reference ${refId} is already injected. Aborting.`);
-                    this.showToast(i18n.t('msg_ref_already_exists'), 'info');
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                } else {
-                    this.showLoading(i18n.t('msg_auto_importing_ref'));
-                    setTimeout(async () => {
-                        try {
-                            const response = await fetch('docs/dev-notes/refrence/references-manifest.json');
-                            if (!response.ok) throw new Error("Manifest load failed");
-                            const manifest = await response.json();
-
-                            const targetRef = manifest.find(r => r.id === refId);
-                            if (targetRef) {
-                                const refRes = await fetch(targetRef.path);
-                                if (!refRes.ok) throw new Error("Reference file load failed");
-                                const refData = await refRes.json();
-
-                                const updatedData = (Array.isArray(refData) ? refData : [refData]).map(q => {
-                                    q.fromReferenceId = refId;
-                                    return q;
-                                });
-
-                                await ExportModule.processStrictImport(updatedData, async () => {
-                                    localStorage.setItem(`imported_ref_${refId}`, "true");
-                                    await this.syncData();
-                                    this.showToast(i18n.t('msg_auto_import_success', { name: targetRef.name }), 'success');
-                                    window.history.replaceState({}, document.title, window.location.pathname);
-                                });
-                            }
-                        } catch (e) {
-                            this.handleError(e, "Auto Import Error");
-                        } finally {
-                            this.hideLoading();
-                        }
-                    }, 800);
-                }
+                this.handleAutoImport(refId);
             }
 
         } catch (e) {
             this.handleError(e, "App Initialization failed");
         }
+    },
+
+    async handleAutoImport(refId) {
+        const alreadyImported = this.state.questions.some(q => q.fromReferenceId === refId) ||
+                                localStorage.getItem(`imported_ref_${refId}`) === "true";
+
+        if (alreadyImported) {
+            console.log(`[Import Safeguard] Reference ${refId} is already injected. Aborting.`);
+            this.showToast(i18n.t('msg_ref_already_exists'), 'info');
+            globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
+            return;
+        }
+
+        this.showLoading(i18n.t('msg_auto_importing_ref'));
+        setTimeout(async () => {
+            try {
+                const response = await fetch('docs/dev-notes/refrence/references-manifest.json');
+                if (!response.ok) throw new Error("Manifest load failed");
+                const manifest = await response.json();
+
+                const targetRef = manifest.find(r => r.id === refId);
+                if (targetRef) {
+                    const refRes = await fetch(targetRef.path);
+                    if (!refRes.ok) throw new Error("Reference file load failed");
+                    const refData = await refRes.json();
+
+                    const updatedData = (Array.isArray(refData) ? refData : [refData]).map(q => {
+                        q.fromReferenceId = refId;
+                        return q;
+                    });
+
+                    await ExportModule.processStrictImport(updatedData, async () => {
+                        localStorage.setItem(`imported_ref_${refId}`, "true");
+                        await this.syncData();
+                        this.showToast(i18n.t('msg_auto_import_success', { name: targetRef.name }), 'success');
+                        globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
+                    });
+                }
+            } catch (e) {
+                this.handleError(e, "Auto Import Error");
+            } finally {
+                this.hideLoading();
+            }
+        }, 800);
     },
 
     /**
@@ -235,8 +238,18 @@ export const app = {
             this.state.questions = loadedQuestions;
             
             // Pre-calculate unique categories and tags for Selection Hub performance
-            this.state.availableCategories = [...new Set(loadedQuestions.map(q => q.category).filter(Boolean))].sort();
-            this.state.availableTags = [...new Set(loadedQuestions.flatMap(q => q.tags || []).filter(Boolean))].sort();
+            this.state.availableCategories = [...new Set(loadedQuestions.map(q => q.category).filter(Boolean))].sort((a, b) => {
+                const numA = Number(a);
+                const numB = Number(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return String(a).localeCompare(String(b), undefined, { numeric: true });
+            });
+            this.state.availableTags = [...new Set(loadedQuestions.flatMap(q => q.tags || []).filter(Boolean))].sort((a, b) => {
+                const numA = Number(a);
+                const numB = Number(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return String(a).localeCompare(String(b), undefined, { numeric: true });
+            });
 
             // Always reset filteredQuestions to the full loaded set so undo/redo never
             // leaves a stale filtered view. The active filter will re-apply on renderQuestions().
@@ -400,10 +413,45 @@ export const app = {
         root.style.setProperty('--sidebar-bg', cardBg);
         root.style.setProperty('--text-title', textTitle);
 
+        document.documentElement.setAttribute('data-theme', 'custom');
+
         // Persist as a "custom" theme
         const customVars = { primary, bgMain, cardBg, textTitle };
         localStorage.setItem('qbank_custom_theme', JSON.stringify(customVars));
+
+        const selector = document.getElementById('theme-selector');
+        if (selector) selector.value = 'custom';
+
         this.showToast(i18n.t('msg_theme_applied'), 'success');
+    },
+
+    previewCustomTheme() {
+        const primary  = document.getElementById('theme-primary')?.value  || '#4361ee';
+        const bgMain   = document.getElementById('theme-bg-main')?.value   || '#f5f7fb';
+        const cardBg   = document.getElementById('theme-card-bg')?.value   || '#ffffff';
+        const textTitle = document.getElementById('theme-text-title')?.value || '#1a202c';
+
+        const root = document.documentElement;
+        root.style.setProperty('--primary', primary);
+        root.style.setProperty('--primary-hover', primary);
+        root.style.setProperty('--bg-main', bgMain);
+        root.style.setProperty('--card-bg', cardBg);
+        root.style.setProperty('--sidebar-bg', cardBg);
+        root.style.setProperty('--text-title', textTitle);
+    },
+
+    resetCustomTheme() {
+        localStorage.removeItem('qbank_custom_theme');
+        const root = document.documentElement;
+        root.style.removeProperty('--primary');
+        root.style.removeProperty('--primary-hover');
+        root.style.removeProperty('--bg-main');
+        root.style.removeProperty('--card-bg');
+        root.style.removeProperty('--sidebar-bg');
+        root.style.removeProperty('--text-title');
+
+        this.initTheme();
+        this.showToast(i18n.t('msg_theme_reset'), 'info');
     },
 
     initCustomTheme() {
@@ -417,6 +465,12 @@ export const app = {
             root.style.setProperty('--card-bg', v.cardBg);
             root.style.setProperty('--sidebar-bg', v.cardBg);
             root.style.setProperty('--text-title', v.textTitle);
+
+            document.documentElement.setAttribute('data-theme', 'custom');
+
+            const selector = document.getElementById('theme-selector');
+            if (selector) selector.value = 'custom';
+
             // Sync color pickers
             if (document.getElementById('theme-primary')) {
                 document.getElementById('theme-primary').value = v.primary;
@@ -448,9 +502,9 @@ export const app = {
 
         // Append Options if requested
         if ((mode === 'q_options' || mode === 'all') && (q.type === 'mcq' || q.type === 'match' || q.type === 'boolean')) {
-            if (q.type === 'mcq' && q.options && q.options.length > 0) {
+            if (q.type === 'mcq' && q.options?.length > 0) {
                 textArray.push(`\nOptions:\n- ${q.options.join('\n- ')}`);
-            } else if (q.type === 'match' && q.pairs && q.pairs.length > 0) {
+            } else if (q.type === 'match' && q.pairs?.length > 0) {
                 textArray.push(`\nPairs:\n` + q.pairs.map(p => `- ${p.left} -> ${p.right}`).join('\n'));
             } else if (q.type === 'boolean') {
                 textArray.push(`\nOptions: True / False`);
@@ -480,13 +534,13 @@ export const app = {
             container.innerHTML = ''; // clear previous
             
             // Generate QR Code locally (Offline support)
-            new window.QRCode(container, {
+            new globalThis.QRCode(container, {
                 text: rawPayload,
                 width: 220,
                 height: 220,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
-                correctLevel : window.QRCode.CorrectLevel.L
+                correctLevel : globalThis.QRCode.CorrectLevel.L
             });
         }
         if (titleEl) {
@@ -500,7 +554,7 @@ export const app = {
         const canvas = container?.querySelector('canvas');
         let dataUrl = '';
         
-        if (img && img.src) {
+        if (img?.src) {
             dataUrl = img.src;
         } else if (canvas) {
             dataUrl = canvas.toDataURL("image/png");
@@ -540,7 +594,7 @@ export const app = {
                 errorEl.textContent = '❌ لا يزال هناك خطأ: ' + e.message;
                 // Highlight approximate error position
                 const match = e.message.match(/position (\d+)/);
-                if (match && editorEl) {
+                if (match?.[1] && editorEl) {
                     const pos = parseInt(match[1]);
                     editorEl.focus();
                     editorEl.setSelectionRange(pos, Math.min(pos + 5, raw.length));
@@ -666,9 +720,7 @@ export const app = {
                 this.updateNotebookDropdowns();
                 this.renderSelectionHub();
                 this.updateExportScopeCounts();
-                if (typeof ExportModule !== 'undefined' && ExportModule.renderExportOptions) {
-                    ExportModule.renderExportOptions(this.exportSelectedFormat || 'json');
-                }
+                ExportModule?.renderExportOptions?.(this.exportSelectedFormat || 'json');
                 this.applyReferenceHubHints();
             },
             'import-hub': () => {
@@ -813,7 +865,7 @@ export const app = {
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 this.navigate(e.currentTarget.dataset.target);
-                if (window.innerWidth <= 768) closeSidebar();
+                if (globalThis.innerWidth <= 768) closeSidebar();
             });
         });
     },
@@ -828,7 +880,7 @@ export const app = {
             else if (['1', '2', '3', '4'].includes(e.key)) {
                 const idx = parseInt(e.key) - 1;
                 const q = this.state.quizState.pool[this.state.quizState.currentIdx];
-                if (q && q.type === 'mcq' && q.options[idx]) {
+                if (q?.type === 'mcq' && q.options?.[idx]) {
                     this.saveQuizAnswer(q.id, q.options[idx]);
                     this.renderQuizQuestion();
                 }
@@ -1118,7 +1170,7 @@ export const app = {
     async handleNotebookSubmit(e) { await NotebookModule.handleNotebookSubmit(e, () => this.syncData(), (id) => this.closeModal(id)); },
     async deleteNotebook(id) { await NotebookModule.deleteNotebook(id, () => this.syncData(), (resetId) => {
         const filterEl = document.getElementById('filter-notebook');
-        if (filterEl && filterEl.value === resetId) {
+        if (filterEl?.value === resetId) {
             filterEl.value = '';
             this.syncCustomDropdown('filter-notebook');
         }
@@ -1579,22 +1631,91 @@ export const app = {
     /**
      * Renders the interactive selection hub UI in the modal.
      */
+    renderNotebooksHub(nbContainer, search) {
+        if (!nbContainer) return;
+        const filtered = this.state.notebooks.filter(n => n.name.toLowerCase().includes(search));
+        nbContainer.innerHTML = filtered.map(nb => `
+            <div class="selection-item ${this.state.selectionCriteria.notebooks.has(nb.id) ? 'active' : ''}" onclick="app.toggleSelectionCriteria('notebooks', '${nb.id}')">
+                <input type="checkbox" ${this.state.selectionCriteria.notebooks.has(nb.id) ? 'checked' : ''} style="pointer-events:none;">
+                <span>${Helpers.sanitize(nb.name)}</span>
+            </div>
+        `).join('');
+    },
+
+    renderCategoriesHub(catContainer, search) {
+        if (!catContainer) return;
+        const categories = this.state.availableCategories;
+        let html = `
+            <div class="selection-item ${this.state.selectionCriteria.categories.has('__none__') ? 'active' : ''}" onclick="app.toggleSelectionCriteria('categories', '__none__')">
+                <input type="checkbox" ${this.state.selectionCriteria.categories.has('__none__') ? 'checked' : ''} style="pointer-events:none;">
+                <span style="color:var(--danger-color); font-weight:bold;">${i18n.t('no_category_badge')}</span>
+            </div>
+        `;
+        html += categories.filter(c => c.toLowerCase().includes(search)).map(cat => `
+            <div class="selection-item ${this.state.selectionCriteria.categories.has(cat) ? 'active' : ''}" onclick="app.toggleSelectionCriteria('categories', '${cat.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                <input type="checkbox" ${this.state.selectionCriteria.categories.has(cat) ? 'checked' : ''} style="pointer-events:none;">
+                <span>${Helpers.sanitize(cat)}</span>
+            </div>
+        `).join('');
+        catContainer.innerHTML = html;
+    },
+
+    renderTagsHub(tagContainer, search) {
+        if (!tagContainer) return;
+        let tags = this.state.availableTags;
+        const selectedCats = this.state.selectionCriteria.categories;
+        const selectedNbs = this.state.selectionCriteria.notebooks;
+        
+        let hasQuestionsWithoutTags = true;
+        if (selectedCats.size > 0 || selectedNbs.size > 0) {
+            const filteredPool = this.state.questions.filter(q => {
+                const catMatch = selectedCats.size === 0 || 
+                               (selectedCats.has('__none__') && (!q.category || q.category.trim() === '')) ||
+                               selectedCats.has(q.category);
+                const nbMatch = selectedNbs.size === 0 || 
+                               (selectedNbs.has('orphaned') && !this.state.notebooks.some(n => n.id === q.notebookId)) ||
+                               selectedNbs.has(q.notebookId);
+                return catMatch && nbMatch;
+            });
+            
+            const tagsInPool = new Set();
+            hasQuestionsWithoutTags = false;
+            filteredPool.forEach(q => {
+                if (!q.tags || q.tags.length === 0) hasQuestionsWithoutTags = true;
+                if (q.tags) q.tags.forEach(t => tagsInPool.add(t));
+            });
+            tags = Array.from(tagsInPool).sort((a, b) => {
+                const numA = Number(a);
+                const numB = Number(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return String(a).localeCompare(String(b), undefined, { numeric: true });
+            });
+        }
+
+        let html = '';
+        if (hasQuestionsWithoutTags) {
+            html += `
+                <div class="selection-item tag-item ${this.state.selectionCriteria.tags.has('__none__') ? 'active' : ''}" onclick="app.toggleSelectionCriteria('tags', '__none__')">
+                    <span style="color:var(--danger-color); font-weight:bold;">${i18n.t('no_tags_badge')}</span>
+                </div>
+            `;
+        }
+        html += tags.filter(t => t.toLowerCase().includes(search)).map(tag => `
+            <div class="selection-item tag-item ${this.state.selectionCriteria.tags.has(tag) ? 'active' : ''}" onclick="app.toggleSelectionCriteria('tags', '${tag.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                <span>#${Helpers.sanitize(tag)}</span>
+            </div>
+        `).join('');
+        tagContainer.innerHTML = html;
+    },
+
     renderSelectionHub() {
         const hub = document.getElementById('selection-hub-content');
         if (!hub) return;
 
         // Render Notebooks
         const nbContainer = document.getElementById('sel-notebooks');
-        if (nbContainer) {
-            const search = (this.state.selectionSearch?.notebooks || '').toLowerCase();
-            const filtered = this.state.notebooks.filter(n => n.name.toLowerCase().includes(search));
-            nbContainer.innerHTML = filtered.map(nb => `
-                <div class="selection-item ${this.state.selectionCriteria.notebooks.has(nb.id) ? 'active' : ''}" onclick="app.toggleSelectionCriteria('notebooks', '${nb.id}')">
-                    <input type="checkbox" ${this.state.selectionCriteria.notebooks.has(nb.id) ? 'checked' : ''} style="pointer-events:none;">
-                    <span>${Helpers.sanitize(nb.name)}</span>
-                </div>
-            `).join('');
-        }
+        const nbSearch = (this.state.selectionSearch?.notebooks || '').toLowerCase();
+        this.renderNotebooksHub(nbContainer, nbSearch);
 
         // Update checkboxes for Types & Difficulties
         ['mcq', 'boolean', 'match', 'written'].forEach(t => {
@@ -1608,71 +1729,13 @@ export const app = {
 
         // Categories
         const catContainer = document.getElementById('sel-categories');
-        if (catContainer) {
-            const categories = this.state.availableCategories;
-            const search = (this.state.selectionSearch?.categories || '').toLowerCase();
-            
-            let html = `
-                <div class="selection-item ${this.state.selectionCriteria.categories.has('__none__') ? 'active' : ''}" onclick="app.toggleSelectionCriteria('categories', '__none__')">
-                    <input type="checkbox" ${this.state.selectionCriteria.categories.has('__none__') ? 'checked' : ''} style="pointer-events:none;">
-                    <span style="color:var(--danger-color); font-weight:bold;">${i18n.t('no_category_badge')}</span>
-                </div>
-            `;
-            html += categories.filter(c => c.toLowerCase().includes(search)).map(cat => `
-                <div class="selection-item ${this.state.selectionCriteria.categories.has(cat) ? 'active' : ''}" onclick="app.toggleSelectionCriteria('categories', '${cat.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
-                    <input type="checkbox" ${this.state.selectionCriteria.categories.has(cat) ? 'checked' : ''} style="pointer-events:none;">
-                    <span>${Helpers.sanitize(cat)}</span>
-                </div>
-            `).join('');
-            catContainer.innerHTML = html;
-        }
+        const catSearch = (this.state.selectionSearch?.categories || '').toLowerCase();
+        this.renderCategoriesHub(catContainer, catSearch);
 
         // Tags
         const tagContainer = document.getElementById('sel-tags');
-        if (tagContainer) {
-            let tags = this.state.availableTags;
-            const search = (this.state.selectionSearch?.tags || '').toLowerCase();
-            
-            // Cascading Filter: Filter tags based on selected categories/notebooks
-            const selectedCats = this.state.selectionCriteria.categories;
-            const selectedNbs = this.state.selectionCriteria.notebooks;
-            
-            let hasQuestionsWithoutTags = true; // Default to true if nothing is selected
-            if (selectedCats.size > 0 || selectedNbs.size > 0) {
-                const filteredPool = this.state.questions.filter(q => {
-                    const catMatch = selectedCats.size === 0 || 
-                                   (selectedCats.has('__none__') && (!q.category || q.category.trim() === '')) ||
-                                   selectedCats.has(q.category);
-                    const nbMatch = selectedNbs.size === 0 || 
-                                   (selectedNbs.has('orphaned') && !this.state.notebooks.some(n => n.id === q.notebookId)) ||
-                                   selectedNbs.has(q.notebookId);
-                    return catMatch && nbMatch;
-                });
-                
-                const tagsInPool = new Set();
-                hasQuestionsWithoutTags = false;
-                filteredPool.forEach(q => {
-                    if (!q.tags || q.tags.length === 0) hasQuestionsWithoutTags = true;
-                    if (q.tags) q.tags.forEach(t => tagsInPool.add(t));
-                });
-                tags = Array.from(tagsInPool).sort();
-            }
-
-            let html = '';
-            if (hasQuestionsWithoutTags) {
-                html += `
-                    <div class="selection-item tag-item ${this.state.selectionCriteria.tags.has('__none__') ? 'active' : ''}" onclick="app.toggleSelectionCriteria('tags', '__none__')">
-                        <span style="color:var(--danger-color); font-weight:bold;">${i18n.t('no_tags_badge')}</span>
-                    </div>
-                `;
-            }
-            html += tags.filter(t => t.toLowerCase().includes(search)).map(tag => `
-                <div class="selection-item tag-item ${this.state.selectionCriteria.tags.has(tag) ? 'active' : ''}" onclick="app.toggleSelectionCriteria('tags', '${tag.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
-                    <span>#${Helpers.sanitize(tag)}</span>
-                </div>
-            `).join('');
-            tagContainer.innerHTML = html;
-        }
+        const tagSearch = (this.state.selectionSearch?.tags || '').toLowerCase();
+        this.renderTagsHub(tagContainer, tagSearch);
 
         this.renderPresets();
         this.updateExportSummary();
@@ -1864,7 +1927,7 @@ export const app = {
                 existingHint.textContent = i18n.t(hintKey);
                 return;
             }
-            if (btn.parentNode && !btn.parentNode.classList.contains('btn-hint-wrapper')) {
+            if (btn.parentNode && !btn.parentNode.classList?.contains('btn-hint-wrapper')) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'btn-hint-wrapper';
                 wrapper.style.display = 'flex';
@@ -2064,7 +2127,7 @@ export const app = {
             let position = -1;
 
             const posMatch = errorMsg.match(/position (\d+)/);
-            if (posMatch && posMatch[1]) position = parseInt(posMatch[1], 10);
+            if (posMatch?.[1]) position = parseInt(posMatch[1], 10);
 
             if (position >= 0) {
                 const textUpToError = text.substring(0, position);
@@ -2136,7 +2199,7 @@ export const app = {
             let position = -1;
 
             const posMatch = errorMsg.match(/position (\d+)/);
-            if (posMatch && posMatch[1]) position = parseInt(posMatch[1], 10);
+            if (posMatch?.[1]) position = parseInt(posMatch[1], 10);
 
             if (position >= 0) {
                 const textarea = document.getElementById('single-q-smart-fill');
@@ -2188,7 +2251,7 @@ export const app = {
                 requestAnimationFrame(() => {
                     setTimeout(() => {
                         this.hideLoading();
-                        window.print();
+                        globalThis.print();
                     }, 500);
                 });
             } else {
@@ -2421,7 +2484,15 @@ export const app = {
             const nbId = document.getElementById('quiz-notebook')?.value;
             const limit = parseInt(document.getElementById('quiz-count')?.value) || 20;
             let quizPool = this.state.questions;
-            if (nbId) quizPool = quizPool.filter(q => q.notebookId === nbId);
+            if (nbId) {
+                if (nbId === 'orphaned') {
+                    quizPool = quizPool.filter(q => !this.state.notebooks.some(n => n.id === q.notebookId));
+                } else {
+                    const descendantIds = NotebookModule.getAllDescendantIds(nbId, this.state.notebooks);
+                    const allowedIds = [nbId, ...descendantIds];
+                    quizPool = quizPool.filter(q => allowedIds.includes(q.notebookId));
+                }
+            }
             pool = [...quizPool].sort(() => Math.random() - 0.5).slice(0, limit);
         } else {
             pool = this.getQueryPool();
@@ -2448,8 +2519,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-window.app = app;
-window.DuplicatesUI = DuplicatesUI;
-window.i18n = i18n;
-window.Helpers = Helpers;
+globalThis.app = app;
+globalThis.DuplicatesUI = DuplicatesUI;
+globalThis.i18n = i18n;
+globalThis.Helpers = Helpers;
 export default app;
