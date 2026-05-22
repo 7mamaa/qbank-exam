@@ -2206,16 +2206,78 @@ export const app = {
         let url = urlInput.value.trim();
         if (!url) return alert(i18n.t('err_invalid_url'));
         
-        const btn = event.currentTarget;
-        const originalText = btn.innerHTML;
+        const btn = event?.currentTarget || document.getElementById('btn-import-url');
+        const originalText = btn ? btn.innerHTML : '';
         try {
-            btn.innerHTML = `${i18n.t('loading')} ⏳`;
-            btn.disabled = true;
-            const text = await Helpers.fetchUrlWithProxy(url);
-            if (text) await this.processImportedJSON(text);
+            if (btn) {
+                btn.innerHTML = `${i18n.t('loading')} ⏳`;
+                btn.disabled = true;
+            }
+            let text = await Helpers.fetchUrlWithProxy(url);
+            if (!text) return;
+
+            // خط دفاع فوري لمنع قراءة صفحات الـ HTML كـ JSON
+            const trimmedText = text.trim();
+            if (trimmedText.startsWith('<!DOCTYPE') || trimmedText.startsWith('<html') || trimmedText.startsWith('<')) {
+                UIComponents.showToast("الرابط الممرر يؤدي لصفحة ويب وليس لملف أسئلة JSON صالح! ⚠️", 'warning');
+                return;
+            }
+
+            // Decouple URL Fetch & process Decompression in Memory
+            let finalJsonText = text;
+            if (text.length >= 2) {
+                const charCodeArray = new Uint8Array(text.length);
+                for (let i = 0; i < text.length; i++) {
+                    charCodeArray[i] = text.charCodeAt(i) & 0xff;
+                }
+                if (charCodeArray[0] === 0x1f && charCodeArray[1] === 0x8b) {
+                    if (typeof DecompressionStream !== 'undefined') {
+                        const stream = new ReadableStream({
+                            start(controller) {
+                                controller.enqueue(charCodeArray);
+                                controller.close();
+                            }
+                        });
+                        const decompressionStream = new DecompressionStream('gzip');
+                        const decompressedStream = stream.pipeThrough(decompressionStream);
+                        finalJsonText = await new Response(decompressedStream).text();
+                    } else if (typeof pako !== 'undefined') {
+                        finalJsonText = pako.ungzip(charCodeArray, { to: 'string' });
+                    } else {
+                        throw new Error("GZIP decompression is not supported in this browser.");
+                    }
+                }
+            }
+
+            // Parse text to memory array (JSON parsed data)
+            let parsedData = JSON.parse(finalJsonText);
+            const questionCount = Array.isArray(parsedData) ? parsedData.length : 0;
+
+            // Pre-Commit Confirmation Gate (Asynchronous Confirmation Flow)
+            const userConfirmed = confirm(`هل توافق على استيراد عدد ${questionCount} سؤال من الرابط الخارجي إلى بنك أسئلتك؟`);
+
+            if (!userConfirmed) {
+                // Strict Rollback & Data Pollution prevention: nullify memory variables
+                text = null;
+                finalJsonText = null;
+                parsedData = null;
+
+                // Show safe toast cancellation message
+                UIComponents.showToast("تم إلغاء عملية الاستيراد بأمان ولم تتأثر قاعدة بياناتك", "info");
+                return;
+            }
+
+            // Commit Phase: Pass the parsed array directly to atomic importData engine
+            await ExportModule.importData(parsedData, () => this.syncData());
+            
             urlInput.value = '';
         } catch (e) { alert((i18n.t('err_read_data', {msg: e.message})).replace('حدث خطأ أثناء قراءة البيانات: ', 'Error: ')); }
-        finally { btn.innerHTML = originalText; btn.disabled = false; }
+        finally {
+            if (btn) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
     },
 
     async importFromPaste() {

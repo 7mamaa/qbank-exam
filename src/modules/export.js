@@ -471,13 +471,19 @@ export const ExportModule = {
         URL.revokeObjectURL(url);
     },
 
-    validateImportPayload(jsonText) {
+    validateImportPayload(jsonTextOrData) {
         let data;
-        try {
-            data = JSON.parse(jsonText);
-        } catch (e) {
-            Logger.error('ExportModule', 'Aborted: JSON data-payload is malformed or corrupted', e);
-            throw new Error(i18n.t('err_invalid_format'), { cause: e });
+        if (typeof jsonTextOrData === 'string') {
+            try {
+                data = JSON.parse(jsonTextOrData);
+            } catch (e) {
+                Logger.error('ExportModule', 'Aborted: JSON data-payload is malformed or corrupted', e);
+                throw new Error(i18n.t('err_invalid_format'), { cause: e });
+            }
+        } else if (Array.isArray(jsonTextOrData)) {
+            data = jsonTextOrData;
+        } else {
+            throw new Error(i18n.t('err_invalid_format'));
         }
 
         if (!Array.isArray(data)) throw new Error(i18n.t('err_must_be_array'));
@@ -522,9 +528,9 @@ export const ExportModule = {
             let parsed;
             let floatingCount = 0;
             let newNotebooks = [];
-            const { manualTargetNb, autoDistribute } = this.validateImportPayload(fileContent);
+            const { data: importedPayload, manualTargetNb, autoDistribute } = this.validateImportPayload(fileContent);
             try {
-                parsed = JSON.parse(fileContent);
+                parsed = importedPayload;
                 const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
                 const validationResult = await validateIncomingPayload(parsed, existingNotebooks, {
                     autoDistribute,
@@ -1237,47 +1243,7 @@ export const ExportModule = {
             };
         }
 
-        // Bind direct link import button click to handle CORS and protect against HTML injection
-        const importBtn = document.getElementById('btn-import-url');
-        if (importBtn) {
-            importBtn.onclick = async (e) => {
-                e.preventDefault();
-                const urlInput = document.getElementById('import-url');
-                let targetUrl = urlInput ? urlInput.value.trim() : '';
-                if (!targetUrl) return alert(i18n.t('err_invalid_url'));
 
-                const originalText = importBtn.innerHTML;
-                try {
-                    importBtn.innerHTML = `${i18n.t('loading') || 'Loading...'} ⏳`;
-                    importBtn.disabled = true;
-
-                    // استخدام محرك البروكسي المتطور والمدعوم بآليات دفاعية تبادلية (Fallback) لتخطي حظر CORS
-                    const responseText = await Helpers.fetchUrlWithProxy(targetUrl);
-                    if (!responseText) throw new Error("Fetch failed");
-                    // خط دفاع فوري لمنع قراءة صفحات الـ HTML كـ JSON
-                    if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<')) {
-                        UIComponents.showToast("الرابط الممرر يؤدي لصفحة ويب وليس لملف أسئلة JSON صالح! ⚠️", 'warning');
-                        return;
-                    }
-
-                    const refData = JSON.parse(responseText);
-                    if (typeof app !== 'undefined' && typeof app.processImportedJSON === 'function') {
-                        await app.processImportedJSON(JSON.stringify(refData));
-                    } else {
-                        await ExportModule.importData(JSON.stringify(refData), () => {
-                            app?.syncData?.();
-                        });
-                    }
-
-                    if (urlInput) urlInput.value = '';
-                } catch (err) {
-                    alert((i18n.t('err_read_data', {msg: err.message}) || 'Error: ' + err.message).replace('حدث خطأ أثناء قراءة البيانات: ', 'Error: '));
-                } finally {
-                    importBtn.innerHTML = originalText;
-                    importBtn.disabled = false;
-                }
-            };
-        }
 
         // Auto-fill import URL from ?direct_url= query param
         const urlParams = new URLSearchParams(globalThis.location.search);

@@ -742,4 +742,80 @@ describe('QBank Core Logic Tests', () => {
             expect(result.length).toBe(2);
         });
     });
+
+    describe('Direct Link Import Confirmation Gate', () => {
+        it('should fetch and parsedData correctly, prompt confirm, and commit to importData if confirmed', async () => {
+            const { Helpers } = await import('../src/utils/helpers.js?v=16.6.0');
+            const { ExportModule } = await import('../src/modules/export.js?v=16.6.0');
+
+            const fetchSpy = vi.spyOn(Helpers, 'fetchUrlWithProxy').mockResolvedValue(JSON.stringify([
+                { id: 'q-url-1', question: 'Fetched Q1', type: 'boolean', answer: true, notebookId: 'nb-1' }
+            ]));
+            const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+            const importSpy = vi.spyOn(ExportModule, 'importData').mockResolvedValue();
+            const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+            // Set up DOM elements required by app.importFromUrl
+            const mockUrlInput = document.createElement('input');
+            mockUrlInput.id = 'import-url';
+            mockUrlInput.value = 'https://example.com/questions.json';
+            document.body.appendChild(mockUrlInput);
+
+            const mockBtn = document.createElement('button');
+            const mockEvent = { currentTarget: mockBtn };
+
+            await app.importFromUrl(mockEvent);
+
+            expect(fetchSpy).toHaveBeenCalledWith('https://example.com/questions.json');
+            expect(confirmSpy).toHaveBeenCalledWith('هل توافق على استيراد عدد 1 سؤال من الرابط الخارجي إلى بنك أسئلتك؟');
+            expect(importSpy).toHaveBeenCalled();
+            expect(mockUrlInput.value).toBe('');
+
+            // Clean up
+            fetchSpy.mockRestore();
+            confirmSpy.mockRestore();
+            importSpy.mockRestore();
+            alertSpy.mockRestore();
+            mockUrlInput.remove();
+        });
+
+        it('should abort and show safe cancel toast if user rejects confirmation', async () => {
+            const { Helpers } = await import('../src/utils/helpers.js?v=16.6.0');
+            const { ExportModule } = await import('../src/modules/export.js?v=16.6.0');
+
+            const fetchSpy = vi.spyOn(Helpers, 'fetchUrlWithProxy').mockResolvedValue(JSON.stringify([
+                { id: 'q-url-1', question: 'Fetched Q1', type: 'boolean', answer: true, notebookId: 'nb-1' }
+            ]));
+            const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+            const importSpy = vi.spyOn(ExportModule, 'importData');
+            const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+            
+            // Mock UIComponents toast
+            const { UIComponents } = await import('../src/ui/components.js?v=16.6.0');
+            const toastSpy = vi.spyOn(UIComponents, 'showToast').mockImplementation(() => {});
+
+            // Set up DOM elements
+            const mockUrlInput = document.createElement('input');
+            mockUrlInput.id = 'import-url';
+            mockUrlInput.value = 'https://example.com/questions.json';
+            document.body.appendChild(mockUrlInput);
+
+            const mockBtn = document.createElement('button');
+            const mockEvent = { currentTarget: mockBtn };
+
+            await app.importFromUrl(mockEvent);
+
+            expect(confirmSpy).toHaveBeenCalled();
+            expect(importSpy).not.toHaveBeenCalled();
+            expect(toastSpy).toHaveBeenCalledWith('تم إلغاء عملية الاستيراد بأمان ولم تتأثر قاعدة بياناتك', 'info');
+
+            // Clean up
+            fetchSpy.mockRestore();
+            confirmSpy.mockRestore();
+            importSpy.mockRestore();
+            alertSpy.mockRestore();
+            toastSpy.mockRestore();
+            mockUrlInput.remove();
+        });
+    });
 });
