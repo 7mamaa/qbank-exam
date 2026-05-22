@@ -177,10 +177,14 @@ export const app = {
                         return q;
                     });
 
-                    await ExportModule.processStrictImport(updatedData, async () => {
+                    await ExportModule.processStrictImport(updatedData, async (floatingCount) => {
                         localStorage.setItem(`imported_ref_${refId}`, "true");
                         await this.syncData();
-                        this.showToast(i18n.t('msg_auto_import_success', { name: targetRef.name }), 'success');
+                        if (floatingCount > 0) {
+                            this.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+                        } else {
+                            this.showToast(i18n.t('msg_auto_import_success', { name: targetRef.name }), 'success');
+                        }
                         globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
                     });
                 }
@@ -1030,9 +1034,13 @@ export const app = {
                             jsonData = JSON.parse(textDecoder.decode(arrayBuffer));
                         }
 
-                        await ExportModule.processStrictImport(jsonData, () => {
+                        await ExportModule.processStrictImport(jsonData, (floatingCount) => {
                             if (typeof this.syncData === 'function') this.syncData();
-                            alert(i18n.t('msg_import_fixed_success') || "تم الاستيراد بنجاح وبدون أي تكرار!");
+                            if (floatingCount > 0) {
+                                UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+                            } else {
+                                alert(i18n.t('msg_import_fixed_success') || "تم الاستيراد بنجاح وبدون أي تكرار!");
+                            }
                         });
 
                     } catch (error) {

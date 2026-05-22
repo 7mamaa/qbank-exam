@@ -7,28 +7,92 @@ import { Helpers } from '../utils/helpers.js?v=16.6.0';
 import { Logger } from '../utils/logger.js?v=16.6.0';
 import { UIComponents } from '../ui/components.js?v=16.6.0';
 
-function validateIncomingPayload(payload, existingNotebookIds = []) {
+function validateIncomingPayload(payload, existingNotebooks = []) {
     const errors = [];
     const seenIds = new Set();
     const seenQNumbers = new Map(); // notebookId -> Set of qNumbers
+    let floatingCount = 0;
 
     if (!Array.isArray(payload)) {
         throw new Error(i18n.t('err_import_not_array'));
+    }
+
+    if (typeof i18n !== 'undefined' && i18n.locales) {
+        if (i18n.locales.ar && !i18n.locales.ar['msg_import_success_floating']) {
+            i18n.locales.ar['msg_import_success_floating'] = 'تم استيراد بنك الأسئلة بنجاح! (تم تحويل {count} سؤال إلى أسئلة عائمة لعدم وجود الدفتر المسمى)';
+        }
+        if (i18n.locales.en && !i18n.locales.en['msg_import_success_floating']) {
+            i18n.locales.en['msg_import_success_floating'] = 'Question bank imported successfully! ({count} questions were made floating due to missing notebook)';
+        }
+    }
+
+    const stateNbs = globalThis.app?.state?.notebooks || state.notebooks || [];
+    const notebooksById = new Map();
+    const notebooksByName = new Map();
+
+    stateNbs.forEach(nb => {
+        if (nb && nb.id) {
+            notebooksById.set(String(nb.id), nb);
+            if (nb.name) {
+                notebooksByName.set(String(nb.name).trim().toLowerCase(), nb);
+            }
+            if (nb.title) {
+                notebooksByName.set(String(nb.title).trim().toLowerCase(), nb);
+            }
+        }
+    });
+
+    if (Array.isArray(existingNotebooks)) {
+        existingNotebooks.forEach(nb => {
+            if (nb && typeof nb === 'object' && nb.id) {
+                notebooksById.set(String(nb.id), nb);
+                if (nb.name) {
+                    notebooksByName.set(String(nb.name).trim().toLowerCase(), nb);
+                }
+                if (nb.title) {
+                    notebooksByName.set(String(nb.title).trim().toLowerCase(), nb);
+                }
+            } else if (typeof nb === 'string') {
+                if (!notebooksById.has(nb)) {
+                    notebooksById.set(nb, { id: nb });
+                }
+            }
+        });
     }
 
     for (let i = 0; i < payload.length; i++) {
         const q = payload[i];
         const ctx = `${i18n.t('err_at_question')} ${i + 1}: `;
 
-        // 1. فحص البنية الأساسية والهوية (Scenario 1)
+        // --- Self-Healing Code Block ---
+        // 1. Identity Repair
         if (!q.id || typeof q.id !== 'string' || q.id.trim() === '') {
-            errors.push(`${ctx}${i18n.t('err_invalid_id')}`);
-        } else {
-            if (seenIds.has(q.id)) {
-                errors.push(`${ctx}${i18n.t('err_id_collision')} [${q.id}]`);
-            }
-            seenIds.add(q.id);
+            q.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `self_healed_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${i}`;
         }
+
+        // 2. Numbering Repair
+        if (q.qNumber === undefined || q.qNumber === null || typeof q.qNumber !== 'number' || isNaN(q.qNumber)) {
+            q.qNumber = i + 1;
+        }
+
+        // 3. Boolean Correction
+        if (q.type === 'boolean') {
+            if (q.answer === undefined || q.answer === null || q.answer === '' || typeof q.answer === 'string') {
+                if (q.answer === 'true' || q.answer === true) {
+                    q.answer = true;
+                } else {
+                    q.answer = false; // Safe fallback
+                }
+            }
+        }
+
+        // --- Validation Checks ---
+        if (seenIds.has(q.id)) {
+            errors.push(`${ctx}${i18n.t('err_id_collision')} [${q.id}]`);
+        }
+        seenIds.add(q.id);
 
         if (!q.question || typeof q.question !== 'string' || q.question.trim() === '') {
             errors.push(`${ctx}${i18n.t('err_empty_question')}`);
@@ -39,7 +103,7 @@ function validateIncomingPayload(payload, existingNotebookIds = []) {
             errors.push(`${ctx}${i18n.t('err_unknown_type')} [${q.type || 'N/A'}]`);
         }
 
-        // 2. فحص التناقض المنطقي بين الأنواع والخيارات (Scenario 2)
+        // MCQ check
         if (q.type === 'mcq') {
             if (!Array.isArray(q.options) || q.options.length < 2) {
                 errors.push(`${ctx}${i18n.t('err_mcq_options_min')}`);
@@ -48,30 +112,34 @@ function validateIncomingPayload(payload, existingNotebookIds = []) {
         if (q.type === 'written' && q.options && q.options.length > 0) {
             errors.push(`${ctx}${i18n.t('err_written_has_options')}`);
         }
-        if (q.type === 'boolean') {
-            if (typeof q.answer !== 'boolean' && q.answer !== 'true' && q.answer !== 'false') {
-                errors.push(`${ctx}${i18n.t('err_boolean_answer_mismatch')}`);
+
+        // 3. ترقية منطق مطابقة الدفتر (Dual-Resolution Logic)
+        let resolvedNb = null;
+        if (q.notebookId !== undefined && q.notebookId !== null) {
+            const target = String(q.notebookId).trim();
+            const targetLower = target.toLowerCase();
+            if (notebooksById.has(target)) {
+                resolvedNb = notebooksById.get(target);
+            } else if (notebooksByName.has(targetLower)) {
+                resolvedNb = notebooksByName.get(targetLower);
+                q.notebookId = resolvedNb.id;
             }
         }
 
-        // 3. حماية البيانات من فخ الدفاتر اليتيمة (Scenario 3)
-        if (!q.notebookId || typeof q.notebookId !== 'string') {
-            errors.push(`${ctx}${i18n.t('err_missing_notebook_id')}`);
-        } else if (existingNotebookIds.length > 0 && !existingNotebookIds.includes(q.notebookId)) {
-            errors.push(`${ctx}${i18n.t('err_orphan_notebook')} [${q.notebookId}]`);
+        if (!resolvedNb) {
+            q.notebookId = null;
+            floatingCount++;
         }
 
-        // 4. فحص سلامة هيكل أسئلة التوصيل (Scenario 4)
+        // Match check
         if (q.type === 'match') {
             if (!Array.isArray(q.pairs) && (!q.options || typeof q.options !== 'object')) {
                 errors.push(`${ctx}${i18n.t('err_malformed_match_structure')}`);
             }
         }
 
-        // 5. حماية تسلسل وترقيم الأسئلة الفئوية (Scenario 5)
-        if (typeof q.qNumber !== 'number' || isNaN(q.qNumber)) {
-            errors.push(`${ctx}${i18n.t('err_invalid_qnumber')}`);
-        } else if (q.notebookId) {
+        // qNumber collision check
+        if (q.notebookId) {
             if (!seenQNumbers.has(q.notebookId)) {
                 seenQNumbers.set(q.notebookId, new Set());
             }
@@ -87,10 +155,14 @@ function validateIncomingPayload(payload, existingNotebookIds = []) {
         // دمج كافة الأخطاء المكتشفة في استجابة موحدة لمنع الكتابة الجزئية
         throw new Error(errors.join('\n'));
     }
-    return true;
+    return { success: true, floatingCount };
 }
 
 export const ExportModule = {
+    validateIncomingPayload(payload, existingNotebooks = []) {
+        return validateIncomingPayload(payload, existingNotebooks);
+    },
+
     updateExportScopeCounts() {
         const pool = QueryEngine.getQueryPool();
         const count = pool.length;
@@ -177,7 +249,7 @@ export const ExportModule = {
                 const isBeautify = beautifyEl ? beautifyEl.checked : false;
                 const isCompress = compressEl ? compressEl.checked : true;
 
-                const clean = pool.map(q => { const temp = { ...q }; delete temp.id; return temp; }); // Export clean schema
+                const clean = pool.map(q => ({ ...q })); // Export full profile schema
                 const jsonString = isBeautify ? JSON.stringify(clean, null, 4) : JSON.stringify(clean);
 
                 if (isCompress && typeof pako !== 'undefined') {
@@ -320,10 +392,12 @@ export const ExportModule = {
         let importedCount = 0;
         try {
             let parsed;
+            let floatingCount = 0;
             try {
                 parsed = JSON.parse(jsonText);
-                const existingNotebookIds = globalThis.app?.state?.notebooks?.map(n => n.id) || [];
-                validateIncomingPayload(parsed, existingNotebookIds);
+                const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
+                const validationResult = validateIncomingPayload(parsed, existingNotebooks);
+                floatingCount = validationResult.floatingCount || 0;
             } catch (validationError) {
                 console.error("[Security Gate Abort]:", validationError.message);
                 alert("❌ " + validationError.message);
@@ -331,7 +405,8 @@ export const ExportModule = {
                 return;
             }
 
-            const { data, manualTargetNb, autoDistribute } = this.validateImportPayload(jsonText);
+            const { manualTargetNb, autoDistribute } = this.validateImportPayload(jsonText);
+            const data = parsed;
             const questionsToSave = [];
             const qNumberCache = {}; 
 
@@ -345,7 +420,9 @@ export const ExportModule = {
                 let finalNbId = manualTargetNb;
                 const sourceName = cleanItem.notebookName || (typeof cleanItem.notebookId === 'string' && isNaN(cleanItem.notebookId) ? cleanItem.notebookId : null);
 
-                if (autoDistribute && sourceName) {
+                if (cleanItem.notebookId === null || cleanItem.notebookId === "") {
+                    finalNbId = null;
+                } else if (autoDistribute && sourceName) {
                     let existingNb = state.notebooks.find(n => n.name === sourceName || n.id === sourceName);
                     if (existingNb) {
                         finalNbId = existingNb.id;
@@ -361,6 +438,8 @@ export const ExportModule = {
                         state.notebooks.push(newNb);
                         finalNbId = newNb.id;
                     }
+                } else if (cleanItem.notebookId) {
+                    finalNbId = cleanItem.notebookId;
                 }
 
                 if (!qNumberCache[finalNbId]) {
@@ -395,7 +474,11 @@ export const ExportModule = {
                 await db.bulkPut('questions', questionsToSave);
             }
 
-            alert(i18n.t('msg_questions_found', { count: importedCount }));
+            if (floatingCount > 0) {
+                UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+            } else {
+                alert(i18n.t('msg_questions_found', { count: importedCount }));
+            }
             if (syncCallback) await syncCallback();
         } catch (err) {
             alert(i18n.t('err_import_failed', { message: err.message }));
@@ -406,9 +489,11 @@ export const ExportModule = {
      * المعالجة الصارمة للاستيراد: تمنع تمرير المراجع (References) وتمنع تصادم الـ IDs
      */
     async processStrictImport(parsedData, successCallback) {
+        let floatingCount = 0;
         try {
-            const existingNotebookIds = globalThis.app?.state?.notebooks?.map(n => n.id) || [];
-            validateIncomingPayload(parsedData, existingNotebookIds);
+            const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
+            const validationResult = validateIncomingPayload(parsedData, existingNotebooks);
+            floatingCount = validationResult.floatingCount || 0;
         } catch (validationError) {
             console.error("[Security Gate Abort]:", validationError.message);
             alert("❌ " + validationError.message);
@@ -454,7 +539,9 @@ export const ExportModule = {
             cleanItem.createdAt = Date.now() + index; // إضافة الـ index لمنع تطابق التوقيت تماماً
 
             // Set mandatory fields missing in strict mode
-            cleanItem.notebookId = cleanItem.notebookId || 'orphaned';
+            if (cleanItem.notebookId !== null && cleanItem.notebookId !== '') {
+                cleanItem.notebookId = cleanItem.notebookId || 'orphaned';
+            }
             cleanItem.type = cleanItem.type || 'mcq';
 
             cleanQuestions.push(cleanItem);
@@ -464,7 +551,7 @@ export const ExportModule = {
         try {
             await db.bulkPut('questions', cleanQuestions);
             console.log(`[Import Engine] Successfully injected ${cleanQuestions.length} unique items.`);
-            if (successCallback) successCallback();
+            if (successCallback) successCallback(floatingCount);
         } catch (dbError) {
             console.error("[Import Engine] DB Write Failure:", dbError);
             throw dbError;
@@ -1156,7 +1243,7 @@ export const ExportModule = {
         if (confirmBtn) confirmBtn.disabled = true;
 
         try {
-            await ExportModule.processStrictImport(ExportModule.loadedReferenceData, () => {
+            await ExportModule.processStrictImport(ExportModule.loadedReferenceData, (floatingCount) => {
                 ExportModule.loadedReferenceData = null;
                 const selector = document.getElementById('reference-selector');
                 if (selector) selector.value = '';
@@ -1172,7 +1259,11 @@ export const ExportModule = {
                 
                 globalThis.app?.syncData?.();
                 
-                alert(i18n.t('msg_import_success'));
+                if (floatingCount > 0) {
+                    UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+                } else {
+                    alert(i18n.t('msg_import_success'));
+                }
             });
         } catch (err) {
             console.error('[Reference Hub] Import failed:', err);

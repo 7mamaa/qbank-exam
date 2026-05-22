@@ -135,4 +135,106 @@ describe('QBank Core Logic Tests', () => {
             expect(distance).toBe(1);
         });
     });
+
+    describe('validateIncomingPayload Dual-Resolution and Floating Fallback', () => {
+        it('should resolve notebook by ID and keep it intact', () => {
+            const notebooks = [{ id: 'nb-uuid-1', name: 'Ophthalmology' }];
+            const payload = [
+                {
+                    id: 'q-1',
+                    question: 'Test question 1',
+                    type: 'mcq',
+                    options: ['A', 'B'],
+                    answer: 'A',
+                    qNumber: 1,
+                    notebookId: 'nb-uuid-1'
+                }
+            ];
+
+            const result = ExportModule.validateIncomingPayload(payload, notebooks);
+            expect(result.success).toBe(true);
+            expect(result.floatingCount).toBe(0);
+            expect(payload[0].notebookId).toBe('nb-uuid-1');
+        });
+
+        it('should resolve notebook by name/title and replace with UUID', () => {
+            const notebooks = [{ id: 'nb-uuid-2', name: 'Cardiology' }];
+            const payload = [
+                {
+                    id: 'q-2',
+                    question: 'Test question 2',
+                    type: 'mcq',
+                    options: ['A', 'B'],
+                    answer: 'A',
+                    qNumber: 2,
+                    notebookId: 'Cardiology'
+                }
+            ];
+
+            const result = ExportModule.validateIncomingPayload(payload, notebooks);
+            expect(result.success).toBe(true);
+            expect(result.floatingCount).toBe(0);
+            expect(payload[0].notebookId).toBe('nb-uuid-2');
+        });
+
+        it('should convert unmatching notebookId to null (floating fallback) and count it', () => {
+            const notebooks = [{ id: 'nb-uuid-3', name: 'Pediatrics' }];
+            const payload = [
+                {
+                    id: 'q-3',
+                    question: 'Test question 3',
+                    type: 'mcq',
+                    options: ['A', 'B'],
+                    answer: 'A',
+                    qNumber: 3,
+                    notebookId: 'NonExistentNotebook'
+                }
+            ];
+
+            const result = ExportModule.validateIncomingPayload(payload, notebooks);
+            expect(result.success).toBe(true);
+            expect(result.floatingCount).toBe(1);
+            expect(payload[0].notebookId).toBeNull();
+        });
+
+        it('should self-heal missing q.id and q.qNumber and invalid boolean answer', () => {
+            const notebooks = [{ id: 'nb-uuid-4', name: 'Neurology' }];
+            const payload = [
+                {
+                    question: 'Test boolean self-heal question',
+                    type: 'boolean',
+                    answer: 'true',
+                    notebookId: 'nb-uuid-4'
+                },
+                {
+                    id: '',
+                    question: 'Test boolean self-heal question 2',
+                    type: 'boolean',
+                    answer: '',
+                    notebookId: 'nb-uuid-4'
+                }
+            ];
+
+            const result = ExportModule.validateIncomingPayload(payload, notebooks);
+            expect(result.success).toBe(true);
+            expect(result.floatingCount).toBe(0);
+            
+            // Check identity repair
+            expect(payload[0].id).toBeDefined();
+            expect(typeof payload[0].id).toBe('string');
+            expect(payload[0].id.length).toBeGreaterThan(0);
+            expect(payload[1].id).toBeDefined();
+            expect(typeof payload[1].id).toBe('string');
+            expect(payload[1].id.length).toBeGreaterThan(0);
+            expect(payload[0].id).not.toBe(payload[1].id);
+
+            // Check numbering repair
+            expect(payload[0].qNumber).toBe(1);
+            expect(payload[1].qNumber).toBe(2);
+
+            // Check boolean correction
+            expect(payload[0].answer).toBe(true);
+            expect(payload[1].answer).toBe(false);
+        });
+    });
 });
