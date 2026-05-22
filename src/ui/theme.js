@@ -1,4 +1,4 @@
-import { state } from '../core/state.js';
+import { state } from '../core/state.js?v=16.6.0';
 
 export const ThemeManager = {
     initTheme(updateSoundIcon) {
@@ -31,7 +31,7 @@ export const ThemeManager = {
 
                 if (updateSoundIcon) updateSoundIcon();
                 return;
-            } catch (e) {
+            } catch {
                 localStorage.removeItem('qbank_custom_theme');
             }
         }

@@ -1197,6 +1197,16 @@
             <p style="color:var(--text-secondary); margin-bottom:15px; line-height:1.6;" data-i18n="ai_instructions">خصّص البرومبت أدناه ثم انسخه وأرسله لأي نموذج ذكاء اصطناعي (ChatGPT، Gemini، Claude...) للحصول على أسئلة جاهزة للاستيراد مباشرة.</p>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                <div class="form-group" style="margin:0; grid-column: span 2;">
+                    <label data-i18n="lbl_task_type">نوع المهمة الكبرى</label>
+                    <select id="ai-task-type" class="form-control" onchange="app.regeneratePrompt()">
+                        <option value="scratch" data-i18n="opt_task_scratch">توليد أسئلة جديدة من الصفر 🎯</option>
+                        <option value="pdf_ingest" data-i18n="opt_task_pdf_ingest">تحويل نصوص كتب وملفات PDF 📄</option>
+                        <option value="ocr_cleanup" data-i18n="opt_task_ocr_cleanup">تنظيف وهيكلة امتحانات الـ OCR 📸</option>
+                        <option value="schema_refactor" data-i18n="opt_task_schema_refactor">إعادة هيكلة وتأمين ملفات قديمة 🛡️</option>
+                        <option value="clinical_case" data-i18n="opt_task_clinical_case">توليد سيناريوهات حالات إكلينيكية معقدة 🩺</option>
+                    </select>
+                </div>
                 <div class="form-group" style="margin:0;">
                     <label data-i18n="topic_label">الموضوع / المادة</label>
                     <input type="text" id="ai-topic" class="form-control" value="التاريخ الإسلامي" oninput="app.regeneratePrompt()">

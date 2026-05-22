@@ -1,6 +1,6 @@
-import { db } from '../core/db.js';
-import { state } from '../core/state.js';
-import { i18n } from '../core/i18n.js';
+import { db } from '../core/db.js?v=16.6.0';
+import { state } from '../core/state.js?v=16.6.0';
+import { i18n } from '../core/i18n.js?v=16.6.0';
 
 /**
  * @file duplicates.js

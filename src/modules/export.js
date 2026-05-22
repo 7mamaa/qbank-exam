@@ -1,10 +1,11 @@
-/* global pako, React, ReactPDF, UIComponents, app */
+/* global pako, React, ReactPDF, app */
 import { state } from '../core/state.js?v=16.6.0';
 import { db } from '../core/db.js?v=16.6.0';
 import { QueryEngine } from '../core/query.js?v=16.6.0';
 import { i18n } from '../core/i18n.js?v=16.6.0';
 import { Helpers } from '../utils/helpers.js?v=16.6.0';
 import { Logger } from '../utils/logger.js?v=16.6.0';
+import { UIComponents } from '../ui/components.js?v=16.6.0';
 
 function validateIncomingPayload(payload, existingNotebookIds = []) {
     const errors = [];

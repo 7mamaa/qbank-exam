@@ -1,5 +1,5 @@
-import { db } from './db.js';
-import { Helpers } from '../utils/helpers.js';
+import { db } from './db.js?v=16.6.0';
+import { Helpers } from '../utils/helpers.js?v=16.6.0';
 
 /**
  * Migration Engine for QBank.

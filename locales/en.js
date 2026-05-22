@@ -375,7 +375,7 @@ export const en = {
     "err_notebook_exists": "⚠️ Another notebook exists with name {name}.",
     "notebook_delete_confirm": "Are you sure you want to delete this notebook? All associated questions will be permanently deleted.",
     "no_desc": "No description.",
-    "ai_prompt_template": `You are a professional curriculum and question bank designer. Output a clean, direct JSON array inside a code block [ ... ] containing the requested questions about the topic "{topic}".
+    "ai_prompt_template": `{intro}; output a clean, direct JSON array inside a code block [ ... ] containing the requested questions about the topic "{topic}".
 
 Technical Specifications Required:
 - Total number of questions: {totalCount}.
@@ -548,6 +548,10 @@ Important technical notes for standard JSON compliance:
     "theme_cream_earthy": "Cream Earthy ☕",
     "app_version_badge": "v16.6.0 pro",
     "app_version_label": "Stable Version",
+    "answer_label": "Model Answer",
+    "msg_institution_saved": "✅ Institution details saved successfully!",
+    "msg_institution_confirm": "Are you sure you want to clear the institution logo and name?",
+    "msg_institution_cleared": "🔄 Institution logo and name cleared successfully.",
     "btn_copy_share_link": "Copy Direct Import Link 🔗",
     "msg_share_link_copied": "Auto-import link copied to clipboard! Ready to share 📋",
     "msg_auto_importing_ref": "Auto-importing medical reference... 📡",
@@ -579,5 +583,16 @@ Important technical notes for standard JSON compliance:
     "err_qnumber_collision": "Detected a sequence tracking collision (qNumber) within the same notebook domain:",
     "msg_raw_bank_copied": "✅ Full question bank copied to clipboard as raw JSON! Ready to paste into any editor or AI tool.",
     "msg_bank_empty_copy": "⚠️ Question bank is currently empty! Add questions first and try again.",
-    "msg_schema_template_copied": "✅ Schema template (v16.6.0) copied successfully! Paste it into ChatGPT or any AI generator for compatible question output."
+    "msg_schema_template_copied": "✅ Schema template (v16.6.0) copied successfully! Paste it into ChatGPT or any AI generator for compatible question output.",
+    "lbl_task_type": "Core Task Type",
+    "opt_task_scratch": "Generate New From Scratch 🎯",
+    "opt_task_pdf_ingest": "PDF / Text Document Ingestion 📄",
+    "opt_task_ocr_cleanup": "OCR Exam Image Cleanup 📸",
+    "opt_task_schema_refactor": "Old Data Schema Refactoring 🛡️",
+    "opt_task_clinical_case": "Complex Clinical Case Scenarios 🩺",
+    "ai_intro_scratch": "You are a professional curriculum and question bank designer. I want you to generate from scratch a professional JSON array of questions",
+    "ai_intro_pdf_ingest": "You are an advanced medical document ingestion engine. I will paste text extracted from a medical book/file. Your strict task is to extract information and transform it into a JSON array of questions",
+    "ai_intro_ocr_cleanup": "You are an expert in cleaning and engineering OCR data. I will give you text extracted via Optical Character Recognition (OCR) from exam images. The text contains spelling errors and broken symbols; reformulate it",
+    "ai_intro_schema_refactor": "You are a Data Quality Assurance (Data QA) engineer. I will give you an array of old questions that lack security standards; your task is to restructure them and inject strict fields",
+    "ai_intro_clinical_case": "You are a professor of clinical medical education. I want you to take the medical topic and draft questions based on complex clinical vignettes"
 };

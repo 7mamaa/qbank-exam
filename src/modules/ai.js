@@ -1,5 +1,5 @@
-import { i18n } from '../core/i18n.js';
-import { state } from '../core/state.js';
+import { i18n } from '../core/i18n.js?v=16.6.0';
+import { state } from '../core/state.js?v=16.6.0';
 
 export const AIModule = {
     regeneratePrompt() {
@@ -33,8 +33,13 @@ export const AIModule = {
             countWritten > 0 ? `${countWritten} ${i18n.t('type_written')}` : null
         ].filter(Boolean).join(isAr ? '، و ' : ', and ');
 
+        const taskType = document.getElementById('ai-task-type')?.value || 'scratch';
+        const introKey = `ai_intro_${taskType}`;
+        const intro = i18n.t(introKey);
+
         let prompt = i18n.t('ai_prompt_template');
-        prompt = prompt.replace(/{topic}/g, topic)
+        prompt = prompt.replace(/{intro}/g, intro)
+                       .replace(/{topic}/g, topic)
                        .replace(/{totalCount}/g, totalCount)
                        .replace(/{typesStr}/g, typesStr)
                        .replace(/{lang}/g, lang)

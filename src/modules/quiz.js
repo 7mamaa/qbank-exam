@@ -1,10 +1,10 @@
-import { state } from '../core/state.js';
-import { AudioManager } from '../ui/audio.js';
-import { Helpers } from '../utils/helpers.js';
-import { i18n } from '../core/i18n.js';
-import { QuestionModule } from './questions.js';
+import { state } from '../core/state.js?v=16.6.0';
+import { AudioManager } from '../ui/audio.js?v=16.6.0';
+import { Helpers } from '../utils/helpers.js?v=16.6.0';
+import { i18n } from '../core/i18n.js?v=16.6.0';
+import { QuestionModule } from './questions.js?v=16.6.0';
 
-import { NotebookModule } from './notebooks.js';
+import { NotebookModule } from './notebooks.js?v=16.6.0';
 
 /**
  * @module QuizModule

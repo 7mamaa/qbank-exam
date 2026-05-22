@@ -342,7 +342,7 @@ export const QuestionModule = {
             const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
             const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
             const numA = Number(valA);
-            const numB = Number(numB);
+            const numB = Number(valB);
             if (!isNaN(numA) && !isNaN(numB)) {
                 return numA - numB;
             }

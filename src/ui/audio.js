@@ -1,4 +1,4 @@
-import { state } from '../core/state.js';
+import { state } from '../core/state.js?v=16.6.0';
 
 export const AudioManager = {
     toggleSound(updateSoundIcon) {
