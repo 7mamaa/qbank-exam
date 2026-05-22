@@ -143,6 +143,14 @@ export const app = {
                 this.handleAutoImport(refId);
             }
 
+            // Global keydown listener for Developer Diagnostics tool (Ctrl + Shift + E)
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'e') {
+                    e.preventDefault();
+                    this.dumpSystemDiagnostics();
+                }
+            });
+
         } catch (e) {
             this.handleError(e, "App Initialization failed");
         }
@@ -177,10 +185,12 @@ export const app = {
                         return q;
                     });
 
-                    await ExportModule.processStrictImport(updatedData, async (floatingCount) => {
+                    await ExportModule.processStrictImport(updatedData, async (floatingCount, autoDistribute) => {
                         localStorage.setItem(`imported_ref_${refId}`, "true");
                         await this.syncData();
-                        if (floatingCount > 0) {
+                        if (!autoDistribute) {
+                            this.showToast(i18n.t('msg_import_success_forced'), 'success');
+                        } else if (floatingCount > 0) {
                             this.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
                         } else {
                             this.showToast(i18n.t('msg_auto_import_success', { name: targetRef.name }), 'success');
@@ -1019,39 +1029,49 @@ export const app = {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    try {
-                        let jsonData;
-                        const arrayBuffer = event.target.result;
-                        
-                        if (file.name.endsWith('.gz') && typeof pako !== 'undefined') {
+                try {
+                    let fileContent;
+                    if (file.name.endsWith('.gz') || file.name.endsWith('.gzip')) {
+                        if (typeof DecompressionStream !== 'undefined') {
+                            const decompressionStream = new DecompressionStream('gzip');
+                            const fileStream = typeof file.stream === 'function' ? file.stream() : new ReadableStream({
+                                async start(controller) {
+                                    controller.enqueue(new Uint8Array(await file.arrayBuffer()));
+                                    controller.close();
+                                }
+                            });
+                            const decompressedStream = fileStream.pipeThrough(decompressionStream);
+                            fileContent = await new Response(decompressedStream).text();
+                        } else if (typeof pako !== 'undefined') {
+                            const arrayBuffer = await file.arrayBuffer();
                             const uint8Array = new Uint8Array(arrayBuffer);
-                            const decompressed = pako.ungzip(uint8Array, { to: 'string' });
-                            jsonData = JSON.parse(decompressed);
+                            fileContent = pako.ungzip(uint8Array, { to: 'string' });
                         } else {
-                            const textDecoder = new TextDecoder('utf-8');
-                            jsonData = JSON.parse(textDecoder.decode(arrayBuffer));
+                            throw new Error("GZIP decompression is not supported in this browser.");
                         }
-
-                        await ExportModule.processStrictImport(jsonData, (floatingCount) => {
-                            if (typeof this.syncData === 'function') this.syncData();
-                            if (floatingCount > 0) {
-                                UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
-                            } else {
-                                alert(i18n.t('msg_import_fixed_success') || "تم الاستيراد بنجاح وبدون أي تكرار!");
-                            }
-                        });
-
-                    } catch (error) {
-                        Logger.error('ImportSystem', 'Critical failure during file decompression/parsing', error);
-                        alert(i18n.t('err_decompression_failed') || "فشل الاستيراد: تأكد من سلامة الملف.");
-                    } finally {
-                        e.target.value = ''; 
+                    } else {
+                        fileContent = await file.text();
                     }
-                };
-                // قراءة الملف كـ ArrayBuffer لدعم الـ Binary Data (Gzip)
-                reader.readAsArrayBuffer(file);
+
+                    const jsonData = JSON.parse(fileContent);
+
+                    await ExportModule.processStrictImport(jsonData, (floatingCount, autoDistribute) => {
+                        if (typeof this.syncData === 'function') this.syncData();
+                        if (!autoDistribute) {
+                            UIComponents.showToast(i18n.t('msg_import_success_forced'), 'success');
+                        } else if (floatingCount > 0) {
+                            UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+                        } else {
+                            alert(i18n.t('msg_import_fixed_success') || "تم الاستيراد بنجاح وبدون أي تكرار!");
+                        }
+                    });
+
+                } catch (error) {
+                    Logger.error('ImportSystem', 'Critical failure during file decompression/parsing', error);
+                    alert(i18n.t('err_decompression_failed') || "فشل الاستيراد: تأكد من سلامة الملف.");
+                } finally {
+                    e.target.value = ''; 
+                }
             });
         }
 
@@ -2591,6 +2611,99 @@ export const app = {
             (err, ctx) => this.handleError(err, ctx),
             (count) => UIComponents.showToast(i18n.t('msg_transfer_simulator', { count }), 'success')
         );
+    },
+
+    async dumpSystemDiagnostics() {
+        console.log("%c==================================================", "color: #ff9900; font-weight: bold;");
+        console.log("%c🚀 STARTING FULL SYSTEM DIAGNOSTICS DUMP", "color: #ff9900; font-weight: bold; font-size: 14px;");
+        console.log("%c==================================================", "color: #ff9900; font-weight: bold;");
+
+        // [أولاً: الحالة العامة للنظام (System Health)]
+        console.log("%c[1/3] System Health Overview:", "color: #ff9900; font-weight: bold;");
+        const version = "v16.6.0";
+        const isoTime = new Date().toISOString();
+        const notebooksCount = this.state.notebooks ? this.state.notebooks.length : 0;
+        const questionsCount = this.state.questions ? this.state.questions.length : 0;
+        const orphanedCount = this.state.questions ? this.state.questions.filter(q => !q.notebookId).length : 0;
+
+        console.log(`- Stable Version: ${version}`);
+        console.log(`- ISO Timestamp: ${isoTime}`);
+        console.log(`- Notebooks Count: ${notebooksCount}`);
+        console.log(`- Questions Count: ${questionsCount}`);
+        if (orphanedCount > 0) {
+            console.log(`%c- ⚠️ Orphaned/Floating Questions: ${orphanedCount}`, "color: #ff4500; font-weight: bold;");
+        } else {
+            console.log(`- Orphaned/Floating Questions: ${orphanedCount}`);
+        }
+
+        // [ثانياً: خريطة طبوغرافيا الدفاتر والعلاقات (Notebooks Topology Table)]
+        console.log("%c[2/3] Notebooks Topology Map:", "color: #ff9900; font-weight: bold;");
+        const topology = (this.state.notebooks || []).map(nb => {
+            const qCount = this.state.questions ? this.state.questions.filter(q => q.notebookId === nb.id).length : 0;
+            return {
+                "Notebook ID": nb.id,
+                "Notebook Title": nb.name || "Untitled",
+                "Parent ID": nb.parentId || "None",
+                "Child ID": (this.state.notebooks || []).filter(n => n.parentId === nb.id).map(n => n.id).join(', ') || "None",
+                "Questions": qCount
+            };
+        });
+        if (topology.length > 0) {
+            console.table(topology);
+        } else {
+            console.log("No notebooks found in current state.");
+        }
+
+        // [ثالثاً: فحص الكاش والبيئة المحيطة (Storage & Environment Audit)]
+        console.log("%c[3/3] Storage & Environment Audit:", "color: #ff9900; font-weight: bold;");
+
+        // 1. Persistent storage
+        let storageGranted = "Unknown/Unsupported";
+        try {
+            if (navigator.storage && navigator.storage.persisted) {
+                const persisted = await navigator.storage.persisted();
+                storageGranted = persisted ? "Granted" : "Denied";
+            }
+        } catch (e) {
+            storageGranted = `Error: ${e.message}`;
+        }
+        const storageColor = storageGranted === 'Granted' ? '#00ff00' : '#ff4500';
+        console.log(`- Persistent Storage: %c${storageGranted}`, `color: ${storageColor}; font-weight: bold;`);
+
+        // 2. LocalStorage audit
+        console.log("- LocalStorage Usage:");
+        let totalSize = 0;
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const val = localStorage.getItem(key) || "";
+            const size = (key.length + val.length) * 2; // UTF-16 bytes approx
+            totalSize += size;
+            console.log(`  * ${key}: ~${(size / 1024).toFixed(2)} KB`);
+        }
+        console.log(`- Total LocalStorage size: ~${(totalSize / 1024).toFixed(2)} KB`);
+
+        // 3. Service Worker
+        let swStatus = "Unsupported";
+        if ('serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                if (registrations.length > 0) {
+                    swStatus = registrations.map(r => {
+                        const stateStr = r.active ? "Active" : r.installing ? "Installing" : r.waiting ? "Waiting" : "Inactive";
+                        return `Scope: ${r.scope} [${stateStr}]`;
+                    }).join(', ');
+                } else {
+                    swStatus = "No active service worker registrations found";
+                }
+            } catch (e) {
+                swStatus = `Error: ${e.message}`;
+            }
+        }
+        console.log(`- Service Worker Status: ${swStatus}`);
+
+        console.log("%c==================================================", "color: #ff9900; font-weight: bold;");
+        console.log("%c🚀 DIAGNOSTICS DUMP COMPLETED SUCCESSFULLY", "color: #ff9900; font-weight: bold; font-size: 14px;");
+        console.log("%c==================================================", "color: #ff9900; font-weight: bold;");
     }
 };
 

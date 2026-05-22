@@ -7,22 +7,56 @@ import { Helpers } from '../utils/helpers.js?v=16.6.0';
 import { Logger } from '../utils/logger.js?v=16.6.0';
 import { UIComponents } from '../ui/components.js?v=16.6.0';
 
-function validateIncomingPayload(payload, existingNotebooks = []) {
+async function validateIncomingPayload(payload, existingNotebooks = [], options = {}) {
     const errors = [];
     const seenIds = new Set();
-    const seenQNumbers = new Map(); // notebookId -> Set of qNumbers
     let floatingCount = 0;
+    const newNotebooks = [];
+
+    const isUUID = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+    const maxQNumbersByNotebook = new Map();
+    const getMaxQForNotebook = (nbId) => {
+        if (!nbId) return 0;
+        if (maxQNumbersByNotebook.has(nbId)) {
+            return maxQNumbersByNotebook.get(nbId);
+        }
+        const localQs = (globalThis.app?.state?.questions || state.questions || []);
+        const maxVal = Math.max(...localQs.filter(item => item.notebookId === nbId).map(item => item.qNumber || 0), 0);
+        maxQNumbersByNotebook.set(nbId, maxVal);
+        return maxVal;
+    };
 
     if (!Array.isArray(payload)) {
         throw new Error(i18n.t('err_import_not_array'));
     }
 
+    const autoDistribute = (options.autoDistribute !== undefined)
+        ? options.autoDistribute
+        : (document.getElementById('import-auto-distribute') ? document.getElementById('import-auto-distribute').checked : true);
+
+    const activeNotebookId = (options.activeNotebookId !== undefined)
+        ? options.activeNotebookId
+        : (document.getElementById('import-notebook') ? document.getElementById('import-notebook').value : null);
+
+    const maxQForForced = !autoDistribute ? getMaxQForNotebook(activeNotebookId) : 0;
+
     if (typeof i18n !== 'undefined' && i18n.locales) {
-        if (i18n.locales.ar && !i18n.locales.ar['msg_import_success_floating']) {
-            i18n.locales.ar['msg_import_success_floating'] = 'تم استيراد بنك الأسئلة بنجاح! (تم تحويل {count} سؤال إلى أسئلة عائمة لعدم وجود الدفتر المسمى)';
+        if (i18n.locales.ar) {
+            if (!i18n.locales.ar['msg_import_success_floating']) {
+                i18n.locales.ar['msg_import_success_floating'] = 'تم استيراد بنك الأسئلة بنجاح! (تم تحويل {count} سؤال إلى أسئلة عائمة لعدم وجود الدفتر المسمى)';
+            }
+            if (!i18n.locales.ar['msg_import_success_forced']) {
+                i18n.locales.ar['msg_import_success_forced'] = 'تم صب كافة الأسئلة داخل الدفتر المختار بنجاح!';
+            }
         }
-        if (i18n.locales.en && !i18n.locales.en['msg_import_success_floating']) {
-            i18n.locales.en['msg_import_success_floating'] = 'Question bank imported successfully! ({count} questions were made floating due to missing notebook)';
+        if (i18n.locales.en) {
+            if (!i18n.locales.en['msg_import_success_floating']) {
+                i18n.locales.en['msg_import_success_floating'] = 'Question bank imported successfully! ({count} questions were made floating due to missing notebook)';
+            }
+            if (!i18n.locales.en['msg_import_success_forced']) {
+                i18n.locales.en['msg_import_success_forced'] = 'All questions successfully imported into the selected notebook!';
+            }
         }
     }
 
@@ -60,6 +94,36 @@ function validateIncomingPayload(payload, existingNotebooks = []) {
         });
     }
 
+    const addNewNotebook = (id, name) => {
+        const newNb = {
+            id,
+            name,
+            icon: '📁',
+            color: '#4361ee',
+            createdAt: Date.now()
+        };
+        newNotebooks.push(newNb);
+        notebooksById.set(id, newNb);
+        notebooksByName.set(name.trim().toLowerCase(), newNb);
+        return newNb;
+    };
+
+    const getAggregatedNotebook = () => {
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        const nbName = `(استيراد تلقائي - ${dd}/${mm}/${yyyy})`;
+        const nbNameLower = nbName.toLowerCase();
+        
+        if (notebooksByName.has(nbNameLower)) {
+            return notebooksByName.get(nbNameLower);
+        }
+        
+        const newId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `nb_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+        return addNewNotebook(newId, nbName);
+    };
+
     for (let i = 0; i < payload.length; i++) {
         const q = payload[i];
         const ctx = `${i18n.t('err_at_question')} ${i + 1}: `;
@@ -70,11 +134,6 @@ function validateIncomingPayload(payload, existingNotebooks = []) {
             q.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
                 ? crypto.randomUUID()
                 : `self_healed_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${i}`;
-        }
-
-        // 2. Numbering Repair
-        if (q.qNumber === undefined || q.qNumber === null || typeof q.qNumber !== 'number' || isNaN(q.qNumber)) {
-            q.qNumber = i + 1;
         }
 
         // 3. Boolean Correction
@@ -113,22 +172,62 @@ function validateIncomingPayload(payload, existingNotebooks = []) {
             errors.push(`${ctx}${i18n.t('err_written_has_options')}`);
         }
 
-        // 3. ترقية منطق مطابقة الدفتر (Dual-Resolution Logic)
-        let resolvedNb = null;
-        if (q.notebookId !== undefined && q.notebookId !== null) {
-            const target = String(q.notebookId).trim();
-            const targetLower = target.toLowerCase();
-            if (notebooksById.has(target)) {
-                resolvedNb = notebooksById.get(target);
-            } else if (notebooksByName.has(targetLower)) {
-                resolvedNb = notebooksByName.get(targetLower);
+        // Route notebookId conditionally
+        if (!autoDistribute) {
+            q.notebookId = activeNotebookId;
+        } else {
+            const idKey = q.notebookId ? String(q.notebookId).trim() : "";
+            const nameKey = q.notebookName ? String(q.notebookName).trim().toLowerCase() : "";
+
+            let resolvedNb = null;
+            if (idKey && notebooksById.has(idKey)) {
+                resolvedNb = notebooksById.get(idKey);
+            } else {
+                const idKeyLower = idKey.toLowerCase();
+                if (nameKey && notebooksByName.has(nameKey)) {
+                    resolvedNb = notebooksByName.get(nameKey);
+                } else if (idKey && notebooksByName.has(idKeyLower)) {
+                    resolvedNb = notebooksByName.get(idKeyLower);
+                }
+            }
+
+            if (resolvedNb) {
                 q.notebookId = resolvedNb.id;
+            } else {
+                const hasUUID = isUUID(q.notebookId);
+                const hasName = typeof q.notebookName === 'string' && q.notebookName.trim() !== '';
+
+                if (hasUUID && !hasName) {
+                    const newNb = addNewNotebook(q.notebookId, q.notebookId);
+                    q.notebookId = newNb.id;
+                } else if (hasUUID && hasName) {
+                    const newNb = addNewNotebook(q.notebookId, q.notebookName.trim());
+                    q.notebookId = newNb.id;
+                } else if (hasName && !hasUUID) {
+                    const newId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                        ? crypto.randomUUID()
+                        : `nb_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+                    const newNb = addNewNotebook(newId, q.notebookName.trim());
+                    q.notebookId = newNb.id;
+                } else if (!q.notebookId && !hasName) {
+                    const aggNb = getAggregatedNotebook();
+                    q.notebookId = aggNb.id;
+                } else {
+                    q.notebookId = null;
+                    floatingCount++;
+                }
             }
         }
 
-        if (!resolvedNb) {
-            q.notebookId = null;
-            floatingCount++;
+        // 2. Smart Sequence Numbering Injection
+        if (!autoDistribute) {
+            q.qNumber = maxQForForced + i + 1;
+        } else {
+            const groupKey = q.notebookId || "floating";
+            const maxQ = getMaxQForNotebook(groupKey);
+            const nextQ = maxQ + 1;
+            q.qNumber = nextQ;
+            maxQNumbersByNotebook.set(groupKey, nextQ);
         }
 
         // Match check
@@ -137,30 +236,17 @@ function validateIncomingPayload(payload, existingNotebooks = []) {
                 errors.push(`${ctx}${i18n.t('err_malformed_match_structure')}`);
             }
         }
-
-        // qNumber collision check
-        if (q.notebookId) {
-            if (!seenQNumbers.has(q.notebookId)) {
-                seenQNumbers.set(q.notebookId, new Set());
-            }
-            const currentNotebookSet = seenQNumbers.get(q.notebookId);
-            if (currentNotebookSet.has(q.qNumber)) {
-                errors.push(`${ctx}${i18n.t('err_qnumber_collision')} (${q.qNumber})`);
-            }
-            currentNotebookSet.add(q.qNumber);
-        }
     }
 
     if (errors.length > 0) {
-        // دمج كافة الأخطاء المكتشفة في استجابة موحدة لمنع الكتابة الجزئية
         throw new Error(errors.join('\n'));
     }
-    return { success: true, floatingCount };
+    return { success: true, floatingCount, newNotebooks };
 }
 
 export const ExportModule = {
-    validateIncomingPayload(payload, existingNotebooks = []) {
-        return validateIncomingPayload(payload, existingNotebooks);
+    async validateIncomingPayload(payload, existingNotebooks = [], options = {}) {
+        return await validateIncomingPayload(payload, existingNotebooks, options);
     },
 
     updateExportScopeCounts() {
@@ -252,11 +338,27 @@ export const ExportModule = {
                 const clean = pool.map(q => ({ ...q })); // Export full profile schema
                 const jsonString = isBeautify ? JSON.stringify(clean, null, 4) : JSON.stringify(clean);
 
-                if (isCompress && typeof pako !== 'undefined') {
+                if (isCompress) {
                     const uint8Array = new TextEncoder().encode(jsonString);
-                    const compressedData = pako.gzip(uint8Array);
-                    const blob = new Blob([compressedData], { type: 'application/gzip' });
-                    this.downloadFile(blob, `qbank_${Date.now()}.json.gz`);
+                    if (typeof CompressionStream !== 'undefined') {
+                        const stream = new ReadableStream({
+                            start(controller) {
+                                controller.enqueue(uint8Array);
+                                controller.close();
+                            }
+                        });
+                        const compressionStream = new CompressionStream('gzip');
+                        const compressedStream = stream.pipeThrough(compressionStream);
+                        const blob = await new Response(compressedStream).blob();
+                        const gzBlob = new Blob([blob], { type: 'application/gzip' });
+                        this.downloadFile(gzBlob, `qbank_${Date.now()}.json.gz`);
+                    } else if (typeof pako !== 'undefined') {
+                        const compressedData = pako.gzip(uint8Array);
+                        const blob = new Blob([compressedData], { type: 'application/gzip' });
+                        this.downloadFile(blob, `qbank_${Date.now()}.json.gz`);
+                    } else {
+                        throw new Error("GZIP compression is not supported in this browser.");
+                    }
                 } else {
                     const blob = new Blob([jsonString], { type: 'application/json' });
                     this.downloadFile(blob, `qbank_${Date.now()}.json`);
@@ -388,16 +490,48 @@ export const ExportModule = {
         return { data, manualTargetNb, autoDistribute };
     },
 
-    async importData(jsonText, syncCallback) {
+    async importData(jsonTextOrFile, syncCallback) {
         let importedCount = 0;
         try {
+            let fileContent = jsonTextOrFile;
+            if (jsonTextOrFile instanceof File || (jsonTextOrFile && typeof jsonTextOrFile === 'object' && jsonTextOrFile.name)) {
+                const file = jsonTextOrFile;
+                if (file.name.endsWith('.gz') || file.name.endsWith('.gzip')) {
+                    if (typeof DecompressionStream !== 'undefined') {
+                        const decompressionStream = new DecompressionStream('gzip');
+                        const fileStream = typeof file.stream === 'function' ? file.stream() : new ReadableStream({
+                            async start(controller) {
+                                controller.enqueue(new Uint8Array(await file.arrayBuffer()));
+                                controller.close();
+                            }
+                        });
+                        const decompressedStream = fileStream.pipeThrough(decompressionStream);
+                        fileContent = await new Response(decompressedStream).text();
+                    } else if (typeof pako !== 'undefined') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const uint8Array = new Uint8Array(arrayBuffer);
+                        fileContent = pako.ungzip(uint8Array, { to: 'string' });
+                    } else {
+                        throw new Error("GZIP decompression is not supported in this browser.");
+                    }
+                } else {
+                    fileContent = await file.text();
+                }
+            }
+
             let parsed;
             let floatingCount = 0;
+            let newNotebooks = [];
+            const { manualTargetNb, autoDistribute } = this.validateImportPayload(fileContent);
             try {
-                parsed = JSON.parse(jsonText);
+                parsed = JSON.parse(fileContent);
                 const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
-                const validationResult = validateIncomingPayload(parsed, existingNotebooks);
+                const validationResult = await validateIncomingPayload(parsed, existingNotebooks, {
+                    autoDistribute,
+                    activeNotebookId: manualTargetNb
+                });
                 floatingCount = validationResult.floatingCount || 0;
+                newNotebooks = validationResult.newNotebooks || [];
             } catch (validationError) {
                 console.error("[Security Gate Abort]:", validationError.message);
                 alert("❌ " + validationError.message);
@@ -405,10 +539,8 @@ export const ExportModule = {
                 return;
             }
 
-            const { manualTargetNb, autoDistribute } = this.validateImportPayload(jsonText);
             const data = parsed;
             const questionsToSave = [];
-            const qNumberCache = {}; 
 
             for (const item of data) {
                 // Deep clone the incoming item to break all references
@@ -417,35 +549,7 @@ export const ExportModule = {
                 if (!cleanItem.type || !['mcq', 'boolean', 'match', 'written'].includes(cleanItem.type)) continue;
                 if (!cleanItem.question) continue;
 
-                let finalNbId = manualTargetNb;
-                const sourceName = cleanItem.notebookName || (typeof cleanItem.notebookId === 'string' && isNaN(cleanItem.notebookId) ? cleanItem.notebookId : null);
-
-                if (cleanItem.notebookId === null || cleanItem.notebookId === "") {
-                    finalNbId = null;
-                } else if (autoDistribute && sourceName) {
-                    let existingNb = state.notebooks.find(n => n.name === sourceName || n.id === sourceName);
-                    if (existingNb) {
-                        finalNbId = existingNb.id;
-                    } else {
-                        const newNb = {
-                            id: Helpers.generateId(),
-                            name: sourceName,
-                            icon: '📁',
-                            color: '#4361ee',
-                            createdAt: Date.now()
-                        };
-                        await db.put('notebooks', newNb);
-                        state.notebooks.push(newNb);
-                        finalNbId = newNb.id;
-                    }
-                } else if (cleanItem.notebookId) {
-                    finalNbId = cleanItem.notebookId;
-                }
-
-                if (!qNumberCache[finalNbId]) {
-                    const nbQs = state.questions.filter(q => q.notebookId === finalNbId);
-                    qNumberCache[finalNbId] = nbQs.length + 1;
-                }
+                let finalNbId = cleanItem.notebookId;
 
                 const newQ = {
                     id: Helpers.generateId(),
@@ -461,7 +565,7 @@ export const ExportModule = {
                     explain: cleanItem.explain || '',
                     image: cleanItem.image || null,
                     tags: cleanItem.tags || [],
-                    qNumber: qNumberCache[finalNbId]++,
+                    qNumber: cleanItem.qNumber,
                     createdAt: Date.now()
                 };
 
@@ -469,12 +573,45 @@ export const ExportModule = {
                 importedCount++;
             }
 
-            // Bulk Save: Optimized to use single transaction instead of Promise.all loops
-            if (questionsToSave.length > 0) {
-                await db.bulkPut('questions', questionsToSave);
+            // Bulk Save: Optimized to use single transaction instead of separate store calls
+            if (newNotebooks.length > 0 || questionsToSave.length > 0) {
+                if (db.instance) {
+                    await new Promise((resolve, reject) => {
+                        const tx = db.instance.transaction(['notebooks', 'questions'], 'readwrite');
+                        if (newNotebooks.length > 0) {
+                            const nbStore = tx.objectStore('notebooks');
+                            newNotebooks.forEach(nb => nbStore.put(nb));
+                        }
+                        if (questionsToSave.length > 0) {
+                            const qStore = tx.objectStore('questions');
+                            questionsToSave.forEach(q => qStore.put(q));
+                        }
+                        tx.oncomplete = () => resolve(true);
+                        tx.onerror = () => reject(tx.error);
+                    });
+                } else {
+                    if (newNotebooks.length > 0) {
+                        await db.bulkPut('notebooks', newNotebooks);
+                    }
+                    if (questionsToSave.length > 0) {
+                        await db.bulkPut('questions', questionsToSave);
+                    }
+                }
+
+                // Also update app.state.notebooks / state.notebooks
+                if (newNotebooks.length > 0) {
+                    const appNbs = globalThis.app?.state?.notebooks || state.notebooks || [];
+                    newNotebooks.forEach(nb => {
+                        if (!appNbs.some(n => n.id === nb.id)) {
+                            appNbs.push(nb);
+                        }
+                    });
+                }
             }
 
-            if (floatingCount > 0) {
+            if (!autoDistribute) {
+                UIComponents.showToast(i18n.t('msg_import_success_forced'), 'success');
+            } else if (floatingCount > 0) {
                 UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
             } else {
                 alert(i18n.t('msg_questions_found', { count: importedCount }));
@@ -490,10 +627,22 @@ export const ExportModule = {
      */
     async processStrictImport(parsedData, successCallback) {
         let floatingCount = 0;
+        let newNotebooks = [];
+        const autoDistribute = document.getElementById('import-auto-distribute') 
+            ? document.getElementById('import-auto-distribute').checked 
+            : true;
+        const activeNotebookId = document.getElementById('import-notebook')
+            ? document.getElementById('import-notebook').value
+            : null;
+
         try {
             const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
-            const validationResult = validateIncomingPayload(parsedData, existingNotebooks);
+            const validationResult = await validateIncomingPayload(parsedData, existingNotebooks, {
+                autoDistribute,
+                activeNotebookId
+            });
             floatingCount = validationResult.floatingCount || 0;
+            newNotebooks = validationResult.newNotebooks || [];
         } catch (validationError) {
             console.error("[Security Gate Abort]:", validationError.message);
             alert("❌ " + validationError.message);
@@ -549,9 +698,41 @@ export const ExportModule = {
 
         // 6. الحفظ الجماعي (Bulk Save) - تفريغ المصفوفة في قاعدة البيانات (Optimized Architecture)
         try {
-            await db.bulkPut('questions', cleanQuestions);
+            if (newNotebooks.length > 0 || cleanQuestions.length > 0) {
+                if (db.instance) {
+                    await new Promise((resolve, reject) => {
+                        const tx = db.instance.transaction(['notebooks', 'questions'], 'readwrite');
+                        if (newNotebooks.length > 0) {
+                            const nbStore = tx.objectStore('notebooks');
+                            newNotebooks.forEach(nb => nbStore.put(nb));
+                        }
+                        if (cleanQuestions.length > 0) {
+                            const qStore = tx.objectStore('questions');
+                            cleanQuestions.forEach(q => qStore.put(q));
+                        }
+                        tx.oncomplete = () => resolve(true);
+                        tx.onerror = () => reject(tx.error);
+                    });
+                } else {
+                    if (newNotebooks.length > 0) {
+                        await db.bulkPut('notebooks', newNotebooks);
+                    }
+                    if (cleanQuestions.length > 0) {
+                        await db.bulkPut('questions', cleanQuestions);
+                    }
+                }
+
+                if (newNotebooks.length > 0) {
+                    const appNbs = globalThis.app?.state?.notebooks || state.notebooks || [];
+                    newNotebooks.forEach(nb => {
+                        if (!appNbs.some(n => n.id === nb.id)) {
+                            appNbs.push(nb);
+                        }
+                    });
+                }
+            }
             console.log(`[Import Engine] Successfully injected ${cleanQuestions.length} unique items.`);
-            if (successCallback) successCallback(floatingCount);
+            if (successCallback) successCallback(floatingCount, autoDistribute);
         } catch (dbError) {
             console.error("[Import Engine] DB Write Failure:", dbError);
             throw dbError;
@@ -1070,15 +1251,9 @@ export const ExportModule = {
                     importBtn.innerHTML = `${i18n.t('loading') || 'Loading...'} ⏳`;
                     importBtn.disabled = true;
 
-                    // إذا كان الرابط من جوجل درايف أو يحتوي على جوجل، نستخدم البروكسي الآمن لتخطي حظر CORS مجاناً
-                    if (targetUrl.includes('drive.google.com') || targetUrl.includes('google.com')) {
-                        targetUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-                    }
-
-                    const response = await fetch(targetUrl);
-                    if (!response.ok) throw new Error("Fetch failed");
-
-                    const responseText = await response.text();
+                    // استخدام محرك البروكسي المتطور والمدعوم بآليات دفاعية تبادلية (Fallback) لتخطي حظر CORS
+                    const responseText = await Helpers.fetchUrlWithProxy(targetUrl);
+                    if (!responseText) throw new Error("Fetch failed");
                     // خط دفاع فوري لمنع قراءة صفحات الـ HTML كـ JSON
                     if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<')) {
                         UIComponents.showToast("الرابط الممرر يؤدي لصفحة ويب وليس لملف أسئلة JSON صالح! ⚠️", 'warning');
@@ -1243,7 +1418,7 @@ export const ExportModule = {
         if (confirmBtn) confirmBtn.disabled = true;
 
         try {
-            await ExportModule.processStrictImport(ExportModule.loadedReferenceData, (floatingCount) => {
+            await ExportModule.processStrictImport(ExportModule.loadedReferenceData, (floatingCount, autoDistribute) => {
                 ExportModule.loadedReferenceData = null;
                 const selector = document.getElementById('reference-selector');
                 if (selector) selector.value = '';
@@ -1259,7 +1434,9 @@ export const ExportModule = {
                 
                 globalThis.app?.syncData?.();
                 
-                if (floatingCount > 0) {
+                if (!autoDistribute) {
+                    UIComponents.showToast(i18n.t('msg_import_success_forced'), 'success');
+                } else if (floatingCount > 0) {
                     UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
                 } else {
                     alert(i18n.t('msg_import_success'));

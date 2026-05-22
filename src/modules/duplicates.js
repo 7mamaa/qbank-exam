@@ -35,9 +35,32 @@ export const DuplicatesLogic = {
         worker.postMessage({ type: 'RESET' });
 
         return new Promise((resolve, reject) => {
+            let watchdog = null;
+            const resetWatchdog = () => {
+                if (watchdog) clearTimeout(watchdog);
+                watchdog = setTimeout(() => {
+                    console.warn("[Worker Watchdog Timeout]: Worker took too long to respond. Terminating.");
+                    worker.terminate();
+                    if (this._worker === worker) {
+                        this._worker = null;
+                    }
+                    resolve([]);
+                }, 3000);
+            };
+
+            const cleanup = () => {
+                if (watchdog) {
+                    clearTimeout(watchdog);
+                    watchdog = null;
+                }
+            };
+
+            resetWatchdog();
+
             const processData = async () => {
                 try {
                     worker.onmessage = (e) => {
+                        resetWatchdog();
                         const { type, progress, groups, label } = e.data;
                         
                         if (type === 'PROGRESS' && onProgress) {
@@ -45,12 +68,14 @@ export const DuplicatesLogic = {
                         } else if (type === 'PROGRESS_PHASE' && onProgress) {
                             onProgress(50 + Math.round(progress / 2), label); 
                         } else if (type === 'COMPLETE') {
+                            cleanup();
                             resolve(groups);
                         }
                     };
 
                     worker.onerror = (err) => {
                         console.error('Worker Error:', err);
+                        cleanup();
                         reject(err);
                     };
 
@@ -61,6 +86,7 @@ export const DuplicatesLogic = {
 
                     let batch = [];
                     request.onsuccess = (event) => {
+                        resetWatchdog();
                         const cursor = event.target.result;
                         if (cursor) {
                             batch.push(cursor.value);
@@ -78,8 +104,12 @@ export const DuplicatesLogic = {
                         }
                     };
 
-                    request.onerror = (err) => reject(err);
+                    request.onerror = (err) => {
+                        cleanup();
+                        reject(err);
+                    };
                 } catch (e) {
+                    cleanup();
                     reject(e);
                 }
             };

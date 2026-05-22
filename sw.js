@@ -59,6 +59,11 @@ globalThis.addEventListener('activate', (event) => {
     );
 });
 
+// Helper to create fallback response on complete network/cache failure
+const makeFallbackResponse = () => {
+    return new Response('Network error occurred', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+};
+
 // ── Fetch: smart strategy per request type ────────────────────
 globalThis.addEventListener('fetch', (event) => {
     const requestUrl = event.request.url;
@@ -81,7 +86,9 @@ globalThis.addEventListener('fetch', (event) => {
     // Network-first for Google Fonts (fallback to cache offline)
     if (url.hostname.includes('googleapis.com') && url.pathname.includes('/css')) {
         event.respondWith(
-            fetch(event.request).catch(() => caches.match(event.request))
+            fetch(event.request)
+                .catch(() => caches.match(event.request))
+                .then((res) => res || makeFallbackResponse())
         );
         return;
     }
@@ -89,7 +96,9 @@ globalThis.addEventListener('fetch', (event) => {
     // Network-first for HTML navigation — always serve the latest index.html
     if (event.request.mode === 'navigate') {
         event.respondWith(
-            fetch(event.request).catch(() => caches.match('./index.html'))
+            fetch(event.request)
+                .catch(() => caches.match('./index.html'))
+                .then((res) => res || makeFallbackResponse())
         );
         return;
     }
@@ -97,10 +106,12 @@ globalThis.addEventListener('fetch', (event) => {
     // Network-first for versioned JS/CSS (?v=x.x) so bumped versions always load fresh
     if (url.search && url.origin === globalThis.location.origin) {
         event.respondWith(
-            fetch(event.request).catch((err) => {
-                console.warn('[SW] Versioned fetch failed, serving from cache:', err);
-                return caches.match(event.request);
-            })
+            fetch(event.request)
+                .catch((err) => {
+                    console.warn('[SW] Versioned fetch failed, serving from cache:', err);
+                    return caches.match(event.request);
+                })
+                .then((res) => res || makeFallbackResponse())
         );
         return;
     }
@@ -110,13 +121,15 @@ globalThis.addEventListener('fetch', (event) => {
         event.respondWith(
             caches.match(event.request).then((cached) => {
                 if (cached) return cached;
-                return fetch(event.request).then((response) => {
-                    if (response && response.status === 200 && response.type !== 'error') {
-                        const toCache = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, toCache));
-                    }
-                    return response;
-                });
+                return fetch(event.request)
+                    .then((response) => {
+                        if (response && response.status === 200 && response.type !== 'error') {
+                            const toCache = response.clone();
+                            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, toCache));
+                        }
+                        return response;
+                    })
+                    .catch(() => makeFallbackResponse());
             })
         );
         return;
@@ -124,6 +137,8 @@ globalThis.addEventListener('fetch', (event) => {
 
     // Network-first for all other external resources (CDN libs, QR API, etc.)
     event.respondWith(
-        fetch(event.request).catch(() => caches.match(event.request))
+        fetch(event.request)
+            .catch(() => caches.match(event.request))
+            .then((res) => res || makeFallbackResponse())
     );
 });

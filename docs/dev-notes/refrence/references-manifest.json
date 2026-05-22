@@ -1,23 +1,9 @@
 [
   {
-    "id": "ref-v0",
-    "name": "بنك الأسئلة الطبي - الإصدار v0",
-    "path": "docs/dev-notes/refrence/v0.json",
-    "version": "1.0.0",
-    "description": "مرجع شامل لأسئلة طب العيون والجراحة العامة والباطنة."
-  },
-  {
-    "id": "ref-v1",
-    "name": "بنك أسئلة الأنف والأذن والحنجرة - الإصدار v1",
-    "path": "docs/dev-notes/refrence/v1.json",
-    "version": "1.1.0",
-    "description": "أسئلة مخصصة لمادة الأنف والأذن والحنجرة لطلاب مرحلة البكالوريوس."
-  },
-  {
     "id": "ref-v2",
-    "name": "بنك الأسئلة المطور - الإصدار v2",
+    "name": "بنك الرمد",
     "path": "docs/dev-notes/refrence/v2.json",
     "version": "1.2.0",
-    "description": "تحديثات أسئلة التخصصات الطبية الإضافية والامتحانات الإكلينيكية الحالية."
+    "description": "رمد"
   }
 ]

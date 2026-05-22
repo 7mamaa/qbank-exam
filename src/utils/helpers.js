@@ -98,7 +98,9 @@ export const Helpers = {
 
         const strategies = [
             async () => (await fetch(finalUrl)).text(),
+            async () => (await fetch(`https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(finalUrl)}`)).text(),
             async () => (await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(finalUrl)}`)).text(),
+            async () => (await fetch(`https://corsproxy.io/?${encodeURIComponent(finalUrl)}`)).text(),
             async () => (await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(finalUrl)}`)).text()
         ];
 
