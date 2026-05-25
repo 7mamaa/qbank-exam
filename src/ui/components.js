@@ -153,6 +153,342 @@ export const UIComponents = {
         this._renderBarChart('chart-difficulty', difficultyCounts, colors);
     },
 
+    renderDailyActivityHeatmap(questions, quizHistory) {
+        try {
+            const container = document.getElementById('heatmap-container');
+            if (!container) return;
+
+            const activityMap = {};
+            const oneDayMs = 24 * 60 * 60 * 1000;
+
+            (questions || []).forEach(q => {
+                let dateObj = null;
+                if (q.createdAt) {
+                    dateObj = new Date(q.createdAt);
+                } else if (typeof q.id === 'number') {
+                    dateObj = new Date(q.id);
+                } else if (typeof q.id === 'string' && !isNaN(q.id)) {
+                    dateObj = new Date(Number(q.id));
+                }
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    const dateStr = dateObj.toISOString().split('T')[0];
+                    activityMap[dateStr] = (activityMap[dateStr] || 0) + 1;
+                }
+            });
+
+            (quizHistory || []).forEach(quiz => {
+                if (quiz.date) {
+                    const dateStr = quiz.date.split('T')[0];
+                    activityMap[dateStr] = (activityMap[dateStr] || 0) + 1;
+                }
+            });
+
+            const today = new Date();
+            const dates = [];
+            const startDate = new Date(today.getTime() - 364 * oneDayMs);
+            const startDayOfWeek = startDate.getDay();
+            const adjustedStartDate = new Date(startDate.getTime() - startDayOfWeek * oneDayMs);
+
+            for (let i = 0; i < 371; i++) {
+                const d = new Date(adjustedStartDate.getTime() + i * oneDayMs);
+                dates.push(d);
+            }
+
+            let rects = '';
+            for (let col = 0; col < 53; col++) {
+                for (let row = 0; row < 7; row++) {
+                    const index = col * 7 + row;
+                    const d = dates[index];
+                    if (!d) continue;
+
+                    const dateStr = d.toISOString().split('T')[0];
+                    const count = activityMap[dateStr] || 0;
+
+                    let color = 'rgba(128, 128, 128, 0.12)';
+                    let tooltipSuffix = 'لا نشاط';
+                    if (count > 0) {
+                        if (count === 1) {
+                            color = 'rgba(244, 162, 97, 0.3)';
+                            tooltipSuffix = 'نشاط واحد';
+                        } else if (count <= 3) {
+                            color = 'rgba(244, 162, 97, 0.7)';
+                            tooltipSuffix = `${count} نشاطات`;
+                        } else if (count <= 5) {
+                            color = 'rgba(114, 9, 183, 0.6)';
+                            tooltipSuffix = `${count} نشاطات`;
+                        } else {
+                            color = 'rgba(114, 9, 183, 1)';
+                            tooltipSuffix = `${count} نشاطات`;
+                        }
+                    }
+
+                    const x = col * 12;
+                    const y = row * 12;
+
+                    rects += `
+                        <rect x="${x}" y="${y}" width="10" height="10" rx="2" ry="2" fill="${color}" style="transition: fill 0.3s ease; cursor: pointer;">
+                            <title>${dateStr}: ${tooltipSuffix}</title>
+                        </rect>
+                    `;
+                }
+            }
+
+            container.innerHTML = `
+                <svg viewBox="0 0 636 84" width="100%" height="100%" style="max-width: 636px;">
+                    ${rects}
+                </svg>
+            `;
+        } catch (err) {
+            console.error('Heatmap render error', err);
+        }
+    },
+
+    renderVulnerabilityDetector(quizHistory) {
+        try {
+            const catStats = {};
+            const tagStats = {};
+
+            (quizHistory || []).forEach(quiz => {
+                (quiz.questions || []).forEach(q => {
+                    const isCorrect = q.correct ? 1 : 0;
+                    
+                    if (q.category && q.category.trim()) {
+                        const cat = q.category.trim();
+                        if (!catStats[cat]) catStats[cat] = { total: 0, correct: 0 };
+                        catStats[cat].total++;
+                        catStats[cat].correct += isCorrect;
+                    }
+
+                    (q.tags || []).forEach(tag => {
+                        if (tag && tag.trim()) {
+                            const t = tag.trim();
+                            if (!tagStats[t]) tagStats[t] = { total: 0, correct: 0 };
+                            tagStats[t].total++;
+                            tagStats[t].correct += isCorrect;
+                        }
+                    });
+                });
+            });
+
+            const vulnerabilities = [];
+            Object.entries(catStats).forEach(([cat, stat]) => {
+                const pct = Math.round((stat.correct / stat.total) * 100);
+                if (stat.total >= 2 && pct < 50) {
+                    vulnerabilities.push({ name: cat, pct: pct, total: stat.total });
+                }
+            });
+            Object.entries(tagStats).forEach(([tag, stat]) => {
+                const pct = Math.round((stat.correct / stat.total) * 100);
+                if (stat.total >= 2 && pct < 50) {
+                    vulnerabilities.push({ name: `#${tag}`, pct: pct, total: stat.total });
+                }
+            });
+
+            const container = document.getElementById('vulnerability-container');
+            if (!container) return;
+
+            if (vulnerabilities.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 15px; text-align: center; color: var(--success-color); background: rgba(42, 157, 143, 0.05); border: 1px dashed var(--success-color); border-radius: 12px; font-weight: 700; font-size: 0.85rem;">
+                        🛡️ لا توجد نقاط ضعف حالياً.
+                    </div>
+                `;
+                return;
+            }
+
+            vulnerabilities.sort((a, b) => a.pct - b.pct);
+
+            container.innerHTML = vulnerabilities.slice(0, 3).map(v => `
+                <div style="background: rgba(230, 57, 70, 0.05); border: 1.5px solid rgba(230, 57, 70, 0.1); border-left: 5px solid #e63946; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.2rem; flex-shrink:0;">⚠️</span>
+                    <div style="text-align: start;">
+                        <h4 style="margin: 0; color: var(--text-title); font-size: 0.85rem; font-weight: 800; text-align: start;">
+                            تراجع في: <span style="color:#e63946;">${Helpers.sanitize(v.name)}</span>
+                        </h4>
+                        <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: start;">
+                            الإجابات الصحيحة ${v.pct}% (${v.total} أسئلة)
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) {
+            console.error('Vulnerability Detector render error', err);
+        }
+    },
+
+    renderHistoricalQuizChart(quizHistory) {
+        try {
+            const container = document.getElementById('chart-history-container');
+            if (!container) return;
+
+            if (!quizHistory || quizHistory.length === 0) {
+                container.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; opacity:0.15;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
+                        <p style="font-weight:600; font-size:0.85rem;">لا توجد نتائج اختبارات سابقة.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const recentQuizzes = quizHistory
+                .slice(-10)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const width = 600;
+            const height = 180;
+            const padLeft = 40;
+            const padRight = 20;
+            const padTop = 20;
+            const padBottom = 30;
+
+            const plotWidth = width - padLeft - padRight;
+            const plotHeight = height - padTop - padBottom;
+
+            let gridLines = '';
+            const percentages = [0, 50, 100];
+            percentages.forEach(p => {
+                const y = padTop + plotHeight - (p / 100) * plotHeight;
+                gridLines += `
+                    <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4" />
+                    <text x="${padLeft - 8}" y="${y + 4}" font-size="9" fill="var(--text-secondary)" text-anchor="end" font-weight="700">${p}%</text>
+                `;
+            });
+
+            const points = [];
+            recentQuizzes.forEach((quiz, i) => {
+                const pct = quiz.percent || 0;
+                const x = recentQuizzes.length === 1 
+                    ? padLeft + plotWidth / 2 
+                    : padLeft + i * (plotWidth / (recentQuizzes.length - 1));
+                const y = padTop + plotHeight - (pct / 100) * plotHeight;
+                points.push({ x, y, pct, date: quiz.date, index: i + 1, score: quiz.score, total: quiz.total });
+            });
+
+            let pathD = '';
+            if (points.length > 0) {
+                pathD = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+            }
+
+            let areaPathD = '';
+            if (points.length > 0) {
+                areaPathD = `${pathD} L ${points[points.length - 1].x} ${padTop + plotHeight} L ${points[0].x} ${padTop + plotHeight} Z`;
+            }
+
+            let chartElements = `
+                <defs>
+                    <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.3"/>
+                        <stop offset="100%" stop-color="var(--primary)" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                ${gridLines}
+            `;
+
+            if (areaPathD) {
+                chartElements += `<path d="${areaPathD}" fill="url(#chart-grad)" />`;
+            }
+
+            if (pathD) {
+                chartElements += `<path d="${pathD}" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />`;
+            }
+
+            points.forEach(p => {
+                const formattedDate = new Date(p.date).toLocaleDateString(document.documentElement.lang === 'ar' ? 'ar-EG' : 'en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                chartElements += `
+                    <g style="cursor: pointer;">
+                        <circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--card-bg)" stroke="var(--primary)" stroke-width="2" />
+                        <text x="${p.x}" y="${padTop + plotHeight + 15}" font-size="8" fill="var(--text-secondary)" text-anchor="middle" font-weight="700">${formattedDate}</text>
+                        <title>اختبار #${p.index} | الدرجة: ${p.score}/${p.total} (${p.pct}%)</title>
+                    </g>
+                `;
+            });
+
+            container.innerHTML = `
+                <svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" style="overflow: visible;">
+                    ${chartElements}
+                </svg>
+            `;
+        } catch (err) {
+            console.error('Historical chart render error', err);
+        }
+    },
+
+    renderDailyAnalyticsWrap(questions, quizHistory) {
+        try {
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            const addedToday = (questions || []).filter(q => {
+                let dateObj = null;
+                if (q.createdAt) {
+                    dateObj = new Date(q.createdAt);
+                } else if (typeof q.id === 'number') {
+                    dateObj = new Date(q.id);
+                } else if (typeof q.id === 'string' && !isNaN(q.id)) {
+                    dateObj = new Date(Number(q.id));
+                }
+                return dateObj && dateObj.toISOString().split('T')[0] === todayStr;
+            }).length;
+
+            const solvedToday = (quizHistory || []).filter(quiz => {
+                return quiz.date && quiz.date.split('T')[0] === todayStr;
+            });
+
+            const solvedCountToday = solvedToday.length;
+            const highestScoreToday = solvedCountToday > 0 
+                ? Math.max(...solvedToday.map(q => q.percent || 0)) 
+                : 0;
+
+            const container = document.getElementById('daily-wrap-container');
+            if (!container) return;
+
+            if (addedToday === 0 && solvedCountToday === 0) {
+                container.innerHTML = `
+                    <div style="font-weight: 600; color: var(--text-secondary); text-align: start; font-size: 0.9rem;">
+                        أهلاً بك اليوم! البنك جاهز دائماً. لم تقم بإضافة أسئلة أو حل اختبارات اليوم بعد. 🚀
+                    </div>
+                `;
+                return;
+            }
+
+            let summaryText = `النهارده أضفت <strong style="color: var(--primary); font-size:1.1rem;">${addedToday}</strong> سؤالاً جديداً 📚`;
+            if (solvedCountToday > 0) {
+                summaryText += `، وحللت <strong style="color: var(--accent); font-size:1.1rem;">${solvedCountToday}</strong> اختباراً 🧪، وحققت أعلى درجة <strong style="color: #2cb67d; font-size:1.1rem;">${highestScoreToday}%</strong> 🎉.`;
+            } else {
+                summaryText += `، ولم تقم بحل أي اختبارات اليوم.`;
+            }
+
+            container.innerHTML = `
+                <div style="background: rgba(114, 9, 183, 0.04); border: 1px solid rgba(114, 9, 183, 0.08); padding: 12px; border-radius: 10px; font-weight: 600; color: var(--text-title); animation: fadeIn 0.4s ease; text-align: start; font-size: 0.9rem; line-height: 1.5;">
+                    ${summaryText}
+                </div>
+            `;
+        } catch (err) {
+            console.error('Daily wrap render error', err);
+        }
+    },
+
+    renderOrphanCounter(questions) {
+        try {
+            const orphanCount = (questions || []).filter(q => {
+                const hasCategory = q.category && q.category.trim() !== '';
+                const hasTags = q.tags && q.tags.length > 0;
+                return !hasCategory && !hasTags;
+            }).length;
+
+            const valEl = document.getElementById('orphan-count-value');
+            if (valEl) {
+                valEl.textContent = orphanCount;
+            }
+        } catch (err) {
+            console.error('Orphan counter render error', err);
+        }
+    },
+
     /**
      * Shared animated bar chart renderer.
      * Bars grow from 0→target height via CSS transition for a premium feel.

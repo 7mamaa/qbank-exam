@@ -11,6 +11,9 @@ export const state = {
     /** @type {Array} Current list of question objects */
     questions: [],
     
+    /** @type {Array} History of completed quizzes */
+    quizHistory: [],
+    
     /** @type {string} Currently active view/page ID */
     currentView: 'dashboard',
     
@@ -81,6 +84,7 @@ export const state = {
         pool: [],
         currentIdx: 0,
         answers: {},
+        bookmarks: new Set(),
         startTime: null,
         timerInterval: null,
         isFinished: false

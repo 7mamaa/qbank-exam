@@ -196,6 +196,104 @@
                         </div>
                     </div>
                     
+                    <!-- Daily Wrap & Quick Actions -->
+                    <div class="stat-card span-2" style="border-top: 4px solid #7209b7; padding: 25px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
+                                    <span style="color:#7209b7; margin-left: 8px;">🌅</span>
+                                    <span data-i18n="daily_wrap_title">ملخص الأداء اليومي</span>
+                                </h3>
+                            </div>
+                            <div id="daily-wrap-container" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 20px;">
+                                جاري تحميل ملخص اليوم...
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: var(--text-title);" data-i18n="quick_actions_title">الوصول السريع ⚡</h4>
+                            <div class="quick-actions-row" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="btn btn-sm" onclick="app.quickStartQuiz()" style="background: var(--primary); color: white; border: none; font-weight: bold; flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 0.85rem; border-radius: 8px;">
+                                    📝 <span data-i18n="quick_quiz">امتحان فوري</span>
+                                </button>
+                                <button class="btn btn-sm" onclick="app.quickPasteJson()" style="background: var(--accent); color: white; border: none; font-weight: bold; flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 0.85rem; border-radius: 8px;">
+                                    📋 <span data-i18n="quick_paste">لصق كبسولة</span>
+                                </button>
+                                <button class="btn btn-sm" onclick="app.quickCleanDuplicates()" style="background: transparent; border: 1px solid var(--border); color: var(--text-title); font-weight: bold; flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 0.85rem; border-radius: 8px;">
+                                    🧹 <span data-i18n="quick_clean">تنظيف المكررات</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orphan Counter -->
+                    <div class="stat-card span-2" style="border-top: 4px solid #f4a261; padding: 25px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
+                                <span style="color:#f4a261; margin-left: 8px;">🧩</span>
+                                <span data-i18n="orphan_counter_title">الأسئلة اليتيمة (Orphan Counter)</span>
+                            </h3>
+                            <p style="margin: 5px 0 15px 0; font-size: 0.85rem; color: var(--text-secondary);" data-i18n="orphan_counter_desc">الأسئلة التي لا تنتمي لأي تصنيف ولا تحتوي على أي وسوم.</p>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="display: flex; align-items: baseline; gap: 8px;">
+                                <div id="orphan-count-value" style="font-size: 3rem; font-weight: 900; color: #e76f51; line-height: 1;">0</div>
+                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 700;" data-i18n="questions_word">سؤال عائم</span>
+                            </div>
+                            <button class="btn btn-primary" onclick="app.filterOrphans()" style="font-weight: bold; border-radius: 8px; height: 40px; padding: 0 15px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
+                                🔧 <span data-i18n="quick_organize">تنظيم فوري</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historical Quiz Chart -->
+                    <div class="stat-card span-2" style="border-top: 4px solid var(--primary); padding: 25px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
+                                <span style="color:var(--primary); margin-left: 8px;">📈</span>
+                                <span data-i18n="quiz_history_chart_title">منحنى الأداء التاريخي للدرجات</span>
+                            </h3>
+                        </div>
+                        <div id="chart-history-container" class="simple-chart" style="min-height: 180px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px dashed var(--border); padding: 10px;">
+                            <p style="color:var(--text-secondary); font-size:0.9rem; font-weight: 600;">جاري تحميل تاريخ الامتحانات...</p>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerability Detector -->
+                    <div class="stat-card span-2" style="border-top: 4px solid #e63946; padding: 25px; display: flex; flex-direction: column;">
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
+                                <span style="color:#e63946; margin-left: 8px;">⚠️</span>
+                                <span data-i18n="vulnerability_detector_title">رادار نقاط الضعف التلقائي</span>
+                            </h3>
+                            <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);" data-i18n="vulnerability_detector_desc">أقسام ووسوم تحتاج مراجعة فورية بسبب انخفاض معدل درجاتك فيها عن 50%.</p>
+                        </div>
+                        <div id="vulnerability-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; max-height: 180px; overflow-y: auto; padding-inline-end: 5px;">
+                            <p style="color:var(--text-secondary); font-size:0.9rem; font-weight: 600; text-align: center;">جاري فحص رادار الأداء...</p>
+                        </div>
+                    </div>
+
+                    <!-- Activity Heatmap -->
+                    <div class="stat-card span-4" style="grid-column: 1 / -1; border-top: 4px solid #2cb67d; padding: 25px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
+                                <span style="color:#2cb67d; margin-left: 8px;">🟩</span>
+                                <span data-i18n="heatmap_title">خريطة النشاط السنوي (365 يوماً)</span>
+                            </h3>
+                            <div style="display: flex; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); align-items: center;">
+                                <span data-i18n="heatmap_less">أقل</span>
+                                <div style="width: 10px; height: 10px; background: rgba(128, 128, 128, 0.12); border-radius: 2px;"></div>
+                                <div style="width: 10px; height: 10px; background: rgba(244, 162, 97, 0.3); border-radius: 2px;"></div>
+                                <div style="width: 10px; height: 10px; background: rgba(244, 162, 97, 0.7); border-radius: 2px;"></div>
+                                <div style="width: 10px; height: 10px; background: rgba(114, 9, 183, 0.6); border-radius: 2px;"></div>
+                                <div style="width: 10px; height: 10px; background: rgba(114, 9, 183, 1); border-radius: 2px;"></div>
+                                <span data-i18n="heatmap_more">أكثر</span>
+                            </div>
+                        </div>
+                        <div id="heatmap-container" style="overflow-x: auto; width: 100%; display: flex; justify-content: center; padding-bottom: 10px;">
+                            <!-- SVG Grid here -->
+                        </div>
+                    </div>
+
                     <!-- Row 3: Storage Quota -->
                     <div class="stat-card" style="grid-column: 1 / -1; border-top: 4px solid var(--success-color); display: flex; flex-direction: row; align-items: center; gap: 30px; padding: 25px; flex-wrap: wrap;">
                         <div style="flex: 1; min-width: 250px;">
@@ -1163,6 +1261,10 @@
                     <select id="notebook-parent" class="form-control">
                         <option value="" data-i18n="root_notebook">--- دفتر رئيسي ---</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="notebook-target-count" data-i18n="notebook_target_count_label">عدد الأسئلة المستهدف (اختياري)</label>
+                    <input type="number" id="notebook-target-count" class="form-control" placeholder="مثال: 500" min="0">
                 </div>
                 <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" data-i18n="save_notebook">حفظ الدفتر</button>
             </form>

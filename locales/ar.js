@@ -606,5 +606,28 @@ export const ar = {
     "import_paste_desc": "لصق نص JSON المولّد مباشرة هنا",
     "import_ref_desc": "استيراد المراجع الطبية المعتمدة",
     "btn_darkmode": "تبديل المظهر الليلي/النهاري",
-    "lang_toggle": "تغيير لغة الواجهة الحالية"
+    "lang_toggle": "تغيير لغة الواجهة الحالية",
+
+    // v17.1 — Analytics Dashboard & Retention Engine
+    "daily_wrap_title": "ملخص الأداء اليومي",
+    "quick_actions_title": "الوصول السريع ⚡",
+    "quick_quiz": "امتحان فوري",
+    "quick_paste": "لصق كبسولة",
+    "quick_clean": "تنظيف المكررات",
+    "orphan_counter_title": "الأسئلة اليتيمة (Orphan Counter)",
+    "orphan_counter_desc": "الأسئلة التي لا تنتمي لأي تصنيف ولا تحتوي على أي وسوم.",
+    "questions_word": "سؤال عائم",
+    "quick_organize": "تنظيم فوري",
+    "quiz_history_chart_title": "منحنى الأداء التاريخي للدرجات",
+    "vulnerability_detector_title": "رادار نقاط الضعف التلقائي",
+    "vulnerability_detector_desc": "أقسام ووسوم تحتاج مراجعة فورية بسبب انخفاض معدل درجاتك فيها عن 50%.",
+    "heatmap_title": "خريطة النشاط السنوي (365 يوماً)",
+    "heatmap_less": "أقل",
+    "heatmap_more": "أكثر",
+    "notebook_target_count_label": "عدد الأسئلة المستهدف (اختياري)",
+    "errors_notebook_title": "دفتر الأخطاء التلقائي",
+    "zen_mode_btn": "وضع التركيز (Zen Mode)",
+    "flashcard_flip_btn": "اقلب البطاقة",
+    "bookmark_question": "تثبيت السؤال الحالي",
+    "due_today_filter": "المراجعات المستحقة اليوم"
 };

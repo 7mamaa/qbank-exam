@@ -279,6 +279,14 @@ export const app = {
             this.state.virtual.filteredQuestions = [...loadedQuestions];
             this.state.virtual.currentPage = 1;
 
+            // 3. Load Quiz History
+            try {
+                this.state.quizHistory = await db.getAll('quiz_history');
+            } catch (qhErr) {
+                console.warn('[syncData] quiz_history load failed', qhErr);
+                this.state.quizHistory = [];
+            }
+
             // 3. Refresh UI (Batched in animation frame to avoid reflow thrashing)
             requestAnimationFrame(() => {
                 this.updateDashboard();
@@ -1509,6 +1517,13 @@ export const app = {
         ];
         UIComponents.renderDifficultyChart(difficultyCounts);
 
+        // v17.1 Analytics Widgets
+        UIComponents.renderDailyAnalyticsWrap(this.state.questions, this.state.quizHistory);
+        UIComponents.renderOrphanCounter(this.state.questions);
+        UIComponents.renderHistoricalQuizChart(this.state.quizHistory);
+        UIComponents.renderVulnerabilityDetector(this.state.quizHistory);
+        UIComponents.renderDailyActivityHeatmap(this.state.questions, this.state.quizHistory);
+
         this.updateStorageQuota();
     },
 
@@ -1528,6 +1543,68 @@ export const app = {
         } catch (e) {
             console.warn("Could not fetch storage quota", e);
         }
+    },
+
+    // =========================================================
+    // === Quick Actions & Zen Mode (v17.1) ===
+    // =========================================================
+
+    /**
+     * Quick action: jump to quiz view immediately.
+     */
+    quickStartQuiz() {
+        if (this.state.notebooks.length === 0) return alert(i18n.t('err_no_notebook'));
+        this.navigate('quiz');
+    },
+
+    /**
+     * Quick action: jump to import hub for JSON smart paste.
+     */
+    quickPasteJson() {
+        this.navigate('import-hub');
+    },
+
+    /**
+     * Quick action: open duplicate manager modal.
+     */
+    quickCleanDuplicates() {
+        if (typeof DuplicatesUI !== 'undefined' && DuplicatesUI.open) {
+            DuplicatesUI.open();
+        } else {
+            const dupModal = document.getElementById('duplicate-modal');
+            if (dupModal) dupModal.classList.add('active');
+        }
+    },
+
+    /**
+     * Quick action: filter orphan questions (no category and no tags).
+     */
+    filterOrphans() {
+        this.state.selectionCriteria.notebooks.clear();
+        this.state.selectionCriteria.categories.clear();
+        this.state.selectionCriteria.tags.clear();
+        this.state.selectionCriteria.types.clear();
+        this.state.selectionCriteria.difficulties.clear();
+        this.state.selectionCriteria.searchQuery = '';
+
+        this.navigate('questions');
+
+        const orphans = this.state.questions.filter(q => {
+            const hasCategory = q.category && q.category.trim() !== '';
+            const hasTags = q.tags && q.tags.length > 0;
+            return !hasCategory && !hasTags;
+        });
+
+        this.state.virtual.filteredQuestions = orphans;
+        this.state.virtual.currentPage = 1;
+        this.renderQuestions();
+    },
+
+    /**
+     * Toggles Zen Mode for distraction-free quiz experience.
+     */
+    toggleZenMode() {
+        document.body.classList.toggle('zen-mode');
     },
 
     // =========================================================

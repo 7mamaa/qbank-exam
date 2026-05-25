@@ -1,4 +1,5 @@
 import { state } from '../core/state.js?v=16.6.1';
+import { db } from '../core/db.js?v=16.6.1';
 import { AudioManager } from '../ui/audio.js?v=16.6.1';
 import { Helpers } from '../utils/helpers.js?v=16.6.1';
 import { i18n } from '../core/i18n.js?v=16.6.1';
@@ -41,6 +42,7 @@ export const QuizModule = {
             pool: pool,
             currentIdx: 0,
             answers: {},
+            bookmarks: new Set(),
             startTime: Date.now(),
             endTime: Date.now() + (timeLimit * 60 * 1000),
             timerInterval: null,
@@ -201,29 +203,163 @@ export const QuizModule = {
     },
 
     /**
-     * Submits the quiz and displays results.
+     * Toggles bookmark on current quiz question.
      */
-    submitQuiz() {
+    toggleBookmark(questionId) {
+        if (!state.quizState.bookmarks) state.quizState.bookmarks = new Set();
+        if (state.quizState.bookmarks.has(questionId)) {
+            state.quizState.bookmarks.delete(questionId);
+        } else {
+            state.quizState.bookmarks.add(questionId);
+        }
+    },
+
+    /**
+     * SM-2 Spaced Repetition algorithm.
+     * @param {object} prev - Previous SM-2 state {easiness, interval, repetitions}
+     * @param {number} quality - Answer quality 0-5 (0=wrong, 5=perfect)
+     * @returns {object} Updated SM-2 state
+     * @private
+     */
+    _calculateSM2(prev, quality) {
+        let { easiness, interval, repetitions } = prev || { easiness: 2.5, interval: 1, repetitions: 0 };
+
+        if (quality >= 3) {
+            repetitions++;
+            if (repetitions === 1) {
+                interval = 1;
+            } else if (repetitions === 2) {
+                interval = 6;
+            } else {
+                interval = Math.round(interval * easiness);
+            }
+        } else {
+            repetitions = 0;
+            interval = 1;
+        }
+
+        easiness = easiness + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+        if (easiness < 1.3) easiness = 1.3;
+
+        const nextReviewDate = new Date();
+        nextReviewDate.setDate(nextReviewDate.getDate() + interval);
+
+        return {
+            easiness: Math.round(easiness * 100) / 100,
+            interval,
+            repetitions,
+            nextReviewDate: nextReviewDate.toISOString()
+        };
+    },
+
+    /**
+     * Submits the quiz and displays results.
+     * Persists quiz_history, updates SM-2, and hooks errors notebook.
+     */
+    async submitQuiz() {
         if (!confirm(i18n.t('quiz_confirm_submit'))) return;
         
         clearInterval(state.quizState.timerInterval);
         state.quizState.isFinished = true;
         
         let score = 0;
+        const questionDetails = [];
+        const wrongQuestionIds = [];
+
         for (const q of state.quizState.pool) {
             const userAns = state.quizState.answers[q.id];
+            let isCorrect = false;
+
             if (q.type === 'mcq' || q.type === 'boolean') {
-                if (userAns === q.answer) score++;
+                isCorrect = (userAns === q.answer);
             } else if (q.type === 'written') {
                 const normUser = QuestionModule.normalizeMedicalAnswer(userAns);
                 const normModel = QuestionModule.normalizeMedicalAnswer(q.answer || (q.keywords ? q.keywords.join(' ') : ''));
-                
                 const similarity = Helpers.calculateSimilarity(normUser, normModel);
-                if (similarity >= 0.7) score++; // 70% match threshold for academic sentences
+                isCorrect = (similarity >= 0.7);
+            }
+
+            if (isCorrect) score++;
+            if (!isCorrect) wrongQuestionIds.push(q.id);
+
+            questionDetails.push({
+                id: q.id,
+                correct: isCorrect,
+                category: q.category || '',
+                tags: q.tags || [],
+                bookmarked: state.quizState.bookmarks ? state.quizState.bookmarks.has(q.id) : false
+            });
+
+            // SM-2 calculation per question
+            try {
+                const quality = isCorrect ? 4 : 1;
+                const prevSm2 = q.sm2 || { easiness: 2.5, interval: 1, repetitions: 0 };
+                const newSm2 = this._calculateSM2(prevSm2, quality);
+
+                const liveQ = state.questions.find(sq => sq.id === q.id);
+                if (liveQ) {
+                    liveQ.sm2 = newSm2;
+                    await db.put('questions', liveQ);
+                }
+            } catch (sm2Err) {
+                console.warn('[QuizModule] SM-2 update failed for', q.id, sm2Err);
             }
         }
 
         const percent = Math.round((score / state.quizState.pool.length) * 100);
+
+        // Persist quiz history record
+        try {
+            const nbId = document.getElementById('quiz-notebook')?.value || null;
+            const historyRecord = {
+                date: new Date().toISOString(),
+                score: score,
+                total: state.quizState.pool.length,
+                percent: percent,
+                notebookId: nbId,
+                questions: questionDetails
+            };
+            await db.add('quiz_history', historyRecord);
+            state.quizHistory.push(historyRecord);
+
+            // Update lastReviewed on notebook
+            if (nbId) {
+                await NotebookModule.updateLastReviewed(nbId);
+            }
+        } catch (histErr) {
+            console.warn('[QuizModule] quiz_history save failed', histErr);
+        }
+
+        // Errors Notebook Hook: move wrong questions to system errors notebook
+        if (wrongQuestionIds.length > 0) {
+            try {
+                let errorsNb = state.notebooks.find(n => n.id === 'errors_notebook');
+                if (!errorsNb) {
+                    errorsNb = {
+                        id: 'errors_notebook',
+                        name: '❌ دفتر الأخطاء',
+                        description: 'يحتوي تلقائياً على الأسئلة التي أجبت عليها بشكل خاطئ.',
+                        color: '#e63946',
+                        parentId: null,
+                        createdAt: new Date().toISOString(),
+                        isSystem: true
+                    };
+                    await db.put('notebooks', errorsNb);
+                    state.notebooks.push(errorsNb);
+                }
+
+                for (const wqId of wrongQuestionIds) {
+                    const liveQ = state.questions.find(sq => sq.id === wqId);
+                    if (liveQ && liveQ.notebookId !== 'errors_notebook') {
+                        liveQ._originalNotebookId = liveQ._originalNotebookId || liveQ.notebookId;
+                        liveQ.notebookId = 'errors_notebook';
+                        await db.put('questions', liveQ);
+                    }
+                }
+            } catch (errNbErr) {
+                console.warn('[QuizModule] Errors notebook hook failed', errNbErr);
+            }
+        }
         
         document.getElementById('quiz-active').style.display = 'none';
         document.getElementById('quiz-result').style.display = 'block';

@@ -606,5 +606,28 @@ Important technical notes for standard JSON compliance:
     "import_paste_desc": "Paste generated JSON string directly here",
     "import_ref_desc": "Import certified medical reference banks",
     "btn_darkmode": "Toggle Dark/Light Mode",
-    "lang_toggle": "Toggle Application Language"
+    "lang_toggle": "Toggle Application Language",
+
+    // v17.1 — Analytics Dashboard & Retention Engine
+    "daily_wrap_title": "Daily Performance Summary",
+    "quick_actions_title": "Quick Actions ⚡",
+    "quick_quiz": "Instant Quiz",
+    "quick_paste": "Paste Capsule",
+    "quick_clean": "Clean Duplicates",
+    "orphan_counter_title": "Orphan Questions (Orphan Counter)",
+    "orphan_counter_desc": "Questions with no category and no tags assigned.",
+    "questions_word": "floating question(s)",
+    "quick_organize": "Quick Organize",
+    "quiz_history_chart_title": "Historical Score Performance Curve",
+    "vulnerability_detector_title": "Automatic Weakness Radar",
+    "vulnerability_detector_desc": "Categories and tags that need immediate review due to scoring below 50%.",
+    "heatmap_title": "Annual Activity Map (365 Days)",
+    "heatmap_less": "Less",
+    "heatmap_more": "More",
+    "notebook_target_count_label": "Target Question Count (Optional)",
+    "errors_notebook_title": "Automated Errors Notebook",
+    "zen_mode_btn": "Zen Mode",
+    "flashcard_flip_btn": "Flip Card",
+    "bookmark_question": "Bookmark Question",
+    "due_today_filter": "Due Today"
 };

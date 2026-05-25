@@ -140,6 +140,8 @@ export const NotebookModule = {
             const description = document.getElementById('notebook-desc').value.trim();
             const color = document.getElementById('notebook-color').value;
             const parentId = document.getElementById('notebook-parent').value || null;
+            const targetCountVal = document.getElementById('notebook-target-count').value;
+            const targetCount = (targetCountVal && !isNaN(targetCountVal)) ? Math.max(0, parseInt(targetCountVal, 10)) : null;
 
             if (idInput && this.isCircularDependency(idInput, parentId)) {
                 alert(i18n.t('err_circular_dependency'));
@@ -161,12 +163,19 @@ export const NotebookModule = {
                 description: description,
                 color: color,
                 parentId: parentId,
+                targetCount: targetCount,
                 createdAt: idInput ? undefined : new Date().toISOString()
             };
 
             if (idInput) {
                 const existing = state.notebooks.find(n => n.id === idInput);
-                if (existing) notebookData.createdAt = existing.createdAt;
+                if (existing) {
+                    notebookData.createdAt = existing.createdAt;
+                    notebookData.lastReviewed = existing.lastReviewed;
+                    if (targetCount === null) {
+                        notebookData.targetCount = existing.targetCount;
+                    }
+                }
             }
 
             await db.put('notebooks', notebookData);
@@ -210,6 +219,7 @@ export const NotebookModule = {
         document.getElementById('notebook-name').value = notebook.name;
         document.getElementById('notebook-desc').value = notebook.description || '';
         document.getElementById('notebook-color').value = notebook.color || '#4361ee';
+        document.getElementById('notebook-target-count').value = notebook.targetCount || '';
         
         // Populate parent dropdown first to ensure current nb is excluded
         if (syncDropdownsCallback) syncDropdownsCallback();
@@ -222,6 +232,15 @@ export const NotebookModule = {
         state.selectionCriteria.notebooks.clear();
         state.selectionCriteria.notebooks.add(id);
         if (navigateCallback) navigateCallback('questions');
+    },
+
+    async updateLastReviewed(notebookId) {
+        if (!notebookId || notebookId === 'orphaned') return;
+        const notebook = state.notebooks.find(n => String(n.id) === String(notebookId));
+        if (notebook) {
+            notebook.lastReviewed = new Date().toISOString();
+            await db.put('notebooks', notebook);
+        }
     },
 
     renderNotebooks() {
@@ -265,6 +284,68 @@ export const NotebookModule = {
             const sName = Helpers.sanitize(node.name);
             const sDesc = Helpers.sanitize(node.description || '');
 
+            // Calculate difficulty distribution
+            const nbQs = state.questions.filter(q => q.notebookId === node.id || childIds.includes(q.notebookId));
+            const easyCount = nbQs.filter(q => q.difficulty === 'easy').length;
+            const mediumCount = nbQs.filter(q => q.difficulty === 'medium').length;
+            const hardCount = nbQs.filter(q => q.difficulty === 'hard').length;
+            const totalNbQs = nbQs.length;
+
+            let difficultyChartHtml = '';
+            if (totalNbQs > 0) {
+                const easyPct = (easyCount / totalNbQs) * 100;
+                const mediumPct = (mediumCount / totalNbQs) * 100;
+                const hardPct = (hardCount / totalNbQs) * 100;
+                
+                difficultyChartHtml = `
+                    <div class="nb-difficulty-chart" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700;">📊 توزيع الصعوبة:</div>
+                        <div style="display:flex; height:8px; border-radius:4px; overflow:hidden; border: 1px solid var(--border);">
+                            ${easyCount > 0 ? `<div style="width:${easyPct}%; background:#2cb67d;" title="سهل: ${easyCount}"></div>` : ''}
+                            ${mediumCount > 0 ? `<div style="width:${mediumPct}%; background:#f4a261;" title="متوسط: ${mediumCount}"></div>` : ''}
+                            ${hardCount > 0 ? `<div style="width:${hardPct}%; background:#e63946;" title="صعب: ${hardCount}"></div>` : ''}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-secondary); margin-top:3px;">
+                            <span style="color:#2cb67d; font-weight:bold;">🟢 سهل: ${easyCount}</span>
+                            <span style="color:#f4a261; font-weight:bold;">🟡 متوسط: ${mediumCount}</span>
+                            <span style="color:#e63946; font-weight:bold;">🔴 صعب: ${hardCount}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let progressHtml = '';
+            if (node.targetCount && node.targetCount > 0) {
+                const pct = Math.min(Math.round((totalQuestionsIncludingChildren / node.targetCount) * 100), 100);
+                progressHtml = `
+                    <div class="nb-progress-container" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700;">
+                            <span>🎯 المستهدف: ${totalQuestionsIncludingChildren}/${node.targetCount}</span>
+                            <span>${pct}%</span>
+                        </div>
+                        <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:3px; overflow:hidden; border: 1px solid var(--border);">
+                            <div style="width:${pct}%; background:var(--primary); height:100%; border-radius:3px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let lastReviewedHtml = '';
+            if (node.lastReviewed) {
+                const formattedDate = new Date(node.lastReviewed).toLocaleString(state.language === 'ar' ? 'ar-EG' : 'en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                lastReviewedHtml = `
+                    <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:8px; display:flex; align-items:center; gap:4px; opacity:0.8; padding-top: 8px; border-top: 1px solid var(--border);">
+                        <span>📅 آخر مراجعة:</span>
+                        <span style="font-weight:700;">${formattedDate}</span>
+                    </div>
+                `;
+            }
+
             return `
                 <div class="tree-node ${depth > 0 ? 'notebook-child' : ''}" data-depth="${depth}">
                     <div class="notebook-card" style="border-top: 5px solid ${node.color || 'var(--primary)'};">
@@ -285,6 +366,9 @@ export const NotebookModule = {
                             </div>
                         </div>
                         ${sDesc ? `<div class="notebook-desc">${sDesc}</div>` : ''}
+                        ${difficultyChartHtml}
+                        ${progressHtml}
+                        ${lastReviewedHtml}
                     </div>
                     ${node.children && node.children.length > 0 ? this._renderTreeNodes(node.children, depth + 1, countsMap) : ''}
                 </div>
