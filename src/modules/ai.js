@@ -1,5 +1,5 @@
-import { i18n } from '../core/i18n.js?v=16.6.0';
-import { state } from '../core/state.js?v=16.6.0';
+import { i18n } from '../core/i18n.js?v=16.6.1';
+import { state } from '../core/state.js?v=16.6.1';
 
 export const AIModule = {
     regeneratePrompt() {

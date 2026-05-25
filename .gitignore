@@ -42,3 +42,5 @@ tree_output.txt
 *.swp
 *.swo
 deploy.sh
+examwebsite/
+docs/dev-notes/refrence/

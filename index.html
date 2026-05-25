@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="نظام متكامل لإدارة بنوك الأسئلة الامتحانية — يعمل بدون إنترنت">
     <meta name="theme-color" content="#4361ee">
-    <title data-i18n="app_title">QBank - مدير بنك الأسئلة v16.6.0</title>
+    <title data-i18n="app_title">QBank - مدير بنك الأسئلة v16.6.1</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="assets/style.css?v=16.6.0">
+    <link rel="stylesheet" href="assets/style.css?v=16.6.1">
     <script>
         // Register Service Worker for offline-first PWA support
         if ('serviceWorker' in navigator) {
@@ -38,10 +38,10 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                 QBank
              </div>
-             <button id="close-sidebar" class="sidebar-close-btn">&times;</button>
+             <buttonid="close-sidebar" class="sidebar-close-btn">&times;</button>
         </div>
         
-        <div class="nav-group-title" data-i18n="nav_home">الرئيسية</div>
+        <div class="nav-group-title" data-i18n="nav_home">القائمة الرئيسية</div>
         <ul class="nav-links">
             <li class="nav-item active" data-target="dashboard" role="button" tabindex="0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -49,27 +49,31 @@
             </li>
             <li class="nav-item" data-target="notebooks" role="button" tabindex="0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                <span data-i18n="nav_notebooks">الدفاتر</span>
+                <span data-i18n="nav_notebooks">إدارة الدفاتر</span>
             </li>
             <li class="nav-item" data-target="questions" role="button" tabindex="0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                <span data-i18n="nav_questions">الأسئلة</span>
+                <span data-i18n="nav_questions">بنك الأسئلة</span>
             </li>
         </ul>
 
-        <div class="nav-group-title" data-i18n="nav_tools">الأدوات</div>
+        <div class="nav-group-title" data-i18n="nav_tools">مركز نقل البيانات</div>
+        <ul class="nav-links">
+            <li class="nav-item" data-target="import-hub" role="button" tabindex="0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span data-i18n="nav_import">مركز الاستيراد</span>
+            </li>
+            <li class="nav-item" data-target="export-hub" role="button" tabindex="0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 16 12 21 7 16"></polyline><line x1="12" y1="21" x2="12" y2="9"></line></svg>
+                <span data-i18n="nav_export">مركز التصدير</span>
+            </li>
+        </ul>
+
+        <div class="nav-group-title" data-i18n="nav_exams_utilities">الاختبارات والأدوات</div>
         <ul class="nav-links">
             <li class="nav-item" data-target="quiz" role="button" tabindex="0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                 <span data-i18n="nav_quiz">اختبار عشوائي</span>
-            </li>
-            <li class="nav-item" data-target="import-hub" role="button" tabindex="0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span data-i18n="nav_import">استيراد البيانات</span>
-            </li>
-            <li class="nav-item" data-target="export-hub" role="button" tabindex="0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 16 12 21 7 16"></polyline><line x1="12" y1="21" x2="12" y2="9"></line></svg>
-                <span data-i18n="nav_export">تصدير</span>
             </li>
             <li class="nav-item" onclick="window.open('interactive-pdf-export.html', '_blank')" role="button" tabindex="0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -85,7 +89,7 @@
         <ul class="nav-links">
             <li class="nav-item" data-target="settings" role="button" tabindex="0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                <span data-i18n="nav_settings">الإعدادات</span>
+                <span data-i18n="nav_settings">إعدادات المنصة</span>
             </li>
         </ul>
     </aside>
@@ -100,23 +104,29 @@
             </div>
 
             <div class="header-actions">
-                <button class="theme-toggle" id="btn-toggle-sound" title="كتم/تفعيل الصوت" data-i18n-title="btn_sound">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                </button>
-                <button class="theme-toggle" id="btn-show-report" title="عن المشروع وتقرير النظام" data-i18n-title="btn_report">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                </button>
-                <div class="theme-switcher-group">
-                    <select id="theme-selector" class="theme-select" onchange="app.setTheme(this.value)" title="اختر المظهر" data-i18n-title="theme_select_label">
-                        <option value="cream-earthy" data-i18n="theme_cream_earthy">كريمي دافئ ☕</option>
-                        <option value="gray-orange" data-i18n="theme_gray_orange">رمادي برتقالي</option>
-                        <option value="tech-violet" data-i18n="theme_tech_violet">بالكيمي تقني</option>
-                        <option value="deep-orange" data-i18n="theme_orange_dark">برتقالي عميق 🍊</option>
-                        <option value="custom" disabled style="display:none;" data-i18n="theme_custom">ثيم مخصص 🎨</option>
-                    </select>
-                    <button class="theme-toggle" onclick="app.setRandomTheme()" title="مظهر عشوائي" data-i18n-title="random_theme">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                <div class="env-toolbar">
+                    <button class="env-btn" id="btn-toggle-sound" title="كتم/تفعيل الصوت" data-i18n-title="btn_sound">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                     </button>
+                    <button class="env-btn" id="btn-toggle-darkmode" onclick="app.toggleDarkMode()" title="تغيير المظهر الليلي" data-i18n-title="btn_darkmode">🌓</button>
+                    <button class="env-btn btn-dir-rtl" onclick="app.setDirection('rtl')" title="العربية (RTL)" data-i18n-title="lang_ar">ع</button>
+                    <button class="env-btn btn-dir-ltr" onclick="app.setDirection('ltr')" title="English (LTR)" data-i18n-title="lang_en">E</button>
+                    <button class="env-btn" id="btn-lang-toggle" onclick="app.toggleLanguage()" title="تغيير اللغة" data-i18n-title="lang_toggle">🌐</button>
+                    <button class="env-btn" id="btn-show-report" title="عن المشروع وتقرير النظام" data-i18n-title="btn_report">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </button>
+                    <div class="theme-switcher-group">
+                        <select id="theme-selector" class="theme-select" onchange="app.setTheme(this.value)" title="اختر المظهر" data-i18n-title="theme_select_label">
+                            <option value="cream-earthy" data-i18n="theme_cream_earthy">كريمي ☕</option>
+                            <option value="gray-orange" data-i18n="theme_gray_orange">رمادي</option>
+                            <option value="tech-violet" data-i18n="theme_tech_violet">تقني</option>
+                            <option value="deep-orange" data-i18n="theme_orange_dark">برتقالي 🍊</option>
+                            <option value="custom" disabled style="display:none;" data-i18n="theme_custom">ثيم مخصص 🎨</option>
+                        </select>
+                        <button class="env-btn" onclick="app.setRandomTheme()" title="مظهر عشوائي" data-i18n-title="random_theme">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -127,7 +137,7 @@
             <!-- Dashboard View -->
             <section id="dashboard" class="view-section active">
                 <div style="margin-bottom: 25px; padding: 25px; background: var(--surface-color); border-radius: 16px; border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: 15px; left: 15px; background: var(--primary); color: var(--btn-text); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; box-shadow: var(--shadow-sm);" data-i18n="app_version_badge">v16.6.0 pro</div>
+                    <div style="position: absolute; top: 15px; left: 15px; background: var(--primary); color: var(--btn-text); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; box-shadow: var(--shadow-sm);" data-i18n="app_version_badge">v16.6.1 pro</div>
                     <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 5px;" data-i18n="dashboard_title">لوحة التحكم</h1>
                     <p style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; max-width: 800px; line-height: 1.6;" data-i18n="dashboard_desc">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
                 </div>
@@ -252,56 +262,69 @@
             <section id="questions" class="view-section">
                 <div class="flex-between">
                     <h2 data-i18n="question_bank">بنك الأسئلة</h2>
-                    <button class="btn" id="btn-add-question"><span data-i18n="add_question">+ إضافة سؤال</span></button>
+                    <button class="btn btn-primary-action" id="btn-add-question">
+                        <span data-i18n="add_question">+ إضافة سؤال جديد</span>
+                    </button>
                 </div>
 
                 <!-- Advanced Filter Bar -->
                 <div class="filter-bar">
                     <!-- Mobile: Filter Drawer Toggle (shown via CSS on small screens) -->
                     <button id="filter-toggle-btn" onclick="app.openFilterDrawer()" aria-label="فتح الفلاتر">⚙️ <span data-i18n="filters">فلاتر</span></button>
-                    <input type="text" id="filter-search" class="form-control" placeholder="بحث بكلمات السؤال أو الوسوم..." style="flex: 2; min-width: 200px;" data-i18n-placeholder="filter_search_placeholder">
-                    <select id="filter-notebook" class="form-control">
-                        <option value="" data-i18n="all_notebooks">كل الدفاتر</option>
-                    </select>
-                    <select id="filter-category" class="form-control">
-                        <option value="" data-i18n="all_categories">كل التصنيفات</option>
-                    </select>
-                    <select id="filter-tag" class="form-control">
-                        <option value="" data-i18n="all_tags">كل الوسوم</option>
-                    </select>
-                    <select id="filter-type" class="form-control">
-                        <option value="" data-i18n="all_types">كل الأنواع</option>
-                        <option value="mcq" data-i18n="type_mcq">اختيار من متعدد</option>
-                        <option value="boolean" data-i18n="type_boolean">صح / خطأ</option>
-                        <option value="match" data-i18n="type_match">مزاوجة</option>
-                        <option value="written" data-i18n="type_written">مقالي</option>
-                    </select>
-                    <select id="filter-difficulty" class="form-control">
-                        <option value="" data-i18n="all_levels">كل المستويات</option>
-                        <option value="easy" data-i18n="difficulty_easy">سهل</option>
-                        <option value="medium" data-i18n="difficulty_medium">متوسط</option>
-                        <option value="hard" data-i18n="difficulty_hard">صعب</option>
-                    </select>
-                    <button id="smartSearchBtn" class="btn btn-action shadow-sm" title="محرك الاختيار المتقدم" style="background-color: var(--primary); color: white; flex: 1; min-width: 150px; justify-content: center;">
-                        <span class="icon">🎯</span>
-                        <span class="btn-text" data-i18n="smart_selection">تحديد ذكي</span>
-                    </button>
-                    <button class="btn" onclick="app.openPrintModal()" style="background-color: #7209b7; flex: 1; min-width: 150px; justify-content: center;" data-i18n="print_pdf">🖨️ طباعة / تصدير PDF</button>
+                    
+                    <div class="filter-row-top" style="display: flex; width: 100%; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="filter-search" class="form-control" placeholder="بحث بكلمات السؤال أو الوسوم..." style="flex: 3; min-width: 200px;" data-i18n-placeholder="filter_search_placeholder">
+                        <button id="smartSearchBtn" class="btn btn-action shadow-sm" title="محرك الاختيار المتقدم" style="background-color: var(--primary); color: var(--btn-text); flex: 1; min-width: 150px; justify-content: center; border-radius: 20px;">
+                            <span class="icon">🎯</span>
+                            <span class="btn-text" data-i18n="smart_selection">تحديد ذكي</span>
+                        </button>
+                        <button class="btn" onclick="app.openPrintModal()" style="background-color: #7209b7; color: white; flex: 1; min-width: 150px; justify-content: center; border-radius: 20px;" data-i18n="print_pdf">🖨️ طباعة / تصدير PDF</button>
+                    </div>
+
+                    <div class="filter-row-bottom" style="display: flex; flex-wrap: wrap; width: 100%; gap: 8px; align-items: center; margin-top: 10px;">
+                        <select id="filter-notebook" class="form-control filter-pill">
+                            <option value="" data-i18n="all_notebooks">كل الدفاتر</option>
+                        </select>
+                        <select id="filter-category" class="form-control filter-pill">
+                            <option value="" data-i18n="all_categories">كل التصنيفات</option>
+                        </select>
+                        <select id="filter-tag" class="form-control filter-pill">
+                            <option value="" data-i18n="all_tags">كل الوسوم</option>
+                        </select>
+                        <select id="filter-type" class="form-control filter-pill">
+                            <option value="" data-i18n="all_types">كل الأنواع</option>
+                            <option value="mcq" data-i18n="type_mcq">اختيار من متعدد</option>
+                            <option value="boolean" data-i18n="type_boolean">صح / خطأ</option>
+                            <option value="match" data-i18n="type_match">مزاوجة</option>
+                            <option value="written" data-i18n="type_written">مقالي</option>
+                        </select>
+                        <select id="filter-difficulty" class="form-control filter-pill">
+                            <option value="" data-i18n="all_levels">كل المستويات</option>
+                            <option value="easy" data-i18n="difficulty_easy">سهل</option>
+                            <option value="medium" data-i18n="difficulty_medium">متوسط</option>
+                            <option value="hard" data-i18n="difficulty_hard">صعب</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Bulk Actions Bar -->
-                <div id="bulk-actions-bar" style="display:none; margin-bottom: 20px; background: var(--primary); color: white; padding: 10px 15px; border-radius: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <input type="checkbox" id="bulk-select-all" style="margin-right:10px; cursor:pointer;"> 
-                        <span id="bulk-count" style="font-weight:bold;">تم تحديد 0</span>
+                <div id="bulk-actions-bar" class="bulk-actions-dock" style="display:none; margin-bottom: 20px;">
+                    <div class="bulk-select-group">
+                        <label class="custom-checkbox" for="bulk-select-all" style="margin: 0; cursor:pointer; display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="bulk-select-all">
+                            <span class="checkmark"></span>
+                            <span id="bulk-count" style="font-weight:bold;">تم تحديد 0</span>
+                        </label>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap: wrap; width: 100%;">
-                        <select id="bulk-notebook-move" class="form-control">
+                    <div class="bulk-btn-group" style="display:flex; gap:10px; flex: 1; justify-content: center; flex-wrap: wrap;">
+                        <select id="bulk-notebook-move" class="form-control bulk-select-move" style="max-width: 200px;">
                             <option value="">نقل إلى دفتر...</option>
                         </select>
                         <button class="btn btn-sm btn-info" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" title="اختيار أسئلة بناءً على معايير محددة" data-i18n="smart_selection">🎯 تحديد ذكي</button>
                         <button class="btn btn-sm btn-primary" onclick="app.bridgeToExam()" style="background: var(--accent); color: white; border: none; font-weight: 600;" data-i18n="exam_simulation">🚀 محاكاة اختبار</button>
-                        <button class="btn btn-danger btn-sm" onclick="app.bulkDelete()" style="background:white; color:var(--danger-color); border:none;" data-i18n="delete">🗑️ حذف</button>
+                    </div>
+                    <div class="bulk-danger-group">
+                        <button class="btn btn-danger btn-sm bulk-delete-btn" onclick="app.bulkDelete()" data-i18n="delete">🗑️ حذف المحدد</button>
                     </div>
                 </div>
 
@@ -372,7 +395,7 @@
                 </div>
 
                 <!-- Active Phase -->
-                <div id="quiz-active" style="display:none; max-width: 800px; margin: 0 auto;">
+                <div id="quiz-active" style="display:none; max-width: 800px; margin: 0 auto; padding-bottom: 120px;">
                     
                     <div style="background: var(--surface-color); padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 25px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
@@ -384,7 +407,6 @@
                             </div>
                             <div style="display:flex; gap:10px;">
                                 <button class="btn" id="btn-zen-mode" onclick="app.toggleZenMode()" title="وضع التركيز" style="background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px;">🔲 تركيز</button>
-                                <button class="btn btn-danger" onclick="app.submitQuiz()" style="border-radius: 10px; font-weight: bold;" data-i18n="quiz_finish">إنهاء 🏁</button>
                             </div>
                         </div>
                         <div style="height: 8px; width: 100%; background: var(--bg-main); border-radius: 10px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
@@ -396,9 +418,19 @@
                         <!-- Question rendered here -->
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                        <button class="btn" id="btn-quiz-prev" onclick="app.quizNav(-1)" style="background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); padding: 12px 25px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; flex: 1; justify-content: center;" data-i18n="prev_arrow">« السابق</button>
-                        <button class="btn" id="btn-quiz-next" onclick="app.quizNav(1)" style="background: var(--primary); color: white; padding: 12px 35px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); flex: 2; justify-content: center;" data-i18n="next_arrow">التالي »</button>
+                    <!-- Floating Bottom Navigation Dock -->
+                    <div class="quiz-nav-dock">
+                        <!-- Reveal Row (Top part of dock) -->
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                            <button class="btn" onclick="app.quizRevealAnswer()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border);" data-i18n="reveal_answer">كشف الإجابة 👁️</button>
+                            <button class="btn" onclick="app.quizRevealExplanation()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border);" data-i18n="reveal_explain">كشف التفسير 💡</button>
+                        </div>
+                        <!-- Navigation Row (Bottom part of dock) -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+                            <button class="btn" id="btn-quiz-prev" onclick="app.quizNav(-1)" style="background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); height: 42px; font-size: 0.95rem; flex: 1; justify-content: center;" data-i18n="prev_arrow">« السابق</button>
+                            <button class="btn" id="btn-quiz-next" onclick="app.quizNav(1)" style="background: var(--primary); color: white; height: 42px; font-size: 0.95rem; flex: 1.5; justify-content: center;" data-i18n="next_arrow">التالي »</button>
+                            <button class="btn btn-danger" onclick="app.submitQuiz()" style="height: 42px; font-size: 0.95rem; flex: 1; justify-content: center; font-weight: bold; background: #e76f51; color: white; border: none;" data-i18n="quiz_finish">إنهاء 🏁</button>
+                        </div>
                     </div>
                 </div>
 
@@ -420,244 +452,266 @@
 
             <!-- Settings View -->
             <section id="settings" class="view-section">
-
-                
-                <div class="dashboard-grid" style="margin-top: 30px; gap: 20px;">
-                    <!-- AI Assistant Card -->
-                    <div class="stat-card" style="border-top: 4px solid #7209b7; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <div style="background: #7209b7; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🤖</div>
-                            <h3 style="margin:0;" data-i18n="ai_assistant">مساعد الذكاء الاصطناعي</h3>
+                <!-- Group 1: Typography & Interface Language -->
+                <div class="settings-group-section" style="margin-bottom: 30px;">
+                    <h3 class="settings-group-title" style="margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
+                        <span>🌐</span> <span data-i18n="group_lang_typo">اللغة والمظهر البصري</span>
+                    </h3>
+                    <div class="dashboard-grid" style="gap: 20px; margin-top: 15px;">
+                        <!-- Font Size Control -->
+                        <div class="stat-card" style="border-top:4px solid #4cc9f0; display:flex; flex-direction:column;">
+                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                                <div style="background:#4cc9f0; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900;">Aa</div>
+                                <h3 style="margin:0;" data-i18n="font_size_title">تحكم في حجم الخط</h3>
+                            </div>
+                            <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:auto;" data-i18n="font_size_desc">اضبط حجم الخط ليناسب راحة عينك — مهم خصوصاً للعربي.</p>
+                            <div style="margin-top:20px;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                    <label for="font-size-slider" style="font-size:0.85rem; color:var(--text-body);" data-i18n="font_size_current">حجم الخط الحالي</label>
+                                    <strong id="font-size-value" style="color:var(--primary);">16px</strong>
+                                </div>
+                                <input type="range" id="font-size-slider" min="13" max="22" value="16" step="1"
+                                    style="width:100%; accent-color:var(--primary);"
+                                    oninput="app.setFontSize(this.value)">
+                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-body); opacity:0.6; margin-top:4px;">
+                                    <span data-i18n="font_size_small">13px صغير</span><span data-i18n="font_size_large">22px كبير</span>
+                                </div>
+                            </div>
                         </div>
-                        <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="ai_desc">قم بتوليد برومبتات (Prompts) مخصصة لأي ذكاء اصطناعي (مثل ChatGPT) لإنشاء أسئلة متوافقة تماماً مع بنية النظام.</p>
-                        <button class="btn" onclick="app.openAiPromptModal()" style="width:100%; justify-content:center; background: linear-gradient(135deg, #4361ee, #7209b7); height: 45px; margin-top: 20px; font-weight: 600; border: none; box-shadow: 0 4px 12px rgba(114, 9, 183, 0.2);" data-i18n="ai_btn">
-                            ✨ تخصيص البرومبت الذكي
-                        </button>
+
+                        <!-- Interface Direction Card -->
+                        <div class="stat-card" style="border-top: 4px solid var(--success-color); display: flex; flex-direction: column;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                                <div style="background: var(--success-color); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🌐</div>
+                                <h3 style="margin:0;" data-i18n="interface_lang">تخصيص لغة الواجهة</h3>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="interface_desc">تحكم في اتجاه نصوص الواجهة والأسئلة ليتناسب مع المادة العلمية (عربي/إنجليزي).</p>
+                            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                                <button class="btn" id="btn-dir-rtl" onclick="app.setLanguage('ar')" style="flex:1; min-width: 120px; justify-content:center; height: 42px; font-size: 0.85rem;" data-i18n="lang_ar">العربية (RTL)</button>
+                                <button class="btn" id="btn-dir-ltr" onclick="app.setLanguage('en')" style="flex:1; min-width: 120px; justify-content:center; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); height: 42px; font-size: 0.85rem;" data-i18n="lang_en">English (LTR)</button>
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- Maintenance Tools Card -->
-                    <div class="stat-card" style="border-top: 4px solid var(--danger-color); display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <div style="background: var(--danger-color); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🛠️</div>
-                            <h3 style="margin:0;" data-i18n="maintenance_tools">أدوات الصيانة والدمج</h3>
-                        </div>
-                        <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="maintenance_desc">تنظيف البيانات المكررة ودمج الوسوم والتصنيفات المتشابهة (مثلاً "كيمياء" و "كيميا") لضمان دقة البحث.</p>
-                        <div style="display:flex; flex-direction:column; gap:8px; margin-top: 20px;">
-                            <button class="btn btn-sm" onclick="app.openTagNormalizer()" style="width:100%; justify-content:center; gap:8px; background: var(--bg-main); color: var(--text-title); border: 1.5px solid var(--border);" data-i18n="tag_normalizer">
-                                🏷️ تنظيف وتحسين الوسوم
+                <!-- Group 2: AI & Customization -->
+                <div class="settings-group-section" style="margin-bottom: 30px;">
+                    <h3 class="settings-group-title" style="margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
+                        <span>🎨</span> <span data-i18n="group_ai_custom">الذكاء الاصطناعي والتخصيص</span>
+                    </h3>
+                    <div class="dashboard-grid" style="gap: 20px; margin-top: 15px;">
+                        <!-- AI Assistant Card -->
+                        <div class="stat-card" style="border-top: 4px solid #7209b7; display: flex; flex-direction: column;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                                <div style="background: #7209b7; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🤖</div>
+                                <h3 style="margin:0;" data-i18n="ai_assistant">مساعد الذكاء الاصطناعي</h3>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="ai_desc">قم بتوليد برومبتات (Prompts) مخصصة لأي ذكاء اصطناعي (مثل ChatGPT) لإنشاء أسئلة متوافقة تماماً مع بنية النظام.</p>
+                            <button class="btn" onclick="app.openAiPromptModal()" style="width:100%; justify-content:center; background: linear-gradient(135deg, #4361ee, #7209b7); height: 45px; margin-top: 20px; font-weight: 600; border: none; box-shadow: 0 4px 12px rgba(114, 9, 183, 0.2);" data-i18n="ai_btn">
+                                ✨ تخصيص البرومبت الذكي
                             </button>
-                            <button class="btn btn-sm" onclick="app.openCategoryNormalizer()" style="width:100%; justify-content:center; gap:8px; background: var(--bg-main); color: var(--text-title); border: 1.5px solid var(--border);" data-i18n="cat_normalizer">
-                                📂 تنظيف وتحسين التصنيفات
-                            </button>
                         </div>
-                    </div>
 
-                    <!-- Interface Direction Card -->
-                    <div class="stat-card" style="border-top: 4px solid var(--success-color); display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <div style="background: var(--success-color); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🌐</div>
-                            <h3 style="margin:0;" data-i18n="interface_lang">تخصيص لغة الواجهة</h3>
+                        <!-- Custom Theme Maker -->
+                        <div class="stat-card" style="border-top:4px solid #f72585; display:flex; flex-direction:column;">
+                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                                <div style="background:#f72585; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🎨</div>
+                                <h3 style="margin:0;" data-i18n="theme_maker_title">صانع الثيمات المخصص</h3>
+                            </div>
+                            <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:auto;" data-i18n="theme_maker_desc">اختر ألوان المنصة لتتوافق مع هوية مدرستك أو جامعتك.</p>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;">
+                                <div>
+                                    <label for="theme-primary" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_primary">اللون الرئيسي</label>
+                                    <input type="color" id="theme-primary" value="#4361ee" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
+                                </div>
+                                <div>
+                                    <label for="theme-bg-main" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_bg">خلفية الصفحة</label>
+                                    <input type="color" id="theme-bg-main" value="#f5f7fb" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
+                                </div>
+                                <div>
+                                    <label for="theme-card-bg" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_card">خلفية البطاقات</label>
+                                    <input type="color" id="theme-card-bg" value="#ffffff" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
+                                </div>
+                                <div>
+                                    <label for="theme-text-title" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_title">لون العناوين</label>
+                                    <input type="color" id="theme-text-title" value="#1a202c" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px;">
+                                <button class="btn" style="flex:1; justify-content:center; background:#f72585; color:white; border:none;" onclick="app.applyCustomTheme()" data-i18n="btn_apply">✅ تطبيق</button>
+                                <button class="btn btn-secondary" style="flex:1; justify-content:center;" onclick="app.resetCustomTheme()" data-i18n="btn_reset">↺ إعادة ضبط</button>
+                            </div>
                         </div>
-                        <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="interface_desc">تحكم في اتجاه نصوص الواجهة والأسئلة ليتناسب مع المادة العلمية (عربي/إنجليزي).</p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-                            <button class="btn" id="btn-dir-rtl" onclick="app.setLanguage('ar')" style="flex:1; min-width: 120px; justify-content:center; height: 42px; font-size: 0.85rem;" data-i18n="lang_ar">العربية (RTL)</button>
-                            <button class="btn" id="btn-dir-ltr" onclick="app.setLanguage('en')" style="flex:1; min-width: 120px; justify-content:center; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); height: 42px; font-size: 0.85rem;" data-i18n="lang_en">English (LTR)</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Backup & Reset Card -->
-                    <div class="stat-card" style="border-top: 4px solid #f4a261; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <div style="background: #f4a261; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💾</div>
-                            <h3 style="margin:0;" data-i18n="backup_title">النسخ الاحتياطي</h3>
-                        </div>
-                        <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="backup_desc">تصدير كافة بيانات البنك في ملف JSON واحد للنسخ الاحتياطي أو مشاركته مع الآخرين.</p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-                            <button class="btn" onclick="app.exportToJSON()" style="flex:1; min-width: 120px; justify-content:center; background: #f4a261; color:white; border:none; height: 42px; font-size:0.85rem;" data-i18n="export_json">تصدير النسخة 📁</button>
-                            <button class="btn" onclick="app.clearAllData(this)" style="flex:1; min-width: 120px; justify-content:center; background: #e76f51; color:white; border:none; height: 42px; font-size:0.85rem;" data-i18n="clear_all">حذف الكل 🗑️</button>
-                        </div>
-                    </div>
 
-                    <!-- ── Font Size Control ── -->
-                    <div class="stat-card" style="border-top:4px solid #4cc9f0; display:flex; flex-direction:column;">
-                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-                            <div style="background:#4cc9f0; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900;">Aa</div>
-                            <h3 style="margin:0;" data-i18n="font_size_title">تحكم في حجم الخط</h3>
-                        </div>
-                        <p style="color:var(--text-body); font-size:0.9rem; line-height:1.6; margin-bottom:auto;" data-i18n="font_size_desc">اضبط حجم الخط ليناسب راحة عينك — مهم خصوصاً للعربي.</p>
-                        <div style="margin-top:20px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                                <label for="font-size-slider" style="font-size:0.85rem; color:var(--text-body);" data-i18n="font_size_current">حجم الخط الحالي</label>
-                                <strong id="font-size-value" style="color:var(--primary);">16px</strong>
+                        <!-- Institution Identity -->
+                        <div class="stat-card" style="border-top:4px solid #3a0ca3; display:flex; flex-direction:column;">
+                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                                <div style="background:#3a0ca3; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🏫</div>
+                                <h3 style="margin:0;" data-i18n="institution_title">هوية المؤسسة</h3>
                             </div>
-                            <input type="range" id="font-size-slider" min="13" max="22" value="16" step="1"
-                                style="width:100%; accent-color:var(--primary);"
-                                oninput="app.setFontSize(this.value)">
-                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-body); opacity:0.6; margin-top:4px;">
-                                <span data-i18n="font_size_small">13px صغير</span><span data-i18n="font_size_large">22px كبير</span>
+                            <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:10px;" data-i18n="institution_desc">اسم المدرسة وشعارها يظهران تلقائياً في ترويسة كل PDF تطبعه.</p>
+                            <label for="institution-name" style="font-size:0.85rem; color:var(--text-body); margin-bottom:5px; display:block;" data-i18n="institution_title">اسم المؤسسة</label>
+                            <input type="text" id="institution-name" class="form-control" placeholder="اسم المدرسة / الجامعة / المؤسسة" data-i18n-placeholder="institution_name_placeholder" style="margin-bottom:10px;">
+                            <input type="file" id="institution-logo-upload" accept="image/*" style="display:none;" onchange="app.handleInstitutionLogoUpload(event)">
+                            <input type="hidden" id="institution-logo-b64">
+                            <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+                                <button class="btn btn-secondary" onclick="document.getElementById('institution-logo-upload').click()" style="flex:1; justify-content:center;" data-i18n="btn_upload_logo">📁 رفع شعار</button>
+                                <img id="institution-logo-preview" style="display:none; height:40px; border-radius:6px; border:1px solid var(--border);">
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:auto;">
+                                <button class="btn" style="flex:2; justify-content:center; background:#3a0ca3; color:white; border:none;" onclick="app.saveInstitution()" data-i18n="btn_save_identity">💾 حفظ الهوية</button>
+                                <button class="btn btn-secondary" style="flex:1; justify-content:center; color: var(--danger-color); border: 1.5px solid var(--border);" onclick="app.clearInstitution()" data-i18n="btn_remove">🗑️ إزالة</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- ── Custom Theme Maker ── -->
-                    <div class="stat-card" style="border-top:4px solid #f72585; display:flex; flex-direction:column;">
-                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-                            <div style="background:#f72585; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🎨</div>
-                            <h3 style="margin:0;" data-i18n="theme_maker_title">صانع الثيمات المخصص</h3>
-                        </div>
-                        <p style="color:var(--text-body); font-size:0.9rem; line-height:1.6; margin-bottom:auto;" data-i18n="theme_maker_desc">اختر ألوان المنصة لتتوافق مع هوية مدرستك أو جامعتك.</p>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;">
-                            <div>
-                                <label for="theme-primary" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_primary">اللون الرئيسي</label>
-                                <input type="color" id="theme-primary" value="#4361ee" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
+                <!-- Group 3: Maintenance & Database tools -->
+                <div class="settings-group-section" style="margin-bottom: 30px;">
+                    <h3 class="settings-group-title" style="margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
+                        <span>🛠️</span> <span data-i18n="group_maintenance">الصيانة وقاعدة البيانات</span>
+                    </h3>
+                    <div class="dashboard-grid" style="gap: 20px; margin-top: 15px;">
+                        <!-- Maintenance Tools Card -->
+                        <div class="stat-card" style="border-top: 4px solid var(--danger-color); display: flex; flex-direction: column;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                                <div style="background: var(--danger-color); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🛠️</div>
+                                <h3 style="margin:0;" data-i18n="maintenance_tools">أدوات الصيانة والدمج</h3>
                             </div>
-                            <div>
-                                <label for="theme-bg-main" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_bg">خلفية الصفحة</label>
-                                <input type="color" id="theme-bg-main" value="#f5f7fb" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
-                            </div>
-                            <div>
-                                <label for="theme-card-bg" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_card">خلفية البطاقات</label>
-                                <input type="color" id="theme-card-bg" value="#ffffff" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
-                            </div>
-                            <div>
-                                <label for="theme-text-title" style="font-size:0.82rem; color:var(--text-body); display:block; margin-bottom:4px;" data-i18n="theme_color_title">لون العناوين</label>
-                                <input type="color" id="theme-text-title" value="#1a202c" style="width:100%; height:32px; border:none; border-radius:6px; cursor:pointer; display:block;" oninput="app.previewCustomTheme()">
+                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="maintenance_desc">تنظيف البيانات المكررة ودمج الوسوم والتصنيفات المتشابهة (مثلاً "كيمياء" و "كيميا") لضمان دقة البحث.</p>
+                            <div style="display:flex; flex-direction:column; gap:8px; margin-top: 20px;">
+                                <button class="btn btn-sm" onclick="app.openTagNormalizer()" style="width:100%; justify-content:center; gap:8px; background: var(--bg-main); color: var(--text-title); border: 1.5px solid var(--border);" data-i18n="tag_normalizer">
+                                    🏷️ تنظيف وتحسين الوسوم
+                                </button>
+                                <button class="btn btn-sm" onclick="app.openCategoryNormalizer()" style="width:100%; justify-content:center; gap:8px; background: var(--bg-main); color: var(--text-title); border: 1.5px solid var(--border);" data-i18n="cat_normalizer">
+                                    📂 تنظيف وتحسين التصنيفات
+                                </button>
                             </div>
                         </div>
-                        <div style="display:flex; gap:8px; margin-top:12px;">
-                            <button class="btn" style="flex:1; justify-content:center; background:#f72585; color:white; border:none;" onclick="app.applyCustomTheme()" data-i18n="btn_apply">✅ تطبيق</button>
-                            <button class="btn btn-secondary" style="flex:1; justify-content:center;" onclick="app.resetCustomTheme()" data-i18n="btn_reset">↺ إعادة ضبط</button>
+
+                        <!-- Backup & Reset Card -->
+                        <div class="stat-card" style="border-top: 4px solid #f4a261; display: flex; flex-direction: column;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                                <div style="background: #f4a261; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💾</div>
+                                <h3 style="margin:0;" data-i18n="backup_title">النسخ الاحتياطي</h3>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="backup_desc">تصدير كافة بيانات البنك في ملف JSON واحد للنسخ الاحتياطي أو مشاركته مع الآخرين.</p>
+                            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                                <button class="btn" onclick="app.exportToJSON()" style="flex:1; min-width: 120px; justify-content:center; background: #f4a261; color:white; border:none; height: 42px; font-size:0.85rem;" data-i18n="export_json">تصدير النسخة 📁</button>
+                                <button class="btn" onclick="app.clearAllData(this)" style="flex:1; min-width: 120px; justify-content:center; background: #e76f51; color:white; border:none; height: 42px; font-size:0.85rem;" data-i18n="clear_all">حذف الكل 🗑️</button>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- ── Institution Identity ── -->
-                    <div class="stat-card" style="border-top:4px solid #3a0ca3; display:flex; flex-direction:column;">
-                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-                            <div style="background:#3a0ca3; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🏫</div>
-                            <h3 style="margin:0;" data-i18n="institution_title">هوية المؤسسة</h3>
-                        </div>
-                        <p style="color:var(--text-body); font-size:0.9rem; line-height:1.6; margin-bottom:10px;" data-i18n="institution_desc">اسم المدرسة وشعارها يظهران تلقائياً في ترويسة كل PDF تطبعه.</p>
-                        <label for="institution-name" style="font-size:0.85rem; color:var(--text-body); margin-bottom:5px; display:block;" data-i18n="institution_title">اسم المؤسسة</label>
-                        <input type="text" id="institution-name" class="form-control" placeholder="اسم المدرسة / الجامعة / المؤسسة" data-i18n-placeholder="institution_name_placeholder" style="margin-bottom:10px;">
-                        <input type="file" id="institution-logo-upload" accept="image/*" style="display:none;" onchange="app.handleInstitutionLogoUpload(event)">
-                        <input type="hidden" id="institution-logo-b64">
-                        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
-                            <button class="btn btn-secondary" onclick="document.getElementById('institution-logo-upload').click()" style="flex:1; justify-content:center;" data-i18n="btn_upload_logo">📁 رفع شعار</button>
-                            <img id="institution-logo-preview" style="display:none; height:40px; border-radius:6px; border:1px solid var(--border);">
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:auto;">
-                            <button class="btn" style="flex:2; justify-content:center; background:#3a0ca3; color:white; border:none;" onclick="app.saveInstitution()" data-i18n="btn_save_identity">💾 حفظ الهوية</button>
-                            <button class="btn btn-secondary" style="flex:1; justify-content:center; color: var(--danger-color); border: 1.5px solid var(--border);" onclick="app.clearInstitution()" data-i18n="btn_remove">🗑️ إزالة</button>
-                        </div>
-                    </div>
-
                 </div>
             </section>
 
             <!-- Import Hub View -->
             <section id="import-hub" class="view-section">
-
-                <div class="dashboard-grid" style="margin-top: 30px;">
-                    <!-- Unified Smart Import Card -->
-                    <div class="stat-card smart-import-card" style="border-top: 4px solid #f4a261; grid-column: 1 / -1;">
-                        <div class="import-card-header">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 1.5rem;">📥</span>
-                                <h3 style="margin:0;" data-i18n="import_hub_title">أدوات الاستيراد الموحدة</h3>
-                            </div>
-                            <div class="import-notebook-select">
+                <!-- Global Import Settings -->
+                <div class="stat-card" style="border-top: 4px solid var(--accent); margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 1.5rem;">⚙️</span>
+                            <h3 style="margin:0;" data-i18n="import_settings">إعدادات الاستيراد</h3>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                            <div class="import-notebook-select" style="display: flex; align-items: center; gap: 8px;">
                                 <label for="import-notebook" style="font-size: 0.9rem; font-weight: 600; color: var(--text-title);" data-i18n="nav_notebooks">الدفتر المستهدف:</label>
                                 <select id="import-notebook" class="form-control" style="width: 200px; height: 38px;"></select>
                             </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="import-auto-distribute" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);">
+                                <label for="import-auto-distribute" style="font-size: 0.85rem; font-weight: 600; color: var(--text-title); cursor: pointer;" data-i18n="auto_distribute">🧠 توزيع تلقائي للملفات</label>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="hub-grid">
+                    <!-- Card 1: Smart Text & JSON Paste -->
+                    <div class="stat-card" style="border-top: 4px solid #f4a261; display: flex; flex-direction: column;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 1.3rem;">📝</span>
+                            <h3 style="margin:0;" data-i18n="import_paste_label">استيراد نصي ذكي</h3>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px;" data-i18n="import_paste_desc">ألصق نص JSON أو نصاً طبيعياً حرّاً وسيقوم النظام بتحليله آلياً.</p>
+                        <textarea id="import-paste-area" class="modern-textarea" style="width: 100%; height: 150px; background: var(--bg-main); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; font-family: monospace; font-size: 0.8rem; margin-bottom: 15px;" placeholder='[ { "type": "mcq", "question": "...", "answer": "..." } ]'></textarea>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto;">
+                            <button class="btn btn-primary" onclick="app.importFromPaste()" style="width: 100%; height: 42px; font-weight: 700; background: var(--primary); color: #fff; border: none; border-radius: 8px; justify-content: center;" data-i18n="import_json_btn">
+                                🚀 استيراد JSON
+                            </button>
+                            <button class="btn btn-success" onclick="app.smartTextImport()" style="width: 100%; height: 42px; font-weight: 700; background: var(--success-color); color: #fff; border: none; border-radius: 8px; justify-content: center;" data-i18n="import_smart_btn">
+                                🧠 استيراد ذكي من النص
+                            </button>
+                            <button class="btn btn-secondary" id="btn-copy-raw-structure" onclick="app.copyRawStructure()" style="width: 100%; height: 42px; font-weight: 600; justify-content: center; background: var(--bg-main); border: 1px solid var(--border); color: var(--text-title);" title="نسخ كافة الأسئلة بصيغة JSON خام">
+                                📋 <span data-i18n="btn_copy_raw_structure">نسخ الهيكل الخام</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Certified Medical References -->
+                    <div class="stat-card" style="border-top: 4px solid #7209b7; display: flex; flex-direction: column;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 1.3rem;">📚</span>
+                            <h3 style="margin:0;" data-i18n="import_ref_title">المصادر المعتمدة</h3>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px;" data-i18n="import_ref_desc">حمّل بنوك أسئلة كاملة ومراجعة جاهزة لمناهج الزمالة والامتحانات الطبية.</p>
                         
-                        <div class="import-card-body" style="margin-top: 20px;">
-                            <div class="paste-area-wrapper" style="margin-bottom: 20px;">
-                                <label for="import-paste-area" class="field-label" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-title);" data-i18n="import_paste_label">لصق نص JSON المولد من الذكاء الاصطناعي</label>
-                                <textarea id="import-paste-area" class="modern-textarea" style="width: 100%; height: 180px; background: var(--bg-main); border: 1.5px solid var(--border); border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.85rem;" placeholder="[ { &quot;type&quot;: &quot;mcq&quot;, &quot;question&quot;: &quot;...&quot;, &quot;answer&quot;: &quot;...&quot; } ]"></textarea>
-                                <div class="import-hint-text" style="margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary);" data-i18n="import_hint">💡 تلميح: تأكد من أن النص يبدأ بـ [ وينتهي بـ ] لضمان صحة البيانات.</div>
-                            <!-- Medical References Import Hub -->
-                            <div class="reference-import-wrapper" style="margin-bottom: 25px; padding: 18px; background: rgba(114, 9, 183, 0.05); border-radius: 12px; border: 1.5px dashed #7209b7; transition: var(--transition);">
-                                <label for="reference-selector" class="field-label" style="display: block; margin-bottom: 10px; font-weight: 700; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 1.2rem;">📚</span> <span data-i18n="import_ref_title">استيراد المراجع الطبية المعتمدة</span>
-                                </label>
-                                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
-                                    <select id="reference-selector" class="form-control" style="flex: 1; min-width: 200px; height: 48px; background: var(--card-bg);">
-                                        <option value="" data-i18n="select_ref_placeholder">--- اختر المرجع الطبي المطلوب ---</option>
-                                    </select>
-                                    <button class="btn" id="btn-preview-ref" style="flex: 0 0 auto; height: 48px; padding: 0 25px; background: #7209b7; color: white; border: none; font-weight: 600; box-shadow: 0 4px 10px rgba(114, 9, 183, 0.2);">
-                                        <span data-i18n="btn_preview_ref">فحص ومعاينة المرجع 📡</span>
-                                    </button>
-                                </div>
-                                
-                                <!-- Reference Details & Preview Panel (Hidden by default) -->
-                                <div id="reference-details-panel" style="display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; animation: slideDown 0.3s ease-out;">
-                                    <div style="margin-bottom: 10px;">
-                                        <h4 id="ref-detail-name" style="margin: 0 0 5px 0; color: var(--primary); font-weight: 700;"></h4>
-                                        <p id="ref-detail-desc" style="margin: 0 0 8px 0; font-size: 0.88rem; color: var(--text-secondary);"></p>
-                                        <span id="ref-detail-version" class="badge" style="background: var(--border); color: var(--text-title); font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 600;"></span>
-                                        <button id="btn-copy-ref-link" style="margin-top:8px; width:100%; height:38px; justify-content:center; background:transparent; border:1.5px solid var(--primary); color:var(--primary); border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; gap:6px; display:flex; align-items:center;">
-                                            <span data-i18n="btn_copy_share_link">نسخ رابط الاستيراد السريع 🔗</span>
-                                        </button>
-                                    </div>
-                                    
-                                    <!-- Preview Area -->
-                                    <div id="ref-preview-area" style="display: none; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px;">
-                                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-title);" data-i18n="ref_preview_title">🔍 معاينة أول 3 أسئلة:</div>
-                                        <div id="ref-preview-questions-list" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; max-height: 150px; overflow-y: auto; background: var(--bg-main); padding: 8px; border-radius: 6px;"></div>
-                                    </div>
-                                </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                            <select id="reference-selector" class="form-control" style="width: 100%; height: 42px; background: var(--card-bg);">
+                                <option value="" data-i18n="select_ref_placeholder">--- اختر المرجع المطلوب ---</option>
+                            </select>
+                            <button class="btn" id="btn-preview-ref" style="width: 100%; height: 42px; background: #7209b7; color: white; border: none; font-weight: 600; justify-content: center; border-radius: 8px;">
+                                <span data-i18n="btn_preview_ref">معاينة وفحص 📡</span>
+                            </button>
+                        </div>
 
-                                <div style="display: flex; justify-content: flex-end;">
-                                    <button class="btn" id="btn-confirm-ref-import" disabled style="height: 44px; padding: 0 30px; background: var(--success-color); color: white; border: none; font-weight: 700; box-shadow: 0 4px 10px rgba(44, 182, 125, 0.2); opacity: 0.5; cursor: not-allowed;">
-                                        <span data-i18n="btn_confirm_ref_import">تأكيد الاستيراد الآمن 🚀</span>
-                                    </button>
-                                </div>
+                        <!-- Reference Details Panel -->
+                        <div id="reference-details-panel" style="display: none; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 0.85rem;">
+                            <h4 id="ref-detail-name" style="margin: 0 0 4px 0; color: var(--primary); font-weight: 700;"></h4>
+                            <p id="ref-detail-desc" style="margin: 0 0 6px 0; color: var(--text-secondary); font-size: 0.8rem;"></p>
+                            <span id="ref-detail-version" class="badge" style="background: var(--border); color: var(--text-title); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px;"></span>
+                            <button id="btn-copy-ref-link" style="margin-top:8px; width:100%; height:34px; justify-content:center; background:transparent; border:1px solid var(--primary); color:var(--primary); border-radius:6px; font-size:0.78rem; font-weight:600; cursor:pointer; gap:4px; display:flex; align-items:center;">
+                                <span data-i18n="btn_copy_share_link">نسخ رابط الاستيراد السريع 🔗</span>
+                            </button>
+                            
+                            <!-- Preview Area -->
+                            <div id="ref-preview-area" style="display: none; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
+                                <div id="ref-preview-questions-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 100px; overflow-y: auto; font-size: 0.75rem; background: var(--card-bg); padding: 6px; border-radius: 4px;"></div>
                             </div>
+                        </div>
 
-                            <div class="url-import-wrapper" style="margin-bottom: 25px; padding: 18px; background: rgba(67, 97, 238, 0.05); border-radius: 12px; border: 1.5px dashed var(--primary); transition: var(--transition);">
-                                <label for="import-url" class="field-label" style="display: block; margin-bottom: 10px; font-weight: 700; color: var(--text-title); display: flex; align-items: center; gap: 8px;" data-i18n="import_url_label">
-                                    <span style="font-size: 1.2rem;">🔗</span> <span data-i18n="direct_link">أو التحميل عبر رابط مباشر (Direct Link)</span>
-                                </label>
-                                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                    <input type="url" id="import-url" class="form-control" style="flex: 1; min-width: 200px; height: 48px; background: var(--card-bg);" placeholder="https://example.com/questions.json">
-                                    <button class="btn" id="btn-import-url" onclick="app.importFromUrl(event)" style="flex: 1; min-width: 140px; height: 48px; padding: 0 25px; background: var(--primary); color: white; border: none; font-weight: 600; box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);">
-                                        <span data-i18n="import_fetch">جلب البيانات 📡</span>
-                                    </button>
-                                    <button class="btn" id="btn-copy-direct-link" style="flex: 1; min-width: 160px; height: 48px; padding: 0 20px; background: transparent; border: 1.5px solid var(--primary); color: var(--primary); font-weight: 600; border-radius: 8px; cursor: pointer; gap: 6px; display: inline-flex; align-items: center; justify-content: center;">
-                                        <span data-i18n="btn_gen_direct_share_link">صناعة رابط استيراد مباشر 🔗</span>
-                                    </button>
-                                </div>
-                                <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);" data-i18n="import_url_hint">يدعم روابط JSON المباشرة (مثل Google Drive, Dropbox, Catbox, GitHub).</div>
-                            </div>
+                        <div style="margin-top: auto;">
+                            <button class="btn" id="btn-confirm-ref-import" disabled style="width: 100%; height: 42px; background: var(--success-color); color: white; border: none; font-weight: 700; justify-content: center; border-radius: 8px; opacity: 0.5; cursor: not-allowed;">
+                                <span data-i18n="btn_confirm_ref_import">تأكيد الاستيراد الآمن 🚀</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: URL Direct Download & Local Upload -->
+                    <div class="stat-card" style="border-top: 4px solid #2a9d8f; display: flex; flex-direction: column;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 1.3rem;">🔗</span>
+                            <h3 style="margin:0;" data-i18n="direct_link">الملفات والروابط</h3>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px;" data-i18n="import_url_hint">قم باستيراد ملفات بنك الأسئلة محلياً أو حمّلها من رابط سحابي مباشر.</p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                            <input type="url" id="import-url" class="form-control" style="width: 100%; height: 42px; background: var(--card-bg);" placeholder="https://example.com/questions.json">
+                            <button class="btn" id="btn-import-url" onclick="app.importFromUrl(event)" style="width: 100%; height: 42px; background: var(--primary); color: white; border: none; font-weight: 600; justify-content: center; border-radius: 8px;">
+                                <span data-i18n="import_fetch">جلب البيانات 📡</span>
+                            </button>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto;">
+                            <button class="btn btn-secondary" id="btn-copy-direct-link" style="width: 100%; height: 42px; background: transparent; border: 1.5px solid var(--primary); color: var(--primary); font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                                <span data-i18n="btn_gen_direct_share_link">رابط استيراد مباشر 🔗</span>
+                            </button>
                             
-                            <!-- Smart Notebook Distribution Toggle -->
-                            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(44, 182, 125, 0.05); border-radius: 12px; border: 1px solid var(--accent); transition: var(--transition);">
-                                <input type="checkbox" id="import-auto-distribute" checked style="width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent);">
-                                <label for="import-auto-distribute" style="font-size: 0.95rem; font-weight: 700; color: var(--text-title); cursor: pointer; flex: 1;">
-                                    <span data-i18n="auto_distribute">🧠 توزيع الأسئلة تلقائياً حسب الدفاتر الأصلية</span>
-                                    <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary); margin-top: 4px;" data-i18n="import_auto_distribute_desc">سيقوم النظام بإنشاء دفاتر جديدة آلياً إذا لم تكن موجودة.</div>
-                                </label>
-                            </div>
-                            
-                            <div class="import-action-bar" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-top: 25px;">
-                                <button class="btn" onclick="app.importFromPaste()" style="flex: 1.5; height: 50px; font-weight: 700; background: var(--primary); color: #fff; justify-content: center;" data-i18n="import_json_btn">
-                                    🚀 استيراد JSON من النص
-                                </button>
-                                
-                                <button class="btn" id="btn-copy-raw-structure" onclick="app.copyRawStructure()" style="flex: 1; height: 50px; font-weight: 700; background: #6c757d; color: #fff; justify-content: center;" title="نسخ كافة الأسئلة بصيغة JSON خام">
-                                    📋 <span data-i18n="btn_copy_raw_structure">نسخ الهيكل الخام</span>
-                                </button>
-                                
-                                <button class="btn" onclick="app.smartTextImport()" style="flex: 1.5; height: 50px; font-weight: 700; background: var(--success-color); color: #fff; justify-content: center; border:none;" data-i18n="import_smart_btn">
-                                    🧠 استيراد ذكي من النص
-                                </button>
-                                
-                                <label for="import-file" class="btn" style="flex: 1; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--border); color: var(--text-title);">
-                                    <span data-i18n="import_file_btn">📂 رفع JSON/CSV</span>
-                                    <input type="file" id="import-file" style="display:none;" accept=".json,.csv,.gz,.json.gz,application/json,application/gzip,application/x-gzip">
-                                </label>
-                            </div>
+                            <label for="import-file" class="btn btn-secondary" style="width: 100%; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--border); color: var(--text-title); border: none; border-radius: 8px; margin: 0;">
+                                <span data-i18n="import_file_btn">📂 رفع ملف JSON/CSV</span>
+                                <input type="file" id="import-file" style="display:none;" accept=".json,.csv,.gz,.json.gz,application/json,application/gzip,application/x-gzip">
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -919,6 +973,23 @@
                                     <span data-i18n="bold_question_label">تغميق نص السؤال (Bold)</span>
                                 </label>
                             </div>
+                        </div>
+                        
+                        <div id="btn-export-interactive-html" class="export-card group border-2 border-slate-200 dark:border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition-all hover:-translate-y-1 hover:shadow-xl bg-white dark:bg-slate-900 overflow-hidden relative" style="margin-bottom: 20px;">
+                          <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                              <div class="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-500 rounded-xl group-hover:scale-110 transition-transform font-bold text-xl shrink-0">
+                                ⭐
+                              </div>
+                              <div class="space-y-1 text-left">
+                                <div class="font-black text-slate-900 dark:text-white text-base tracking-tight uppercase group-hover:text-amber-500 transition-colors">Interactive HTML Quiz</div>
+                                <div class="text-xs text-slate-400 dark:text-slate-500 font-medium leading-relaxed">تصدير كملف ناتي مستقل يعمل أوفلاين ككويز حر آمن 100% ضد قيود المتصفحات.</div>
+                              </div>
+                            </div>
+                            <span class="text-slate-300 dark:text-slate-700 group-hover:text-amber-500 transition-colors pt-1 shrink-0">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                            </span>
+                          </div>
                         </div>
 
                         <div class="export-action-card">
@@ -1334,8 +1405,8 @@
                 <!-- ARABIC CONTENT -->
                 <div id="report-ar" class="lang-section ar" dir="rtl">
                     <div style="text-align:center; margin-bottom:25px; padding:20px; background:var(--bg-main); border-radius:12px; border:1.5px solid #000;">
-                        <h1 style="color:var(--primary); margin-bottom:10px;">QBank - نظام إدارة بنوك الأسئلة المتطور (v16.6.0)</h1>
-                        <div style="background: var(--primary); color: white; display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px;">الإصدار 16.6.0</div>
+                        <h1 style="color:var(--primary); margin-bottom:10px;">QBank - نظام إدارة بنوك الأسئلة المتطور (v16.6.1)</h1>
+                        <div style="background: var(--primary); color: white; display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px;">الإصدار 16.6.1</div>
                         <p style="font-weight:600;">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
                     </div>
 
@@ -1429,8 +1500,8 @@
                 <!-- ENGLISH CONTENT -->
                 <div id="report-en" class="lang-section en" dir="ltr" style="display:none;">
                     <div style="text-align:center; margin-bottom:25px; padding:20px; background:var(--bg-main); border-radius:12px; border:1.5px solid #000;">
-                        <h1 style="color:var(--primary); margin-bottom:10px;">QBank - Advanced Question Bank Manager (V16.6.0)</h1>
-                        <div style="background: var(--primary); color: white; display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px;">Version 16.6.0</div>
+                        <h1 style="color:var(--primary); margin-bottom:10px;">QBank - Advanced Question Bank Manager (V16.6.1)</h1>
+                        <div style="background: var(--primary); color: white; display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px;">Version 16.6.1</div>
                         <p style="font-weight:600;">A complete system for managing questions, quizzes, and professional exports. Designed for students and lecturers to ensure the best educational and organizational experience.</p>
                     </div>
 
@@ -1758,6 +1829,6 @@
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="src/lib/qrcode.min.js"></script>
-    <script type="module" src="app.js?v=16.6.0"></script>
+    <script type="module" src="app.js?v=16.6.1"></script>
 </body>
 </html>

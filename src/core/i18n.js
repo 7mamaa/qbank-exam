@@ -1,7 +1,7 @@
-import { state } from './state.js?v=16.6.0';
-import { ar } from '../../locales/ar.js?v=16.6.0';
-import { en } from '../../locales/en.js?v=16.6.0';
-import { Helpers } from '../utils/helpers.js?v=16.6.0';
+import { state } from './state.js?v=16.6.1';
+import { ar } from '../../locales/ar.js?v=16.6.1';
+import { en } from '../../locales/en.js?v=16.6.1';
+import { Helpers } from '../utils/helpers.js?v=16.6.1';
 
 /**
  * @file i18n.js

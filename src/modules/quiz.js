@@ -1,10 +1,10 @@
-import { state } from '../core/state.js?v=16.6.0';
-import { AudioManager } from '../ui/audio.js?v=16.6.0';
-import { Helpers } from '../utils/helpers.js?v=16.6.0';
-import { i18n } from '../core/i18n.js?v=16.6.0';
-import { QuestionModule } from './questions.js?v=16.6.0';
+import { state } from '../core/state.js?v=16.6.1';
+import { AudioManager } from '../ui/audio.js?v=16.6.1';
+import { Helpers } from '../utils/helpers.js?v=16.6.1';
+import { i18n } from '../core/i18n.js?v=16.6.1';
+import { QuestionModule } from './questions.js?v=16.6.1';
 
-import { NotebookModule } from './notebooks.js?v=16.6.0';
+import { NotebookModule } from './notebooks.js?v=16.6.1';
 
 /**
  * @module QuizModule
@@ -131,10 +131,39 @@ export const QuizModule = {
             html += `<textarea class="form-control" placeholder="${i18n.t('quiz_ans_placeholder')}" oninput="app.saveQuizAnswer('${q.id}', this.value)">${Helpers.sanitize(currentAns)}</textarea>`;
         }
 
+        html += `
+            <div class="quiz-revealed-section" style="margin-top: 20px; display: none;">
+                <div class="quiz-correct-ans" style="padding: 12px; background: rgba(44, 182, 125, 0.1); border-radius: 8px; border: 1.5px solid var(--success-color); margin-bottom: 10px; display: none;">
+                    <strong>${i18n.t('correct_answer') || 'الإجابة الصحيحة'}:</strong> ${Helpers.sanitize(String(q.answer))}
+                </div>
+                <div class="quiz-explanation" style="padding: 12px; background: rgba(67, 97, 238, 0.1); border-radius: 8px; border: 1.5px solid var(--primary); display: none;">
+                    <strong>${i18n.t('explain_label') || 'الشرح'}:</strong> ${Helpers.sanitize(q.explain || 'لا يوجد شرح متاح')}
+                </div>
+            </div>
+        `;
+
         html += `</div>`;
         container.innerHTML = html;
         
         this.updateProgress();
+    },
+
+    quizRevealAnswer() {
+        const sec = document.querySelector('.quiz-revealed-section');
+        const ans = document.querySelector('.quiz-correct-ans');
+        if (sec && ans) {
+            sec.style.display = 'block';
+            ans.style.display = 'block';
+        }
+    },
+
+    quizRevealExplanation() {
+        const sec = document.querySelector('.quiz-revealed-section');
+        const exp = document.querySelector('.quiz-explanation');
+        if (sec && exp) {
+            sec.style.display = 'block';
+            exp.style.display = 'block';
+        }
     },
 
     /**

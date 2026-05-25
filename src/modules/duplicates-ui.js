@@ -1,5 +1,5 @@
-import { DuplicatesLogic } from './duplicates.js?v=16.6.0';
-import { i18n } from '../core/i18n.js?v=16.6.0';
+import { DuplicatesLogic } from './duplicates.js?v=16.6.1';
+import { i18n } from '../core/i18n.js?v=16.6.1';
 
 /**
  * @file duplicates-ui.js

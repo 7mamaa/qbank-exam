@@ -1,6 +1,6 @@
-import { i18n } from '../core/i18n.js?v=16.6.0';
-import { Helpers } from '../utils/helpers.js?v=16.6.0';
-import { app } from '../../app.js?v=16.6.0';
+import { i18n } from '../core/i18n.js?v=16.6.1';
+import { Helpers } from '../utils/helpers.js?v=16.6.1';
+import { app } from '../../app.js?v=16.6.1';
 
 /**
  * @module UIComponents

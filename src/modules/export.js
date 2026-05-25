@@ -1,252 +1,280 @@
 /* global pako, React, ReactPDF, app */
-import { state } from '../core/state.js?v=16.6.0';
-import { db } from '../core/db.js?v=16.6.0';
-import { QueryEngine } from '../core/query.js?v=16.6.0';
-import { i18n } from '../core/i18n.js?v=16.6.0';
-import { Helpers } from '../utils/helpers.js?v=16.6.0';
-import { Logger } from '../utils/logger.js?v=16.6.0';
-import { UIComponents } from '../ui/components.js?v=16.6.0';
+import { state } from '../core/state.js?v=16.6.1';
+import { db } from '../core/db.js?v=16.6.1';
+import { QueryEngine } from '../core/query.js?v=16.6.1';
+import { i18n } from '../core/i18n.js?v=16.6.1';
+import { Helpers } from '../utils/helpers.js?v=16.6.1';
+import { Logger } from '../utils/logger.js?v=16.6.1';
+import { UIComponents } from '../ui/components.js?v=16.6.1';
 
-async function validateIncomingPayload(payload, existingNotebooks = [], options = {}) {
-    const errors = [];
-    const seenIds = new Set();
-    let floatingCount = 0;
-    const newNotebooks = [];
+async function validateIncomingPayload(payload, notebooks, activeNotebookId, autoDistribute) {
+    if (!payload) throw new Error("الملف فارغ أو تالف");
 
-    const isUUID = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+    // المسار الفولاذي الأول: الملف عبارة عن كبسولة مجمعة مطورة (Envelope Payload)
+    if (payload.notebooks && payload.questions) {
+        console.log("[Import Engine] تفعيل مسار الكبسولة المجمعة المطورة...");
+        
+        // دمج وحفظ الدفاتر المستوردة ذرياً مع الحفاظ على الأسم ومعرفات الأب والابن
+        const localNotebooks = globalThis.app?.state?.notebooks || notebooks || [];
+        const localIds = new Set(localNotebooks.map(nb => nb.id));
+        const localTitles = new Set(localNotebooks.map(nb => nb.title?.trim()));
 
-    const maxQNumbersByNotebook = new Map();
-    const getMaxQForNotebook = (nbId) => {
-        if (!nbId) return 0;
-        if (maxQNumbersByNotebook.has(nbId)) {
-            return maxQNumbersByNotebook.get(nbId);
+        for (const importedNb of payload.notebooks) {
+            // منع تكرار الدفاتر بالـ ID أو الاسم النصي لحماية السايد بار من الانفجار
+            if (!localIds.has(importedNb.id) && !localTitles.has(importedNb.title?.trim())) {
+                localNotebooks.push(importedNb);
+                if (db.instance) {
+                    const tx = db.instance.transaction(['notebooks'], 'readwrite');
+                    await tx.objectStore('notebooks').put(importedNb);
+                }
+            }
         }
-        const localQs = (globalThis.app?.state?.questions || state.questions || []);
-        const maxVal = Math.max(...localQs.filter(item => item.notebookId === nbId).map(item => item.qNumber || 0), 0);
-        maxQNumbersByNotebook.set(nbId, maxVal);
-        return maxVal;
-    };
-
-    if (!Array.isArray(payload)) {
-        throw new Error(i18n.t('err_import_not_array'));
+        
+        // تمرير الأسئلة المرافقة مباشرة دون تدمير معرفاتها
+        return payload.questions;
     }
 
-    const autoDistribute = (options.autoDistribute !== undefined)
-        ? options.autoDistribute
-        : (document.getElementById('import-auto-distribute') ? document.getElementById('import-auto-distribute').checked : true);
+    // المسار الثاني: التوافق الرجعي لو الملف مجرد مصفوفة أسئلة مسطحة (Legacy Flat Array)
+    if (Array.isArray(payload)) {
+        console.log("[Import Engine] تفعيل مسار التوافق الرجعي للمصفوفات المسطحة...");
+        const cleanQuestions = [];
+        
+        const isUUID = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
-    const activeNotebookId = (options.activeNotebookId !== undefined)
-        ? options.activeNotebookId
-        : (document.getElementById('import-notebook') ? document.getElementById('import-notebook').value : null);
+        // تجميع معلومات الدفاتر الموجودة للمقارنة
+        const localNbs = notebooks || [];
+        const notebooksById = new Map();
+        const notebooksByName = new Map();
 
-    const maxQForForced = !autoDistribute ? getMaxQForNotebook(activeNotebookId) : 0;
-
-    if (typeof i18n !== 'undefined' && i18n.locales) {
-        if (i18n.locales.ar) {
-            if (!i18n.locales.ar['msg_import_success_floating']) {
-                i18n.locales.ar['msg_import_success_floating'] = 'تم استيراد بنك الأسئلة بنجاح! (تم تحويل {count} سؤال إلى أسئلة عائمة لعدم وجود الدفتر المسمى)';
-            }
-            if (!i18n.locales.ar['msg_import_success_forced']) {
-                i18n.locales.ar['msg_import_success_forced'] = 'تم صب كافة الأسئلة داخل الدفتر المختار بنجاح!';
-            }
-        }
-        if (i18n.locales.en) {
-            if (!i18n.locales.en['msg_import_success_floating']) {
-                i18n.locales.en['msg_import_success_floating'] = 'Question bank imported successfully! ({count} questions were made floating due to missing notebook)';
-            }
-            if (!i18n.locales.en['msg_import_success_forced']) {
-                i18n.locales.en['msg_import_success_forced'] = 'All questions successfully imported into the selected notebook!';
-            }
-        }
-    }
-
-    const stateNbs = globalThis.app?.state?.notebooks || state.notebooks || [];
-    const notebooksById = new Map();
-    const notebooksByName = new Map();
-
-    stateNbs.forEach(nb => {
-        if (nb && nb.id) {
-            notebooksById.set(String(nb.id), nb);
-            if (nb.name) {
-                notebooksByName.set(String(nb.name).trim().toLowerCase(), nb);
-            }
-            if (nb.title) {
-                notebooksByName.set(String(nb.title).trim().toLowerCase(), nb);
-            }
-        }
-    });
-
-    if (Array.isArray(existingNotebooks)) {
-        existingNotebooks.forEach(nb => {
-            if (nb && typeof nb === 'object' && nb.id) {
+        localNbs.forEach(nb => {
+            if (nb && nb.id) {
                 notebooksById.set(String(nb.id), nb);
-                if (nb.name) {
-                    notebooksByName.set(String(nb.name).trim().toLowerCase(), nb);
-                }
-                if (nb.title) {
-                    notebooksByName.set(String(nb.title).trim().toLowerCase(), nb);
-                }
-            } else if (typeof nb === 'string') {
-                if (!notebooksById.has(nb)) {
-                    notebooksById.set(nb, { id: nb });
+                const titleKey = (nb.title || nb.name || "").trim().toLowerCase();
+                if (titleKey) {
+                    notebooksByName.set(titleKey, nb);
                 }
             }
         });
-    }
 
-    const addNewNotebook = (id, name) => {
-        const newNb = {
-            id,
-            name,
-            icon: '📁',
-            color: '#4361ee',
-            createdAt: Date.now()
+        const newNotebooksList = [];
+        const addNewNotebook = (id, name) => {
+            const newNb = {
+                id,
+                title: name,
+                name: name,
+                icon: '📁',
+                color: '#4361ee',
+                createdAt: Date.now()
+            };
+            newNotebooksList.push(newNb);
+            localNbs.push(newNb);
+            notebooksById.set(id, newNb);
+            notebooksByName.set(name.trim().toLowerCase(), newNb);
+            return newNb;
         };
-        newNotebooks.push(newNb);
-        notebooksById.set(id, newNb);
-        notebooksByName.set(name.trim().toLowerCase(), newNb);
-        return newNb;
-    };
 
-    const getAggregatedNotebook = () => {
-        const today = new Date();
-        const dd = String(today.getDate()).padStart(2, '0');
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const yyyy = today.getFullYear();
-        const nbName = `(استيراد تلقائي - ${dd}/${mm}/${yyyy})`;
-        const nbNameLower = nbName.toLowerCase();
-        
-        if (notebooksByName.has(nbNameLower)) {
-            return notebooksByName.get(nbNameLower);
-        }
-        
-        const newId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `nb_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-        return addNewNotebook(newId, nbName);
-    };
+        const getAggregatedNotebook = () => {
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            const nbName = `(استيراد تلقائي - ${dd}/${mm}/${yyyy})`;
+            const nbNameLower = nbName.toLowerCase();
+            
+            if (notebooksByName.has(nbNameLower)) {
+                return notebooksByName.get(nbNameLower);
+            }
+            
+            const newId = (typeof crypto !== 'undefined' && crypto.randomUUID) 
+                ? crypto.randomUUID() 
+                : `nb_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+            return addNewNotebook(newId, nbName);
+        };
 
-    for (let i = 0; i < payload.length; i++) {
-        const q = payload[i];
-        const ctx = `${i18n.t('err_at_question')} ${i + 1}: `;
+        // حساب أعلى رقم مسلسل للأسئلة
+        const maxQNumbersByNotebook = new Map();
+        const getMaxQForNotebook = (nbId) => {
+            if (!nbId) return 0;
+            if (maxQNumbersByNotebook.has(nbId)) {
+                return maxQNumbersByNotebook.get(nbId);
+            }
+            const localQs = (globalThis.app?.state?.questions || []);
+            const maxVal = Math.max(...localQs.filter(item => item.notebookId === nbId).map(item => item.qNumber || 0), 0);
+            maxQNumbersByNotebook.set(nbId, maxVal);
+            return maxVal;
+        };
 
-        // --- Self-Healing Code Block ---
-        // 1. Identity Repair
-        if (!q.id || typeof q.id !== 'string' || q.id.trim() === '') {
-            q.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
-                ? crypto.randomUUID()
-                : `self_healed_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${i}`;
-        }
+        const maxQForForced = !autoDistribute ? getMaxQForNotebook(activeNotebookId) : 0;
 
-        // 3. Boolean Correction
-        if (q.type === 'boolean') {
-            if (q.answer === undefined || q.answer === null || q.answer === '' || typeof q.answer === 'string') {
+        for (let i = 0; i < payload.length; i++) {
+            const q = payload[i];
+
+            // 1. تنظيف الحقول الأساسية وتصحيح المعرفات المفقودة
+            if (!q.id || typeof q.id !== 'string' || q.id.trim() === '') {
+                q.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                    ? crypto.randomUUID()
+                    : `self_healed_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${i}`;
+            }
+
+            // تصحيح نوع الأسئلة الثنائية (boolean)
+            if (q.type === 'boolean') {
                 if (q.answer === 'true' || q.answer === true) {
                     q.answer = true;
                 } else {
-                    q.answer = false; // Safe fallback
-                }
-            }
-        }
-
-        // --- Validation Checks ---
-        if (seenIds.has(q.id)) {
-            errors.push(`${ctx}${i18n.t('err_id_collision')} [${q.id}]`);
-        }
-        seenIds.add(q.id);
-
-        if (!q.question || typeof q.question !== 'string' || q.question.trim() === '') {
-            errors.push(`${ctx}${i18n.t('err_empty_question')}`);
-        }
-
-        const validTypes = ['mcq', 'boolean', 'match', 'written'];
-        if (!q.type || !validTypes.includes(q.type)) {
-            errors.push(`${ctx}${i18n.t('err_unknown_type')} [${q.type || 'N/A'}]`);
-        }
-
-        // MCQ check
-        if (q.type === 'mcq') {
-            if (!Array.isArray(q.options) || q.options.length < 2) {
-                errors.push(`${ctx}${i18n.t('err_mcq_options_min')}`);
-            }
-        }
-        if (q.type === 'written' && q.options && q.options.length > 0) {
-            errors.push(`${ctx}${i18n.t('err_written_has_options')}`);
-        }
-
-        // Route notebookId conditionally
-        if (!autoDistribute) {
-            q.notebookId = activeNotebookId;
-        } else {
-            const idKey = q.notebookId ? String(q.notebookId).trim() : "";
-            const nameKey = q.notebookName ? String(q.notebookName).trim().toLowerCase() : "";
-
-            let resolvedNb = null;
-            if (idKey && notebooksById.has(idKey)) {
-                resolvedNb = notebooksById.get(idKey);
-            } else {
-                const idKeyLower = idKey.toLowerCase();
-                if (nameKey && notebooksByName.has(nameKey)) {
-                    resolvedNb = notebooksByName.get(nameKey);
-                } else if (idKey && notebooksByName.has(idKeyLower)) {
-                    resolvedNb = notebooksByName.get(idKeyLower);
+                    q.answer = false;
                 }
             }
 
-            if (resolvedNb) {
-                q.notebookId = resolvedNb.id;
+            // 2. تطبيق المصفوفة الرباعية الاحتياطية بناءً على خيارات الواجهة
+            if (!autoDistribute) {
+                // الصب القسري في الدفتر النشط المختار
+                q.notebookId = activeNotebookId;
             } else {
-                const hasUUID = isUUID(q.notebookId);
-                const hasName = typeof q.notebookName === 'string' && q.notebookName.trim() !== '';
+                const idKey = q.notebookId ? String(q.notebookId).trim() : "";
+                const nameKey = q.notebookName ? String(q.notebookName).trim().toLowerCase() : "";
 
-                if (hasUUID && !hasName) {
-                    const newNb = addNewNotebook(q.notebookId, q.notebookId);
-                    q.notebookId = newNb.id;
-                } else if (hasUUID && hasName) {
-                    const newNb = addNewNotebook(q.notebookId, q.notebookName.trim());
-                    q.notebookId = newNb.id;
-                } else if (hasName && !hasUUID) {
-                    const newId = (typeof crypto !== 'undefined' && crypto.randomUUID)
-                        ? crypto.randomUUID()
-                        : `nb_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-                    const newNb = addNewNotebook(newId, q.notebookName.trim());
-                    q.notebookId = newNb.id;
-                } else if (!q.notebookId && !hasName) {
-                    const aggNb = getAggregatedNotebook();
-                    q.notebookId = aggNb.id;
+                let resolvedNb = null;
+                if (idKey && notebooksById.has(idKey)) {
+                    resolvedNb = notebooksById.get(idKey);
                 } else {
-                    q.notebookId = null;
-                    floatingCount++;
+                    const idKeyLower = idKey.toLowerCase();
+                    if (nameKey && notebooksByName.has(nameKey)) {
+                        resolvedNb = notebooksByName.get(nameKey);
+                    } else if (idKey && notebooksByName.has(idKeyLower)) {
+                        resolvedNb = notebooksByName.get(idKeyLower);
+                    }
+                }
+
+                if (resolvedNb) {
+                    q.notebookId = resolvedNb.id;
+                } else {
+                    const hasUUID = isUUID(q.notebookId);
+                    const hasName = typeof q.notebookName === 'string' && q.notebookName.trim() !== '';
+
+                    if (hasUUID && !hasName) {
+                        const newNb = addNewNotebook(q.notebookId, q.notebookId);
+                        q.notebookId = newNb.id;
+                    } else if (hasUUID && hasName) {
+                        const newNb = addNewNotebook(q.notebookId, q.notebookName.trim());
+                        q.notebookId = newNb.id;
+                    } else if (hasName && !hasUUID) {
+                        const newId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                            ? crypto.randomUUID()
+                            : `nb_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+                        const newNb = addNewNotebook(newId, q.notebookName.trim());
+                        q.notebookId = newNb.id;
+                    } else if (!q.notebookId && !hasName) {
+                        const aggNb = getAggregatedNotebook();
+                        q.notebookId = aggNb.id;
+                    } else {
+                        q.notebookId = null;
+                    }
                 }
             }
-        }
 
-        // 2. Smart Sequence Numbering Injection
-        if (!autoDistribute) {
-            q.qNumber = maxQForForced + i + 1;
-        } else {
-            const groupKey = q.notebookId || "floating";
-            const maxQ = getMaxQForNotebook(groupKey);
-            const nextQ = maxQ + 1;
-            q.qNumber = nextQ;
-            maxQNumbersByNotebook.set(groupKey, nextQ);
-        }
-
-        // Match check
-        if (q.type === 'match') {
-            if (!Array.isArray(q.pairs) && (!q.options || typeof q.options !== 'object')) {
-                errors.push(`${ctx}${i18n.t('err_malformed_match_structure')}`);
+            // 3. توليد رقم المسلسل الذكي (qNumber)
+            if (!autoDistribute) {
+                q.qNumber = maxQForForced + i + 1;
+            } else {
+                const groupKey = q.notebookId || "floating";
+                const maxQ = getMaxQForNotebook(groupKey);
+                const nextQ = maxQ + 1;
+                q.qNumber = nextQ;
+                maxQNumbersByNotebook.set(groupKey, nextQ);
             }
+
+            cleanQuestions.push(q);
         }
+
+        // حفظ الدفاتر الجديدة ذرياً
+        if (newNotebooksList.length > 0 && db.instance) {
+            const tx = db.instance.transaction(['notebooks'], 'readwrite');
+            const store = tx.objectStore('notebooks');
+            newNotebooksList.forEach(nb => store.put(nb));
+        }
+
+
+
+        return cleanQuestions;
     }
 
-    if (errors.length > 0) {
-        throw new Error(errors.join('\n'));
+    throw new Error("صيغة ملف الاستيراد غير مدعومة هندسياً");
+}
+
+async function exportData() {
+    try {
+        // تجميع شجرة الدفاتر كاملة وعلاقات الأب والابن مع مصفوفة الأسئلة
+        const notebooks = globalThis.app?.state?.notebooks || [];
+        const questions = globalThis.app?.state?.questions || [];
+        
+        const exportEnvelope = {
+            version: "16.6.1",
+            exportDate: new Date().toISOString(),
+            notebooks: notebooks,
+            questions: questions
+        };
+
+        // تحويل الكبسولة المجمعة كاملة إلى نص
+        const jsonString = JSON.stringify(exportEnvelope);
+        
+        // إذا كان النظام يدعم الضغط، يتم تمرير الـ jsonString لمحرك الـ CompressionStream
+        // كود التنزيل القياسي المعتمد في التطبيق:
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `qbank_backup_${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        if (typeof UIComponents !== 'undefined') {
+            UIComponents.showToast("تم تصدير بنك الأسئلة بكامل الدفاتر والعلاقات بنجاح!", "success");
+        }
+    } catch (error) {
+        console.error("[Export Engine Crash]:", error);
     }
-    return { success: true, floatingCount, newNotebooks };
 }
 
 export const ExportModule = {
-    async validateIncomingPayload(payload, existingNotebooks = [], options = {}) {
-        return await validateIncomingPayload(payload, existingNotebooks, options);
+    async validateIncomingPayload(payload, existingNotebooks = [], optionsOrActiveId = {}, autoDistributeOpt = undefined) {
+        let activeNotebookId = null;
+        let autoDistribute = true;
+
+        if (optionsOrActiveId && typeof optionsOrActiveId === 'object' && !Array.isArray(optionsOrActiveId)) {
+            activeNotebookId = optionsOrActiveId.activeNotebookId;
+            autoDistribute = optionsOrActiveId.autoDistribute !== undefined ? optionsOrActiveId.autoDistribute : true;
+        } else {
+            activeNotebookId = optionsOrActiveId;
+            autoDistribute = autoDistributeOpt !== undefined ? autoDistributeOpt : true;
+        }
+
+        const notebooksCopy = [...existingNotebooks];
+
+        const questions = await validateIncomingPayload(payload, notebooksCopy, activeNotebookId, autoDistribute);
+
+        const newNotebooks = notebooksCopy.filter(nb => !existingNotebooks.some(existing => existing.id === nb.id));
+
+        newNotebooks.forEach(nb => existingNotebooks.push(nb));
+
+        const appNbs = globalThis.app?.state?.notebooks;
+        if (appNbs) {
+            newNotebooks.forEach(nb => {
+                if (!appNbs.some(n => n.id === nb.id)) {
+                    appNbs.push(nb);
+                }
+            });
+        }
+
+        const floatingCount = Array.isArray(questions) ? questions.filter(q => !q.notebookId).length : 0;
+
+        return {
+            success: true,
+            floatingCount,
+            newNotebooks,
+            questions
+        };
     },
 
     updateExportScopeCounts() {
@@ -319,144 +347,242 @@ export const ExportModule = {
     },
 
     exportData: async function(fmt, passedPool, showToastCallback) {
-        // Use passed pool from UI scope, fallback to dashboard QueryEngine if missing
-        const pool = passedPool && Array.isArray(passedPool) ? passedPool : QueryEngine.getQueryPool();
-        if (pool.length === 0) {
-            alert(i18n.t('export_no_questions'));
-            return;
-        }
-
-        const ts = Date.now();
-
-        if (fmt === 'json') {
-            try {
-                const beautifyEl = document.getElementById('exportBeautify');
-                const compressEl = document.getElementById('exportCompress');
-                const isBeautify = beautifyEl ? beautifyEl.checked : false;
-                const isCompress = compressEl ? compressEl.checked : true;
-
-                const clean = pool.map(q => ({ ...q })); // Export full profile schema
-                const jsonString = isBeautify ? JSON.stringify(clean, null, 4) : JSON.stringify(clean);
-
+        try {
+            const format = String(fmt).toLowerCase();
+            const pool = passedPool || globalThis.app?.getQueryPool?.() || globalThis.app?.state?.questions || [];
+            
+            if (!pool || pool.length === 0) {
+                if (showToastCallback) showToastCallback(i18n.t('msg_no_data_found') || "لا توجد أسئلة للتصدير", 'warning');
+                return;
+            }
+            
+            if (format === 'json') {
+                const notebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
+                const exportEnvelope = {
+                    version: "16.6.1",
+                    exportDate: new Date().toISOString(),
+                    notebooks: notebooks,
+                    questions: pool
+                };
+                
+                const isBeautify = document.getElementById('exportBeautify')?.checked;
+                const isCompress = document.getElementById('exportCompress')?.checked;
+                
+                const jsonString = isBeautify ? JSON.stringify(exportEnvelope, null, 2) : JSON.stringify(exportEnvelope);
+                
                 if (isCompress) {
-                    const uint8Array = new TextEncoder().encode(jsonString);
+                    let compressedBlob;
                     if (typeof CompressionStream !== 'undefined') {
                         const stream = new ReadableStream({
                             start(controller) {
-                                controller.enqueue(uint8Array);
+                                controller.enqueue(new TextEncoder().encode(jsonString));
                                 controller.close();
                             }
-                        });
-                        const compressionStream = new CompressionStream('gzip');
-                        const compressedStream = stream.pipeThrough(compressionStream);
-                        const blob = await new Response(compressedStream).blob();
-                        const gzBlob = new Blob([blob], { type: 'application/gzip' });
-                        this.downloadFile(gzBlob, `qbank_${Date.now()}.json.gz`);
+                        }).pipeThrough(new CompressionStream('gzip'));
+                        
+                        compressedBlob = await new Response(stream).blob();
                     } else if (typeof pako !== 'undefined') {
-                        const compressedData = pako.gzip(uint8Array);
-                        const blob = new Blob([compressedData], { type: 'application/gzip' });
-                        this.downloadFile(blob, `qbank_${Date.now()}.json.gz`);
+                        const compressed = pako.gzip(jsonString);
+                        compressedBlob = new Blob([compressed], { type: 'application/gzip' });
                     } else {
-                        throw new Error("GZIP compression is not supported in this browser.");
+                        throw new Error("GZIP compression not supported by browser");
                     }
+                    this.downloadFile(compressedBlob, `qbank_backup_${Date.now()}.json.gz`);
                 } else {
                     const blob = new Blob([jsonString], { type: 'application/json' });
-                    this.downloadFile(blob, `qbank_${Date.now()}.json`);
-                }
-            } catch (err) {
-                Logger.error('ExportModule', 'Failed to export JSON', err);
-                alert((i18n.t('err_export_failed') ? i18n.t('err_export_failed', { message: err.message }) : `فشل التصدير: ${err.message}`));
-            }
-            return;
-
-        } else if (fmt === 'csv') {
-            const headers = ['question', 'type', 'category', 'difficulty', 'answer', 'tags', 'explain'];
-            const rows = pool.map(q => headers.map(h => {
-                let val = q[h] || '';
-                if (Array.isArray(val)) val = val.join('|');
-                return `"${String(val).replace(/"/g, '""')}"`;
-            }).join(','));
-            const csv = [headers.join(','), ...rows].join('\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            this.downloadFile(blob, `qbank_export_${ts}.csv`);
-
-        } else if (fmt === 'md') {
-            let md = `# ${i18n.t('question_bank')} - ${new Date().toLocaleDateString(state.language === 'ar' ? 'ar-EG' : 'en-US')}\n\n`;
-            pool.forEach((q, i) => {
-                md += `### ${i + 1}. ${q.question}\n`;
-                if (q.type === 'mcq') {
-                    const labels = state.language === 'ar' ? ['أ', 'ب', 'ج', 'د'] : ['A', 'B', 'C', 'D'];
-                    q.options.forEach((o, j) => md += `- ${labels[j] || String.fromCharCode(65+j)} ${o}\n`);
-                    md += `\n**${i18n.t('export_answer')}:** ${q.answer}\n`;
-                } else if (q.type === 'boolean') {
-                    md += `\n**${i18n.t('export_answer')}:** ${q.answer ? i18n.t('quiz_true') : i18n.t('quiz_false')}\n`;
-                } else if (q.type === 'match') {
-                    md += `\n| ${i18n.t('q_pair_right')} | ${i18n.t('q_pair_left')} |\n| :--- | :--- |\n`;
-                    (q.pairs || []).forEach(p => md += `| ${p.left} | ${p.right} |\n`);
-                } else if (q.type === 'written') {
-                    const ansText = q.answer || (q.keywords || []).join(', ');
-                    md += `\n**${i18n.t('export_answer')}:** ${ansText}\n`;
+                    this.downloadFile(blob, `qbank_backup_${Date.now()}.json`);
                 }
                 
-                if (q.explain) md += `\n> 💡 ${q.explain}\n`;
-                if (q.tags && q.tags.length) md += `\n*${i18n.t('all_tags')}: ${q.tags.map(t => `#${t}`).join(' ')}*\n`;
-                md += `\n---\n\n`;
+                if (showToastCallback) showToastCallback(i18n.t('msg_export_success') || "تم التصدير بنجاح!");
+            } else if (format === 'csv') {
+                this.exportCSV(pool);
+                if (showToastCallback) showToastCallback(i18n.t('msg_export_success') || "تم التصدير بنجاح!");
+            } else if (format === 'pdf' || format === 'print') {
+                this.exportToPdf(pool);
+            } else if (format === 'word') {
+                await this.exportToWord(pool, showToastCallback);
+            } else {
+                throw new Error("صيغة التصدير غير مدعومة: " + format);
+            }
+        } catch (error) {
+            console.error("[Export Engine Crash]:", error);
+            alert("❌ فشل التصدير: " + error.message);
+        }
+    },
+
+    exportCSV(pool) {
+        const headers = [
+            'id', 'type', 'question', 'category', 'difficulty', 'tags', 'explain', 
+            'options', 'answer', 'correctAnswers', 'pairs', 'notebookId', 'notebookName', 
+            'qNumber', 'createdAt'
+        ];
+        
+        const csvRows = [headers.join(',')];
+        
+        pool.forEach(q => {
+            const rowValues = headers.map(header => {
+                let val = q[header];
+                if (val === undefined || val === null) {
+                    val = '';
+                }
+                
+                if (header === 'options' || header === 'correctAnswers' || header === 'tags' || header === 'answer' || header === 'explain') {
+                    val = Array.isArray(val) ? val.join('|') : String(val);
+                } else if (header === 'pairs') {
+                    val = Array.isArray(val) ? val.map(p => p && typeof p === 'object' ? `${p.left || ''}:${p.right || ''}` : String(p)).join('|') : String(val);
+                } else if (header === 'notebookName') {
+                    if (!val && q.notebookId) {
+                        const nb = (globalThis.app?.state?.notebooks || []).find(n => String(n.id) === String(q.notebookId));
+                        val = nb ? (nb.title || nb.name || '') : '';
+                    }
+                }
+                
+                return this.escapeCSV(val);
             });
-            const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
-            this.downloadFile(blob, `qbank_${ts}.md`);
+            csvRows.push(rowValues.join(','));
+        });
+        
+        const csvString = csvRows.join('\r\n');
+        const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+        this.downloadFile(blob, `qbank_export_${Date.now()}.csv`);
+    },
 
-        } else if (fmt === 'anki') {
-            const deckName = document.getElementById('ankiDeckName')?.value || `QBank_Anki_${ts}`;
-            let csvContent = `#separator:comma\n#html:true\n#tags column:3\n#deck:${deckName}\nFront,Back,Tags\n`;
-
-            pool.forEach(q => {
-                let frontHtml = `<div><strong>${q.question || ''}</strong></div>`;
-                let backHtml = `<div><strong>${i18n.t('export_answer')}:</strong> ${q.answer || ''}</div>`;
-
-                // إضافة الخيارات إذا كان السؤال MCQ
-                if (q.type === 'mcq' && Array.isArray(q.options)) {
-                    frontHtml += `<ul style="text-align: ${state.direction === 'rtl' ? 'right' : 'left'};">`;
-                    q.options.forEach(opt => {
-                        frontHtml += `<li>${opt}</li>`;
-                    });
-                    frontHtml += `</ul>`;
+    parseCSV(text) {
+        const lines = [];
+        let row = [""];
+        let inQuotes = false;
+        
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const nextChar = text[i + 1];
+            
+            if (char === '"') {
+                if (inQuotes && nextChar === '"') {
+                    row[row.length - 1] += '"';
+                    i++; 
+                } else {
+                    inQuotes = !inQuotes;
                 }
-
-                // معالجة المزاوجة (Matching) - تحويلها لجدول في الظهر
-                if (q.type === 'match' && Array.isArray(q.pairs)) {
-                    backHtml += `<br><table border="1" style="border-collapse: collapse; width: 100%;">`;
-                    q.pairs.forEach(pair => {
-                        backHtml += `<tr><td style="padding: 5px;">${pair.left || ''}</td><td style="padding: 5px;">${pair.right || ''}</td></tr>`;
-                    });
-                    backHtml += `</table>`;
+            } else if (char === ',' && !inQuotes) {
+                row.push("");
+            } else if ((char === '\r' || char === '\n') && !inQuotes) {
+                if (char === '\r' && nextChar === '\n') {
+                    i++; 
                 }
-
-                // إضافة الشرح (Explanation) إن وجد
-                if (q.explain) {
-                    backHtml += `<br><div style="color: #555;"><em>${i18n.t('export_explain')}:</em> ${q.explain}</div>`;
+                if (row.length > 1 || row[0] !== "") {
+                    lines.push(row);
                 }
-
-                // معالجة الوسوم (Tags) - أنكي يفضل مسافات بين الوسوم وليس فواصل
-                let tagsString = Array.isArray(q.tags) ? q.tags.map(t => t.replace(/\s+/g, '_')).join(' ') : '';
-
-                // تطبيق دالة الحماية وتجميع السطر
-                const csvRow = [
-                    this.escapeCSV(frontHtml),
-                    this.escapeCSV(backHtml),
-                    this.escapeCSV(tagsString)
-                ].join(',');
-
-                csvContent += csvRow + '\n';
+                row = [""];
+            } else {
+                row[row.length - 1] += char;
+            }
+        }
+        if (row.length > 1 || row[0] !== "") {
+            lines.push(row);
+        }
+        
+        if (lines.length < 2) return [];
+        
+        const headers = lines[0].map(h => h.trim().toLowerCase());
+        const result = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i];
+            if (values.length < headers.length) continue;
+            
+            const q = {};
+            headers.forEach((header, index) => {
+                let cellVal = values[index] || '';
+                
+                if (i === 1 && index === 0 && cellVal.startsWith('\uFEFF')) {
+                    cellVal = cellVal.substring(1);
+                }
+                
+                if (header === 'options' || header === 'correctanswers' || header === 'tags') {
+                    const key = header === 'correctanswers' ? 'correctAnswers' : header;
+                    if (cellVal.startsWith('[') && cellVal.endsWith(']')) {
+                        try {
+                            q[key] = JSON.parse(cellVal);
+                        } catch (e) {
+                            q[key] = cellVal.split('|');
+                        }
+                    } else {
+                        q[key] = cellVal ? cellVal.split('|') : [];
+                    }
+                } else if (header === 'pairs' || header === 'matchingpairs') {
+                    const key = 'pairs';
+                    let parsedPairs = [];
+                    if (cellVal) {
+                        try {
+                            if (cellVal.startsWith('[') && cellVal.endsWith(']')) {
+                                parsedPairs = JSON.parse(cellVal);
+                            } else {
+                                parsedPairs = cellVal.split('|').map(p => {
+                                    const colIdx = p.indexOf(':');
+                                    if (colIdx === -1) return { left: p, right: '' };
+                                    return { left: p.substring(0, colIdx), right: p.substring(colIdx + 1) };
+                                });
+                            }
+                        } catch (e) {
+                            console.error("[CSV Import] Failed to parse pairs:", cellVal, e);
+                        }
+                    }
+                    q[key] = parsedPairs;
+                } else if (header === 'qnumber') {
+                    q.qNumber = cellVal ? parseInt(cellVal) : null;
+                } else if (header === 'createdat') {
+                    q.createdAt = cellVal ? parseInt(cellVal) : null;
+                } else if (header === 'answer') {
+                    if (cellVal === 'true') {
+                        q.answer = true;
+                    } else if (cellVal === 'false') {
+                        q.answer = false;
+                    } else {
+                        q.answer = cellVal;
+                    }
+                } else {
+                    q[header] = cellVal;
+                }
             });
+            
+            if (q.type === 'written') {
+                q.answer = q.answer || q.correctanswer || q.correctanswers || '';
+            }
+            
+            result.push(q);
+        }
+        
+        return result;
+    },
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            this.downloadFile(blob, `qbank_anki_${ts}.csv`);
-
-        } else if (fmt === 'word') {
-            await this.exportToWord(pool, showToastCallback);
-
-        } else if (fmt === 'pdf') {
-            this.exportToPdf(pool);
+    parseIncomingString(rawText) {
+        if (!rawText || typeof rawText !== 'string' || rawText.trim() === '') {
+            throw new Error("محتوى الملف فارغ");
+        }
+        const trimmed = rawText.trim();
+        
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+            try {
+                const sanitizedJson = Helpers.sanitizeJsonString(trimmed);
+                return JSON.parse(sanitizedJson);
+            } catch (jsonErr) {
+                console.warn("[Import Engine] Failed to parse as sanitized JSON. Attempting direct parse...", jsonErr);
+                try {
+                    return JSON.parse(trimmed);
+                } catch (e2) {
+                    throw new Error("فشل تحليل ملف JSON: " + jsonErr.message);
+                }
+            }
+        }
+        
+        try {
+            const parsedCsv = this.parseCSV(trimmed);
+            if (!parsedCsv || parsedCsv.length === 0) {
+                throw new Error("لا توجد بيانات صالحة في ملف CSV");
+            }
+            return parsedCsv;
+        } catch (csvErr) {
+            throw new Error("فشل تحليل ملف CSV: " + csvErr.message);
         }
     },
 
@@ -475,21 +601,24 @@ export const ExportModule = {
         let data;
         if (typeof jsonTextOrData === 'string') {
             try {
-                data = JSON.parse(jsonTextOrData);
+                data = this.parseIncomingString(jsonTextOrData);
             } catch (e) {
-                Logger.error('ExportModule', 'Aborted: JSON data-payload is malformed or corrupted', e);
-                throw new Error(i18n.t('err_invalid_format'), { cause: e });
+                Logger.error('ExportModule', 'Aborted: Incoming payload is malformed or corrupted', e);
+                throw new Error(i18n.t('err_invalid_format') || "صيغة الملف غير صالحة", { cause: e });
             }
-        } else if (Array.isArray(jsonTextOrData)) {
-            data = jsonTextOrData;
         } else {
-            throw new Error(i18n.t('err_invalid_format'));
+            data = jsonTextOrData;
         }
 
-        if (!Array.isArray(data)) throw new Error(i18n.t('err_must_be_array'));
+        if (!Array.isArray(data) && !(data && data.notebooks && data.questions)) {
+            throw new Error(i18n.t('err_invalid_format') || "صيغة الملف غير مدعومة");
+        }
 
-        const manualTargetNb = document.getElementById('import-notebook').value;
-        const autoDistribute = document.getElementById('import-auto-distribute')?.checked;
+        const importNbEl = document.getElementById('import-notebook');
+        const manualTargetNb = importNbEl ? importNbEl.value : null;
+        
+        const autoDistributeEl = document.getElementById('import-auto-distribute');
+        const autoDistribute = autoDistributeEl ? autoDistributeEl.checked : true;
 
         if (!manualTargetNb && !autoDistribute) throw new Error(i18n.t('err_import_no_target'));
 
@@ -525,93 +654,101 @@ export const ExportModule = {
                 }
             }
 
-            let parsed;
-            let floatingCount = 0;
-            let newNotebooks = [];
             const { data: importedPayload, manualTargetNb, autoDistribute } = this.validateImportPayload(fileContent);
-            try {
-                parsed = importedPayload;
-                const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
-                const validationResult = await validateIncomingPayload(parsed, existingNotebooks, {
-                    autoDistribute,
-                    activeNotebookId: manualTargetNb
-                });
-                floatingCount = validationResult.floatingCount || 0;
-                newNotebooks = validationResult.newNotebooks || [];
-            } catch (validationError) {
-                console.error("[Security Gate Abort]:", validationError.message);
-                alert("❌ " + validationError.message);
-                if (globalThis.app?.hideLoading) globalThis.app.hideLoading();
-                return;
-            }
+            const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
+            
+            const validationResult = await this.validateIncomingPayload(importedPayload, existingNotebooks, {
+                autoDistribute,
+                activeNotebookId: manualTargetNb
+            });
+            const questions = validationResult.questions;
+            const newNotebooks = validationResult.newNotebooks || [];
+            const floatingCount = validationResult.floatingCount || 0;
 
-            const data = parsed;
+            const existingIds = new Set((globalThis.app?.state?.questions || state.questions || []).map(q => q.id));
+            let promptAnswer = null;
+
             const questionsToSave = [];
-
-            for (const item of data) {
-                // Deep clone the incoming item to break all references
+            for (let i = 0; i < questions.length; i++) {
+                const item = questions[i];
                 const cleanItem = JSON.parse(JSON.stringify(item));
-
                 if (!cleanItem.type || !['mcq', 'boolean', 'match', 'written'].includes(cleanItem.type)) continue;
                 if (!cleanItem.question) continue;
 
-                let finalNbId = cleanItem.notebookId;
+                if (cleanItem.id && existingIds.has(cleanItem.id)) {
+                    if (promptAnswer === null) {
+                        if (typeof confirm !== 'undefined') {
+                            const userChoice = confirm("تنبيه: بعض الأسئلة المستوردة تمتلك معرفات (IDs) موجودة بالفعل.\n\nاضغط 'موافق' لتوليد معرفات جديدة وتجنب التكرار.\nاضغط 'إلغاء' لتحديث واستبدال الأسئلة القديمة.");
+                            promptAnswer = userChoice ? 'new' : 'keep';
+                        } else {
+                            promptAnswer = 'new';
+                        }
+                    }
+                    if (promptAnswer === 'new') {
+                        cleanItem.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                            ? crypto.randomUUID()
+                            : `import_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${i}`;
+                    }
+                }
+
+                if (typeof cleanItem.options === 'string') {
+                    cleanItem.options = cleanItem.options ? cleanItem.options.split('|') : [];
+                } else {
+                    cleanItem.options = Array.isArray(cleanItem.options) ? [...cleanItem.options] : [];
+                }
+
+                if (typeof cleanItem.tags === 'string') {
+                    cleanItem.tags = cleanItem.tags ? cleanItem.tags.split('|') : [];
+                } else {
+                    cleanItem.tags = Array.isArray(cleanItem.tags) ? [...cleanItem.tags] : [];
+                }
+
+                if (typeof cleanItem.pairs === 'string') {
+                    cleanItem.pairs = cleanItem.pairs ? cleanItem.pairs.split('|').map(p => {
+                        const colIdx = p.indexOf(':');
+                        if (colIdx === -1) return { left: p, right: '' };
+                        return { left: p.substring(0, colIdx), right: p.substring(colIdx + 1) };
+                    }) : [];
+                } else {
+                    cleanItem.pairs = Array.isArray(cleanItem.pairs) ? [...cleanItem.pairs] : [];
+                }
+
+                cleanItem.explain = Array.isArray(cleanItem.explain) ? cleanItem.explain.join('|') : (cleanItem.explain || '');
+                cleanItem.answer = Array.isArray(cleanItem.answer) ? cleanItem.answer.join('|') : (cleanItem.answer !== undefined ? cleanItem.answer : '');
 
                 const newQ = {
-                    id: Helpers.generateId(),
-                    notebookId: finalNbId,
+                    id: cleanItem.id || Helpers.generateId(),
+                    notebookId: cleanItem.notebookId,
                     type: cleanItem.type,
                     question: cleanItem.question,
                     category: cleanItem.category || i18n.t('general'),
                     difficulty: cleanItem.difficulty || 'medium',
-                    options: cleanItem.options || [],
-                    answer: cleanItem.answer || '',
+                    options: cleanItem.options,
+                    answer: cleanItem.answer,
                     keywords: cleanItem.keywords || [],
-                    pairs: cleanItem.pairs || [],
-                    explain: cleanItem.explain || '',
+                    pairs: cleanItem.pairs,
+                    explain: cleanItem.explain,
                     image: cleanItem.image || null,
-                    tags: cleanItem.tags || [],
+                    tags: cleanItem.tags,
                     qNumber: cleanItem.qNumber,
-                    createdAt: Date.now()
+                    createdAt: cleanItem.createdAt || Date.now()
                 };
 
                 questionsToSave.push(newQ);
                 importedCount++;
             }
 
-            // Bulk Save: Optimized to use single transaction instead of separate store calls
-            if (newNotebooks.length > 0 || questionsToSave.length > 0) {
+            if (questionsToSave.length > 0) {
                 if (db.instance) {
                     await new Promise((resolve, reject) => {
-                        const tx = db.instance.transaction(['notebooks', 'questions'], 'readwrite');
-                        if (newNotebooks.length > 0) {
-                            const nbStore = tx.objectStore('notebooks');
-                            newNotebooks.forEach(nb => nbStore.put(nb));
-                        }
-                        if (questionsToSave.length > 0) {
-                            const qStore = tx.objectStore('questions');
-                            questionsToSave.forEach(q => qStore.put(q));
-                        }
+                        const tx = db.instance.transaction(['questions'], 'readwrite');
+                        const qStore = tx.objectStore('questions');
+                        questionsToSave.forEach(q => qStore.put(q));
                         tx.oncomplete = () => resolve(true);
                         tx.onerror = () => reject(tx.error);
                     });
                 } else {
-                    if (newNotebooks.length > 0) {
-                        await db.bulkPut('notebooks', newNotebooks);
-                    }
-                    if (questionsToSave.length > 0) {
-                        await db.bulkPut('questions', questionsToSave);
-                    }
-                }
-
-                // Also update app.state.notebooks / state.notebooks
-                if (newNotebooks.length > 0) {
-                    const appNbs = globalThis.app?.state?.notebooks || state.notebooks || [];
-                    newNotebooks.forEach(nb => {
-                        if (!appNbs.some(n => n.id === nb.id)) {
-                            appNbs.push(nb);
-                        }
-                    });
+                    await db.bulkPut('questions', questionsToSave);
                 }
             }
 
@@ -643,12 +780,13 @@ export const ExportModule = {
 
         try {
             const existingNotebooks = globalThis.app?.state?.notebooks || state.notebooks || [];
-            const validationResult = await validateIncomingPayload(parsedData, existingNotebooks, {
+            const validationResult = await this.validateIncomingPayload(parsedData, existingNotebooks, {
                 autoDistribute,
                 activeNotebookId
             });
             floatingCount = validationResult.floatingCount || 0;
             newNotebooks = validationResult.newNotebooks || [];
+            parsedData = validationResult.questions;
         } catch (validationError) {
             console.error("[Security Gate Abort]:", validationError.message);
             alert("❌ " + validationError.message);
@@ -661,7 +799,7 @@ export const ExportModule = {
             return;
         }
 
-        const questionCount = Array.isArray(parsedData) ? parsedData.length : 1;
+        const questionCount = parsedData.length;
 
         const userConfirmed = confirm(i18n.t('msg_universal_import_confirm', { count: questionCount }));
 
@@ -670,30 +808,63 @@ export const ExportModule = {
             return;
         }
 
-        // 1. ضمان أن البيانات مصفوفة
-        const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
+        const existingIds = new Set((globalThis.app?.state?.questions || state.questions || []).map(q => q.id));
+        let promptAnswer = null;
+
         const cleanQuestions = [];
 
-        dataArray.forEach((item, index) => {
-            // 2. الاستنساخ العميق (Deep Clone) لقطع أي صلة مرجعية بالسؤال الأصلي
+        parsedData.forEach((item, index) => {
             const cleanItem = JSON.parse(JSON.stringify(item));
 
-            // 3. توليد ID عسكري (مستحيل يتكرر حتى لو في نفس الملي ثانية)
-            const cryptoId = (typeof crypto !== 'undefined' && crypto.randomUUID) 
-                ? crypto.randomUUID() 
-                : `import_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${index}`;
+            if (cleanItem.id && existingIds.has(cleanItem.id)) {
+                if (promptAnswer === null) {
+                    if (typeof confirm !== 'undefined') {
+                        const userChoice = confirm("تنبيه: بعض الأسئلة المستوردة تمتلك معرفات (IDs) موجودة بالفعل.\n\nاضغط 'موافق' لتوليد معرفات جديدة وتجنب التكرار.\nاضغط 'إلغاء' لتحديث واستبدال الأسئلة القديمة.");
+                        promptAnswer = userChoice ? 'new' : 'keep';
+                    } else {
+                        promptAnswer = 'new';
+                    }
+                }
+                if (promptAnswer === 'new') {
+                    cleanItem.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                        ? crypto.randomUUID()
+                        : `import_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${index}`;
+                }
+            }
 
-            cleanItem.id = cryptoId;
+            if (!cleanItem.id) {
+                cleanItem.id = (typeof crypto !== 'undefined' && crypto.randomUUID) 
+                    ? crypto.randomUUID() 
+                    : `import_${Date.now()}_${Math.random().toString(36).substring(2, 10)}_${index}`;
+            }
 
-            // 4. تأمين المصفوفات الداخلية (خيارات ووسوم)
-            cleanItem.options = Array.isArray(cleanItem.options) ? [...cleanItem.options] : [];
-            cleanItem.tags = Array.isArray(cleanItem.tags) ? [...cleanItem.tags] : [];
-            cleanItem.pairs = Array.isArray(cleanItem.pairs) ? [...cleanItem.pairs] : [];
+            if (typeof cleanItem.options === 'string') {
+                cleanItem.options = cleanItem.options ? cleanItem.options.split('|') : [];
+            } else {
+                cleanItem.options = Array.isArray(cleanItem.options) ? [...cleanItem.options] : [];
+            }
 
-            // 5. تأكيد الطابع الزمني الجديد
-            cleanItem.createdAt = Date.now() + index; // إضافة الـ index لمنع تطابق التوقيت تماماً
+            if (typeof cleanItem.tags === 'string') {
+                cleanItem.tags = cleanItem.tags ? cleanItem.tags.split('|') : [];
+            } else {
+                cleanItem.tags = Array.isArray(cleanItem.tags) ? [...cleanItem.tags] : [];
+            }
 
-            // Set mandatory fields missing in strict mode
+            if (typeof cleanItem.pairs === 'string') {
+                cleanItem.pairs = cleanItem.pairs ? cleanItem.pairs.split('|').map(p => {
+                    const colIdx = p.indexOf(':');
+                    if (colIdx === -1) return { left: p, right: '' };
+                    return { left: p.substring(0, colIdx), right: p.substring(colIdx + 1) };
+                }) : [];
+            } else {
+                cleanItem.pairs = Array.isArray(cleanItem.pairs) ? [...cleanItem.pairs] : [];
+            }
+
+            cleanItem.explain = Array.isArray(cleanItem.explain) ? cleanItem.explain.join('|') : (cleanItem.explain || '');
+            cleanItem.answer = Array.isArray(cleanItem.answer) ? cleanItem.answer.join('|') : (cleanItem.answer !== undefined ? cleanItem.answer : '');
+
+            cleanItem.createdAt = cleanItem.createdAt || (Date.now() + index);
+
             if (cleanItem.notebookId !== null && cleanItem.notebookId !== '') {
                 cleanItem.notebookId = cleanItem.notebookId || 'orphaned';
             }
@@ -702,39 +873,18 @@ export const ExportModule = {
             cleanQuestions.push(cleanItem);
         });
 
-        // 6. الحفظ الجماعي (Bulk Save) - تفريغ المصفوفة في قاعدة البيانات (Optimized Architecture)
         try {
-            if (newNotebooks.length > 0 || cleanQuestions.length > 0) {
+            if (cleanQuestions.length > 0) {
                 if (db.instance) {
                     await new Promise((resolve, reject) => {
-                        const tx = db.instance.transaction(['notebooks', 'questions'], 'readwrite');
-                        if (newNotebooks.length > 0) {
-                            const nbStore = tx.objectStore('notebooks');
-                            newNotebooks.forEach(nb => nbStore.put(nb));
-                        }
-                        if (cleanQuestions.length > 0) {
-                            const qStore = tx.objectStore('questions');
-                            cleanQuestions.forEach(q => qStore.put(q));
-                        }
+                        const tx = db.instance.transaction(['questions'], 'readwrite');
+                        const qStore = tx.objectStore('questions');
+                        cleanQuestions.forEach(q => qStore.put(q));
                         tx.oncomplete = () => resolve(true);
                         tx.onerror = () => reject(tx.error);
                     });
                 } else {
-                    if (newNotebooks.length > 0) {
-                        await db.bulkPut('notebooks', newNotebooks);
-                    }
-                    if (cleanQuestions.length > 0) {
-                        await db.bulkPut('questions', cleanQuestions);
-                    }
-                }
-
-                if (newNotebooks.length > 0) {
-                    const appNbs = globalThis.app?.state?.notebooks || state.notebooks || [];
-                    newNotebooks.forEach(nb => {
-                        if (!appNbs.some(n => n.id === nb.id)) {
-                            appNbs.push(nb);
-                        }
-                    });
+                    await db.bulkPut('questions', cleanQuestions);
                 }
             }
             console.log(`[Import Engine] Successfully injected ${cleanQuestions.length} unique items.`);
@@ -1245,19 +1395,7 @@ export const ExportModule = {
 
 
 
-        // Auto-fill import URL from ?direct_url= query param
-        const urlParams = new URLSearchParams(globalThis.location.search);
-        const directUrl = urlParams.get('direct_url');
-        if (directUrl) {
-            const decodedUrl = decodeURIComponent(directUrl);
-            const inputField = document.getElementById('import-url');
-            const importBtn = document.getElementById('btn-import-url');
-            if (inputField && importBtn) {
-                inputField.value = decodedUrl;
-                globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
-                importBtn.click();
-            }
-        }
+
     },
 
     populateReferencesSelector() {

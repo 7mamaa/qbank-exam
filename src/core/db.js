@@ -1,4 +1,4 @@
-import { Logger } from '../utils/logger.js?v=16.6.0';
+import { Logger } from '../utils/logger.js?v=16.6.1';
 
 // --- Database Wrapper (Vanilla IndexedDB) ---
 const DB_NAME = 'QBankDB';

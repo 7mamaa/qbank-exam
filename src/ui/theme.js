@@ -1,4 +1,4 @@
-import { state } from '../core/state.js?v=16.6.0';
+import { state } from '../core/state.js?v=16.6.1';
 
 export const ThemeManager = {
     initTheme(updateSoundIcon) {
@@ -114,20 +114,27 @@ export const ThemeManager = {
     },
 
     updateDirectionButtons() {
-        const btnRtl = document.getElementById('btn-dir-rtl');
-        const btnLtr = document.getElementById('btn-dir-ltr');
-        if (!btnRtl || !btnLtr) return;
+        const btnRtls = document.querySelectorAll('.btn-dir-rtl');
+        const btnLtrs = document.querySelectorAll('.btn-dir-ltr');
 
-        if (state.direction === 'rtl') {
-            btnRtl.style.background = 'var(--primary)';
-            btnRtl.style.color = '#000';
-            btnLtr.style.background = 'var(--bg-main)';
-            btnLtr.style.color = 'var(--text-title)';
-        } else {
-            btnLtr.style.background = 'var(--primary)';
-            btnLtr.style.color = '#000';
-            btnRtl.style.background = 'var(--bg-main)';
-            btnRtl.style.color = 'var(--text-title)';
-        }
+        btnRtls.forEach(btn => {
+            if (state.direction === 'rtl') {
+                btn.style.background = 'var(--primary)';
+                btn.style.color = 'var(--btn-text)';
+            } else {
+                btn.style.background = 'var(--bg-main)';
+                btn.style.color = 'var(--text-title)';
+            }
+        });
+
+        btnLtrs.forEach(btn => {
+            if (state.direction === 'ltr') {
+                btn.style.background = 'var(--primary)';
+                btn.style.color = 'var(--btn-text)';
+            } else {
+                btn.style.background = 'var(--bg-main)';
+                btn.style.color = 'var(--text-title)';
+            }
+        });
     }
 };

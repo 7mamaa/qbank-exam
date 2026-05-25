@@ -1,20 +1,21 @@
 /* global pako */
-import { i18n } from './src/core/i18n.js?v=16.6.0';
-import { db } from './src/core/db.js?v=16.6.0';
-import { Migrations } from './src/core/migrations.js?v=16.6.0';
-import { state } from './src/core/state.js?v=16.6.0';
-import { ThemeManager } from './src/ui/theme.js?v=16.6.0';
-import { AudioManager } from './src/ui/audio.js?v=16.6.0';
-import { QueryEngine } from './src/core/query.js?v=16.6.0';
-import { NotebookModule } from './src/modules/notebooks.js?v=16.6.0';
-import { QuestionModule } from './src/modules/questions.js?v=16.6.0';
-import { QuizModule } from './src/modules/quiz.js?v=16.6.0';
-import { ExportModule } from './src/modules/export.js?v=16.6.0';
-import { AIModule } from './src/modules/ai.js?v=16.6.0';
-import DuplicatesUI from './src/modules/duplicates-ui.js?v=16.6.0';
-import { UIComponents } from './src/ui/components.js?v=16.6.0';
-import { Helpers } from './src/utils/helpers.js?v=16.6.0';
-import { Logger } from './src/utils/logger.js?v=16.6.0';
+import { i18n } from './src/core/i18n.js?v=16.6.1';
+import { db } from './src/core/db.js?v=16.6.1';
+import { Migrations } from './src/core/migrations.js?v=16.6.1';
+import { state } from './src/core/state.js?v=16.6.1';
+import { ThemeManager } from './src/ui/theme.js?v=16.6.1';
+import { AudioManager } from './src/ui/audio.js?v=16.6.1';
+import { QueryEngine } from './src/core/query.js?v=16.6.1';
+import { NotebookModule } from './src/modules/notebooks.js?v=16.6.1';
+import { QuestionModule } from './src/modules/questions.js?v=16.6.1';
+import { QuizModule } from './src/modules/quiz.js?v=16.6.1';
+import { ExportModule } from './src/modules/export.js?v=16.6.1';
+import { generateCleanQuizOnlyHtml } from './src/modules/standaloneHtmlGenerator.js?v=16.6.1';
+import { AIModule } from './src/modules/ai.js?v=16.6.1';
+import DuplicatesUI from './src/modules/duplicates-ui.js?v=16.6.1';
+import { UIComponents } from './src/ui/components.js?v=16.6.1';
+import { Helpers } from './src/utils/helpers.js?v=16.6.1';
+import { Logger } from './src/utils/logger.js?v=16.6.1';
 
 // Central Telemetry & Global Error Radar
 globalThis.onerror = (msg, url, line, col, error) => {
@@ -86,7 +87,7 @@ export const app = {
      * Loads settings, binds events, and synchronizes initial data.
      */
     async init() {
-        console.log('[App] Initializing v16.6.0 (Stable)...');
+        console.log('[App] Initializing v16.6.1 (Stable)...');
         this.initTheme();
         this.initLanguage();
         this.initDirection();
@@ -284,14 +285,12 @@ export const app = {
                 this.updateNotebookDropdowns();
                 this.updateFilterDropdowns();
                 this.updateTagsDatalist();
+                this.renderSelectionHub();
+                this.updateExportScopeCounts();
                 
                 const viewsRequiringRefresh = {
                     'questions': () => this.renderQuestions(),
-                    'notebooks': () => this.renderNotebooks(),
-                    'export-hub': () => {
-                        this.renderSelectionHub();
-                        this.updateExportScopeCounts();
-                    }
+                    'notebooks': () => this.renderNotebooks()
                 };
 
                 if (viewsRequiringRefresh[this.state.currentView]) {
@@ -322,6 +321,15 @@ export const app = {
     initTheme() { ThemeManager.initTheme(() => this.updateSoundIcon()); },
     setTheme(theme) { ThemeManager.setTheme(theme, (t) => this.playSound(t), () => this.updateSoundIcon()); },
     setRandomTheme() { ThemeManager.setRandomTheme((t) => this.playSound(t), () => this.updateSoundIcon()); },
+    toggleDarkMode() {
+        const isDark = state.theme === 'tech-violet' || state.theme === 'deep-orange';
+        const nextTheme = isDark ? 'cream-earthy' : 'tech-violet';
+        this.setTheme(nextTheme);
+    },
+    toggleLanguage() {
+        const nextDir = state.direction === 'rtl' ? 'ltr' : 'rtl';
+        this.setDirection(nextDir);
+    },
     initDirection() { ThemeManager.initDirection(() => this.updateDirectionButtons()); },
     setDirection(dir) { 
         ThemeManager.setDirection(dir, () => this.renderQuestions(), () => this.updateDirectionButtons()); 
@@ -778,6 +786,40 @@ export const app = {
     bindGlobalActions() {
         document.getElementById('btn-toggle-sound')?.addEventListener('click', () => this.toggleSound());
         document.getElementById('btn-show-report')?.addEventListener('click', () => this.openModal('project-report-modal'));
+
+        const htmlExportBtn = document.getElementById('btn-export-interactive-html');
+        if (htmlExportBtn) {
+            htmlExportBtn.onclick = async (e) => {
+                e.preventDefault();
+                
+                // التقاط الأسئلة النشطة أو المختارة في التبويب حالياً بالملي
+                const activeQuestions = app.getQueryPool();
+                
+                if (activeQuestions.length === 0) {
+                    UIComponents.showToast("لا توجد أسئلة نشطة لتصديرها حالياً!", "error");
+                    return;
+                }
+
+                const quizSettings = { randomizeQuestions: true };
+                const currentTheme = globalThis.app?.state?.theme || { visualStyle: 'modern' };
+                const notebookTitle = globalThis.app?.state?.activeNotebookTitle || "كويز تفاعلي مستقل";
+
+                // توليد الكود النظيف بالاستبدال الصارم وحقنه في ملف التنزيل
+                const standaloneHtmlCode = generateCleanQuizOnlyHtml(activeQuestions, quizSettings, currentTheme, notebookTitle);
+
+                const blob = new Blob([standaloneHtmlCode], { type: 'text/html;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `quiz_${Date.now()}.html`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                UIComponents.showToast("تم توليد وتحميل كويز الـ HTML التفاعلي الشامل بنجاح! 🚀", "success");
+            };
+        }
     },
 
     /**
@@ -1053,10 +1095,14 @@ export const app = {
                         fileContent = await file.text();
                     }
 
-                    const jsonData = JSON.parse(fileContent);
+                    const parsedData = ExportModule.parseIncomingString(fileContent);
 
-                    await ExportModule.processStrictImport(jsonData, (floatingCount, autoDistribute) => {
-                        if (typeof this.syncData === 'function') this.syncData();
+                    await ExportModule.processStrictImport(parsedData, async (floatingCount, autoDistribute) => {
+                        if (typeof this.syncData === 'function') {
+                            await this.syncData();
+                            this.renderSelectionHub();
+                            this.updateExportScopeCounts();
+                        }
                         if (!autoDistribute) {
                             UIComponents.showToast(i18n.t('msg_import_success_forced'), 'success');
                         } else if (floatingCount > 0) {
@@ -1307,6 +1353,8 @@ export const app = {
     saveQuizAnswer(qId, val) { QuizModule.saveQuizAnswer(qId, val); },
     quizNav(dir) { QuizModule.quizNav(dir); },
     submitQuiz() { QuizModule.submitQuiz(); },
+    quizRevealAnswer() { QuizModule.quizRevealAnswer(); },
+    quizRevealExplanation() { QuizModule.quizRevealExplanation(); },
 
     async exportData(fmt) { 
         const pool = this.getQueryPool(); 
@@ -2054,7 +2102,13 @@ export const app = {
     // === Smart Import & Print (Legacy Support) ===
     // =========================================================
 
-    async processImportedJSON(jsonText) { await ExportModule.importData(jsonText, () => this.syncData()); },
+    async processImportedJSON(jsonText) {
+        await ExportModule.importData(jsonText, async () => {
+            await this.syncData();
+            this.renderSelectionHub();
+            this.updateExportScopeCounts();
+        });
+    },
     
     async exportToJSON() {
         this.playSound('click');
@@ -2120,7 +2174,7 @@ export const app = {
     /**
      * Copies a clean, empty schema template for AI prompting.
      * Includes all supported question types (MCQ, Boolean, Written, Matching)
-     * with mandatory v16.6.0 fields: UUIDv4 id, notebookId, qNumber.
+     * with mandatory v16.6.1 fields: UUIDv4 id, notebookId, qNumber.
      */
     async copyRawJson() {
         this.playSound('click');
@@ -2251,7 +2305,8 @@ export const app = {
 
             // Parse text to memory array (JSON parsed data)
             let parsedData = JSON.parse(finalJsonText);
-            const questionCount = Array.isArray(parsedData) ? parsedData.length : 0;
+            const questionsArray = (parsedData && parsedData.questions) ? parsedData.questions : (Array.isArray(parsedData) ? parsedData : []);
+            const questionCount = questionsArray.length;
 
             // Pre-Commit Confirmation Gate (Asynchronous Confirmation Flow)
             const userConfirmed = confirm(`هل توافق على استيراد عدد ${questionCount} سؤال من الرابط الخارجي إلى بنك أسئلتك؟`);
@@ -2268,7 +2323,11 @@ export const app = {
             }
 
             // Commit Phase: Pass the parsed array directly to atomic importData engine
-            await ExportModule.importData(parsedData, () => this.syncData());
+            await ExportModule.importData(parsedData, async () => {
+                await this.syncData();
+                this.renderSelectionHub();
+                this.updateExportScopeCounts();
+            });
             
             urlInput.value = '';
         } catch (e) { alert((i18n.t('err_read_data', {msg: e.message})).replace('حدث خطأ أثناء قراءة البيانات: ', 'Error: ')); }
@@ -2682,7 +2741,7 @@ export const app = {
 
         // [أولاً: الحالة العامة للنظام (System Health)]
         console.log("%c[1/3] System Health Overview:", "color: #ff9900; font-weight: bold;");
-        const version = "v16.6.0";
+        const version = "v16.6.1";
         const isoTime = new Date().toISOString();
         const notebooksCount = this.state.notebooks ? this.state.notebooks.length : 0;
         const questionsCount = this.state.questions ? this.state.questions.length : 0;

@@ -1,5 +1,5 @@
-import { state } from './state.js?v=16.6.0';
-import { NotebookModule } from '../modules/notebooks.js?v=16.6.0';
+import { state } from './state.js?v=16.6.1';
+import { NotebookModule } from '../modules/notebooks.js?v=16.6.1';
 
 /**
  * Universal Query Engine

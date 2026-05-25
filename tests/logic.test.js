@@ -46,11 +46,11 @@ vi.mock('../src/core/state.js', () => ({
     state: mockSharedState
 }));
 
-vi.mock('../src/core/state.js?v=16.6.0', () => ({
+vi.mock('../src/core/state.js?v=16.6.1', () => ({
     state: mockSharedState
 }));
 
-vi.mock('../src/core/db.js?v=16.6.0', () => {
+vi.mock('../src/core/db.js?v=16.6.1', () => {
     const mockTx = {
         objectStore: vi.fn().mockReturnValue({
             openCursor: vi.fn().mockReturnValue({
@@ -745,8 +745,8 @@ describe('QBank Core Logic Tests', () => {
 
     describe('Direct Link Import Confirmation Gate', () => {
         it('should fetch and parsedData correctly, prompt confirm, and commit to importData if confirmed', async () => {
-            const { Helpers } = await import('../src/utils/helpers.js?v=16.6.0');
-            const { ExportModule } = await import('../src/modules/export.js?v=16.6.0');
+            const { Helpers } = await import('../src/utils/helpers.js?v=16.6.1');
+            const { ExportModule } = await import('../src/modules/export.js?v=16.6.1');
 
             const fetchSpy = vi.spyOn(Helpers, 'fetchUrlWithProxy').mockResolvedValue(JSON.stringify([
                 { id: 'q-url-1', question: 'Fetched Q1', type: 'boolean', answer: true, notebookId: 'nb-1' }
@@ -780,8 +780,8 @@ describe('QBank Core Logic Tests', () => {
         });
 
         it('should abort and show safe cancel toast if user rejects confirmation', async () => {
-            const { Helpers } = await import('../src/utils/helpers.js?v=16.6.0');
-            const { ExportModule } = await import('../src/modules/export.js?v=16.6.0');
+            const { Helpers } = await import('../src/utils/helpers.js?v=16.6.1');
+            const { ExportModule } = await import('../src/modules/export.js?v=16.6.1');
 
             const fetchSpy = vi.spyOn(Helpers, 'fetchUrlWithProxy').mockResolvedValue(JSON.stringify([
                 { id: 'q-url-1', question: 'Fetched Q1', type: 'boolean', answer: true, notebookId: 'nb-1' }
@@ -791,7 +791,7 @@ describe('QBank Core Logic Tests', () => {
             const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
             
             // Mock UIComponents toast
-            const { UIComponents } = await import('../src/ui/components.js?v=16.6.0');
+            const { UIComponents } = await import('../src/ui/components.js?v=16.6.1');
             const toastSpy = vi.spyOn(UIComponents, 'showToast').mockImplementation(() => {});
 
             // Set up DOM elements
