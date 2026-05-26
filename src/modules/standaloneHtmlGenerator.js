@@ -6,8 +6,6 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
     return wA - wB;
   });
 
-  const safeJson = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
-
   const htmlTemplate = `<!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -579,7 +577,7 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
   </div>
 
   <script>
-    const EXAM_DATA = __EXAM_DATA_PLACEHOLDER__;
+    const EXAM_DATA = JSON.parse(decodeURIComponent('__EXAM_DATA_PLACEHOLDER__'));
     
     // فرز الأسئلة تسلسلياً حسب النوع: written -> mcq -> boolean -> match
     const TYPE_WEIGHTS = { 'written': 1, 'mcq': 2, 'boolean': 3, 'match': 4 };
@@ -803,19 +801,19 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
       const answerBox = document.createElement('div');
       answerBox.className = 'explain-box';
       
-      let answerText = '';
-      if (q.type === 'mcq') {
-        answerText = isRtl ? 'الإجابة النموذجية هي: ' + q.answer : 'Model Answer: ' + q.answer;
-      } else if (q.type === 'boolean') {
-        const isTrue = q.answer === true || String(q.answer) === 'true';
+      let answerText = \`\`;
+      if (q.type === \`mcq\`) {
+        answerText = isRtl ? \`الإجابة النموذجية هي: \${q.answer}\` : \`Model Answer: \${q.answer}\`;
+      } else if (q.type === \`boolean\`) {
+        const isTrue = q.answer === true || String(q.answer) === \`true\`;
         answerText = isRtl 
-          ? 'الإجابة الصحيحة هي: ' + (isTrue ? 'صواب (True)' : 'خطأ (False)')
-          : 'Correct Answer: ' + (isTrue ? 'True' : 'False');
-      } else if (q.type === 'written') {
-        answerText = q.answer || (isRtl ? 'لا توجد إجابة نموذجية.' : 'No model answer.');
-      } else if (q.type === 'match') {
-        answerText = (isRtl ? 'المطابقات الصحيحة:\n' : 'Correct pairings:\n') + 
-          (q.pairs || []).map(p => '- ' + p.left + ' ➔ ' + p.right).join('\n');
+          ? \`الإجابة الصحيحة هي: \${isTrue ? \`صواب (True)\` : \`خطأ (False)\`}\`
+          : \`Correct Answer: \${isTrue ? \`True\` : \`False\`}\`;
+      } else if (q.type === \`written\`) {
+        answerText = q.answer || (isRtl ? \`لا توجد إجابة نموذجية.\` : \`No model answer.\`);
+      } else if (q.type === \`match\`) {
+        answerText = (isRtl ? \`المطابقات الصحيحة:\\\\n\` : \`Correct pairings:\\\\n\`) + 
+          (q.pairs || []).map(p => \`- \${p.left} ➔ \${p.right}\`).join(\`\\\\n\`);
       }
       answerBox.innerText = answerText;
       
@@ -1012,7 +1010,10 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
 </body>
 </html>`;
 
+  const jsonSpecs = JSON.stringify(sortedQuestions);
+  const encodedSpecs = encodeURIComponent(jsonSpecs);
+
   return htmlTemplate
     .replace(/__QUIZ_TITLE__/g, title)
-    .replace('__EXAM_DATA_PLACEHOLDER__', safeJson(sortedQuestions));
+    .replace('__EXAM_DATA_PLACEHOLDER__', encodedSpecs);
 }

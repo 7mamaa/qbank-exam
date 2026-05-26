@@ -76,13 +76,46 @@ export const UIComponents = {
         const span = wrapper.querySelector('span');
         
         ul.innerHTML = '';
-        Array.from(selectEl.options).forEach(opt => {
+        Array.from(selectEl.options).forEach((opt, idx) => {
             const li = document.createElement('li');
-            li.textContent = opt.text;
             li.dataset.value = opt.value;
+            if (idx === selectEl.selectedIndex) {
+                li.classList.add('selected');
+            }
+
+            if (selectId === 'theme-selector') {
+                let iconSvg;
+                let text = opt.text;
+                // Strip emojis from text
+                text = text.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/☕/g, '').trim();
+                
+                if (opt.value === 'default') {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>`;
+                } else if (opt.value === 'apple') {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c-1.54.24-3.05-.18-4.36-1.22a5.9 5.9 0 0 1-2.02-4.57 6 6 0 0 1 5.67-6c1.1.08 2.27.42 2.71.56.45-.14 1.62-.48 2.71-.56a6 6 0 0 1 5.67 6 5.9 5.9 0 0 1-2.02 4.57c-1.31 1.04-2.82 1.46-4.36 1.22z"></path><path d="M12 9V5c0-1.1.9-2 2-2"></path></svg>`;
+                } else if (opt.value === 'cream-earthy') {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`;
+                } else if (opt.value === 'gray-orange') {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>`;
+                } else if (opt.value === 'tech-violet') {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2 12 22"></polygon></svg>`;
+                } else if (opt.value === 'deep-orange') {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg>`;
+                } else {
+                    iconSvg = `<svg class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg>`;
+                }
+                li.innerHTML = `${iconSvg}<span>${text}</span>`;
+            } else {
+                li.textContent = opt.text;
+            }
+
             li.addEventListener('click', (e) => {
                 selectEl.value = opt.value;
-                span.textContent = opt.text;
+                if (selectId === 'theme-selector') {
+                    span.textContent = opt.text.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/☕/g, '').trim();
+                } else {
+                    span.textContent = opt.text;
+                }
                 selectEl.dispatchEvent(new Event('change'));
                 wrapper.classList.remove('active');
                 e.stopPropagation();
@@ -90,7 +123,12 @@ export const UIComponents = {
             ul.appendChild(li);
         });
         
-        span.textContent = selectEl.options[selectEl.selectedIndex]?.text || i18n.t('select_dot');
+        const selectedOptText = selectEl.options[selectEl.selectedIndex]?.text || i18n.t('select_dot');
+        if (selectId === 'theme-selector') {
+            span.textContent = selectedOptText.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/☕/g, '').trim();
+        } else {
+            span.textContent = selectedOptText;
+        }
     },
 
 

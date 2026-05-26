@@ -36,7 +36,7 @@ const { mockSharedState } = vi.hoisted(() => ({
             randomLimit: 0
         },
         selectedIds: new Set(),
-        theme: 'deep-orange',
+        theme: 'default',
         direction: 'rtl',
         soundEnabled: true
     }

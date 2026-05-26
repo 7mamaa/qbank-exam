@@ -436,88 +436,7 @@ export const app = {
         return JSON.parse(localStorage.getItem('qbank_institution') || '{}');
     },
 
-    // ── Feature 2: Custom Theme Maker ─────────────────────────────────────────
-    applyCustomTheme() {
-        const primary  = document.getElementById('theme-primary')?.value  || '#4361ee';
-        const bgMain   = document.getElementById('theme-bg-main')?.value   || '#f5f7fb';
-        const cardBg   = document.getElementById('theme-card-bg')?.value   || '#ffffff';
-        const textTitle = document.getElementById('theme-text-title')?.value || '#1a202c';
 
-        const root = document.documentElement;
-        root.style.setProperty('--primary', primary);
-        root.style.setProperty('--primary-hover', primary);
-        root.style.setProperty('--bg-main', bgMain);
-        root.style.setProperty('--card-bg', cardBg);
-        root.style.setProperty('--sidebar-bg', cardBg);
-        root.style.setProperty('--text-title', textTitle);
-
-        document.documentElement.setAttribute('data-theme', 'custom');
-
-        // Persist as a "custom" theme
-        const customVars = { primary, bgMain, cardBg, textTitle };
-        localStorage.setItem('qbank_custom_theme', JSON.stringify(customVars));
-
-        const selector = document.getElementById('theme-selector');
-        if (selector) selector.value = 'custom';
-
-        this.showToast(i18n.t('msg_theme_applied'), 'success');
-    },
-
-    previewCustomTheme() {
-        const primary  = document.getElementById('theme-primary')?.value  || '#4361ee';
-        const bgMain   = document.getElementById('theme-bg-main')?.value   || '#f5f7fb';
-        const cardBg   = document.getElementById('theme-card-bg')?.value   || '#ffffff';
-        const textTitle = document.getElementById('theme-text-title')?.value || '#1a202c';
-
-        const root = document.documentElement;
-        root.style.setProperty('--primary', primary);
-        root.style.setProperty('--primary-hover', primary);
-        root.style.setProperty('--bg-main', bgMain);
-        root.style.setProperty('--card-bg', cardBg);
-        root.style.setProperty('--sidebar-bg', cardBg);
-        root.style.setProperty('--text-title', textTitle);
-    },
-
-    resetCustomTheme() {
-        localStorage.removeItem('qbank_custom_theme');
-        const root = document.documentElement;
-        root.style.removeProperty('--primary');
-        root.style.removeProperty('--primary-hover');
-        root.style.removeProperty('--bg-main');
-        root.style.removeProperty('--card-bg');
-        root.style.removeProperty('--sidebar-bg');
-        root.style.removeProperty('--text-title');
-
-        this.initTheme();
-        this.showToast(i18n.t('msg_theme_reset'), 'info');
-    },
-
-    initCustomTheme() {
-        const saved = localStorage.getItem('qbank_custom_theme');
-        if (!saved) return;
-        try {
-            const v = JSON.parse(saved);
-            const root = document.documentElement;
-            root.style.setProperty('--primary', v.primary);
-            root.style.setProperty('--bg-main', v.bgMain);
-            root.style.setProperty('--card-bg', v.cardBg);
-            root.style.setProperty('--sidebar-bg', v.cardBg);
-            root.style.setProperty('--text-title', v.textTitle);
-
-            document.documentElement.setAttribute('data-theme', 'custom');
-
-            const selector = document.getElementById('theme-selector');
-            if (selector) selector.value = 'custom';
-
-            // Sync color pickers
-            if (document.getElementById('theme-primary')) {
-                document.getElementById('theme-primary').value = v.primary;
-                document.getElementById('theme-bg-main').value = v.bgMain;
-                document.getElementById('theme-card-bg').value = v.cardBg;
-                document.getElementById('theme-text-title').value = v.textTitle;
-            }
-        } catch { /* ignore corrupt saved theme */ }
-    },
 
     // ── Feature 5: QR Code Generator ─────────────────────────────────────────
     showQRCode(questionId) {
@@ -792,6 +711,15 @@ export const app = {
 
     /** @private */
     bindGlobalActions() {
+        document.addEventListener('theme:changed', (e) => {
+            const selector = document.getElementById('theme-selector');
+            if (selector) {
+                if (selector.value !== e.detail.themeId) {
+                    selector.value = e.detail.themeId;
+                }
+                this.syncCustomDropdown('theme-selector');
+            }
+        });
         document.getElementById('btn-toggle-sound')?.addEventListener('click', () => this.toggleSound());
         document.getElementById('btn-show-report')?.addEventListener('click', () => this.openModal('project-report-modal'));
 
@@ -1598,13 +1526,6 @@ export const app = {
         this.state.virtual.filteredQuestions = orphans;
         this.state.virtual.currentPage = 1;
         this.renderQuestions();
-    },
-
-    /**
-     * Toggles Zen Mode for distraction-free quiz experience.
-     */
-    toggleZenMode() {
-        document.body.classList.toggle('zen-mode');
     },
 
     // =========================================================

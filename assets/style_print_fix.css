@@ -130,3 +130,12 @@
         padding: 8px;
     }
 }
+
+@media print {
+    .question-card, .notebook-plate, .analysis-widget {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        orphans: 3;
+        widows: 3;
+    }
+}
