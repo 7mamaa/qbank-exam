@@ -211,7 +211,7 @@ export const Helpers = {
      * Generates HTML for printing a notebook.
      * @returns {string} HTML string.
      */
-    generatePrintHTML(title, qList, mode) {
+    generatePrintHTML(title, qList, mode, showReferences = false) {
         let html = `
             <div class="print-header">
                 <h2 style="font-size:2rem; margin-bottom:10px;">${this.sanitize(title)}</h2>
@@ -222,6 +222,12 @@ export const Helpers = {
         qList.forEach((q, idx) => {
             html += `<div class="print-question">`;
             html += `<h3 style="margin-bottom:15px;">السؤال ${idx + 1}: ${this.sanitize(q.question)}</h3>`;
+            if (showReferences && q.reference && (q.reference.book || q.reference.page)) {
+                html += `
+                <div style="font-size:0.8rem; color:#555; background:#f9f9f9; border-inline-start:3px solid #007bff; padding:4px 8px; margin: -5px 0 15px 15px; display:inline-flex; align-items:center; gap:5px; border-radius:3px;">
+                    <span>📖 ${this.sanitize(q.reference.book)}${q.reference.page ? `, ص/p. ${this.sanitize(q.reference.page)}` : ''}</span>
+                </div>`;
+            }
             if (q.image) html += `<img src="${q.image}" style="max-width:300px; display:block; margin-bottom:15px;">`;
 
             if (q.type === 'mcq') {

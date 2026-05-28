@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="نظام متكامل لإدارة بنوك الأسئلة الامتحانية — يعمل بدون إنترنت">
@@ -34,11 +32,11 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-             <div style="display:flex; align-items:center; gap:8px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+             <div class="sidebar__item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="sidebar__icon"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                 QBank
              </div>
-             <buttonid="close-sidebar" class="sidebar-close-btn">&times;</button>
+             <button id="close-sidebar" class="sidebar-close-btn">×</button>
         </div>
         
         <div class="nav-group-title" data-i18n="nav_home">القائمة الرئيسية</div>
@@ -83,7 +81,12 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 <span data-i18n="dup_manager_title">منظم التكرارات</span>
             </li>
+            <li class="nav-item" data-target="topic-graph" role="button" tabindex="0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <span data-i18n="nav_topic_graph">الخريطة الشبكية</span>
+            </li>
         </ul>
+
 
         <div class="nav-group-title" data-i18n="nav_system">النظام</div>
         <ul class="nav-links">
@@ -136,89 +139,89 @@
             
             <!-- Dashboard View -->
             <section id="dashboard" class="view-section active">
-                <div style="margin-bottom: 25px; padding: 25px; background: var(--surface-color); border-radius: 16px; border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: 15px; left: 15px; background: var(--primary); color: var(--btn-text); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; box-shadow: var(--shadow-sm);" data-i18n="app_version_badge">v16.6.1 pro</div>
-                    <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 5px;" data-i18n="dashboard_title">لوحة التحكم</h1>
-                    <p style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; max-width: 800px; line-height: 1.6;" data-i18n="dashboard_desc">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
+                <div class="dashboard__item">
+                    <div data-i18n="app_version_badge" class="dashboard__item-1">v16.6.1 pro</div>
+                    <h1 data-i18n="dashboard_title" class="dashboard__title">لوحة التحكم</h1>
+                    <p data-i18n="dashboard_desc" class="dashboard__text">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
                 </div>
                 <div class="dashboard-grid">
                     
                     <!-- Row 1: KPI Cards -->
-                    <div class="stat-card" style="background: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05; color: var(--primary);">
+                    <div class="stat-card dashboard__item-2">
+                        <div class="stat-card__item">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         </div>
-                        <h3 style="color: var(--primary); font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;" data-i18n="stat_total_questions">إجمالي الأسئلة</h3>
-                        <div class="value" id="stat-total-questions" style="font-size: 2.8rem; font-weight: 900; color: var(--text-title); line-height: 1;">0</div>
+                        <h3 data-i18n="stat_total_questions" class="stat-card__title">إجمالي الأسئلة</h3>
+                        <div class="value stat-card__stat-total-questions" id="stat-total-questions">0</div>
                     </div>
                     
-                    <div class="stat-card" style="background: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05; color: var(--primary);">
+                    <div class="stat-card dashboard__item-2">
+                        <div class="stat-card__item">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         </div>
-                        <h3 style="color: var(--primary); font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;" data-i18n="stat_total_notebooks">الدفاتر</h3>
-                        <div class="value" id="stat-total-notebooks" style="font-size: 2.8rem; font-weight: 900; color: var(--text-title); line-height: 1;">0</div>
+                        <h3 data-i18n="stat_total_notebooks" class="stat-card__title">الدفاتر</h3>
+                        <div class="value stat-card__stat-total-questions" id="stat-total-notebooks">0</div>
                     </div>
                     
-                    <div class="stat-card" style="background: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05; color: var(--primary);">
+                    <div class="stat-card dashboard__item-2">
+                        <div class="stat-card__item">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
                         </div>
-                        <h3 style="color: var(--primary); font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;" data-i18n="stat_total_categories">التصنيفات</h3>
-                        <div class="value" id="stat-total-categories" style="font-size: 2.8rem; font-weight: 900; color: var(--text-title); line-height: 1;">0</div>
+                        <h3 data-i18n="stat_total_categories" class="stat-card__title">التصنيفات</h3>
+                        <div class="value stat-card__stat-total-questions" id="stat-total-categories">0</div>
                     </div>
                     
-                    <div class="stat-card" onclick="app.showPinnedOnly()" style="background: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)';" role="button" tabindex="0">
-                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05; color: var(--primary);">
+                    <div class="stat-card dashboard__item-3" onclick="app.showPinnedOnly()" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)';" role="button" tabindex="0">
+                        <div class="stat-card__item">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         </div>
-                        <h3 style="color: var(--primary); font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;" data-i18n="stat_pinned_questions">الأسئلة المثبتة</h3>
-                        <div class="value" id="stat-pinned-questions" style="font-size: 2.8rem; font-weight: 900; color: var(--text-title); line-height: 1;">0</div>
+                        <h3 data-i18n="stat_pinned_questions" class="stat-card__title">الأسئلة المثبتة</h3>
+                        <div class="value stat-card__stat-total-questions" id="stat-pinned-questions">0</div>
                     </div>
 
 
                     <!-- Row 3: Charts -->
-                    <div class="stat-card span-2" style="border-top: 4px solid var(--primary); padding: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);"><span style="color:var(--primary); margin-left: 8px;">📊</span><span data-i18n="chart_types_title">توزيع أنواع الأسئلة</span></h3>
+                    <div class="stat-card span-2 dashboard__item-4">
+                        <div class="stat-card__item-1">
+                            <h3 class="stat-card__title-1"><span class="stat-card__label">📊</span><span data-i18n="chart_types_title">توزيع أنواع الأسئلة</span></h3>
                         </div>
-                        <div id="chart-types" class="simple-chart" style="min-height: 150px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px dashed var(--border);">
-                            <p style="color:var(--text-secondary); font-size:0.9rem; font-weight: 600;" data-i18n="loading_data">جاري تحميل البيانات...</p>
+                        <div id="chart-types" class="simple-chart stat-card__chart-types">
+                            <p data-i18n="loading_data" class="stat-card__text">جاري تحميل البيانات...</p>
                         </div>
                     </div>
                     
-                    <div class="stat-card span-2" style="border-top: 4px solid #f4a261; padding: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);"><span style="color:#f4a261; margin-left: 8px;">📈</span><span data-i18n="chart_difficulty_title">مستوى الصعوبة</span></h3>
+                    <div class="stat-card span-2 dashboard__item-5">
+                        <div class="stat-card__item-1">
+                            <h3 class="stat-card__title-1"><span class="stat-card__label-1">📈</span><span data-i18n="chart_difficulty_title">مستوى الصعوبة</span></h3>
                         </div>
-                        <div id="chart-difficulty" class="simple-chart" style="min-height: 150px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px dashed var(--border);">
-                            <p style="color:var(--text-secondary); font-size:0.9rem; font-weight: 600;">جاري تحميل البيانات...</p>
+                        <div id="chart-difficulty" class="simple-chart stat-card__chart-types">
+                            <p class="stat-card__text">جاري تحميل البيانات...</p>
                         </div>
                     </div>
                     
                     <!-- Daily Wrap & Quick Actions -->
-                    <div class="stat-card span-2" style="border-top: 4px solid #7209b7; padding: 25px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="stat-card span-2 dashboard__item-6">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
-                                    <span style="color:#7209b7; margin-left: 8px;">🌅</span>
+                            <div class="stat-card__item-2">
+                                <h3 class="stat-card__title-1">
+                                    <span class="stat-card__label-2">🌅</span>
                                     <span data-i18n="daily_wrap_title">ملخص الأداء اليومي</span>
                                 </h3>
                             </div>
-                            <div id="daily-wrap-container" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 20px;">
+                            <div id="daily-wrap-container" class="stat-card__daily-wrap-container">
                                 جاري تحميل ملخص اليوم...
                             </div>
                         </div>
                         <div>
-                            <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: var(--text-title);" data-i18n="quick_actions_title">الوصول السريع ⚡</h4>
-                            <div class="quick-actions-row" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn btn-sm" onclick="app.quickStartQuiz()" style="background: var(--primary); color: white; border: none; font-weight: bold; flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 0.85rem; border-radius: 8px;">
+                            <h4 data-i18n="quick_actions_title" class="stat-card__title-2">الوصول السريع ⚡</h4>
+                            <div class="quick-actions-row stat-card__item-3">
+                                <button class="btn btn-sm stat-card__btn" onclick="app.quickStartQuiz()">
                                     📝 <span data-i18n="quick_quiz">امتحان فوري</span>
                                 </button>
-                                <button class="btn btn-sm" onclick="app.quickPasteJson()" style="background: var(--accent); color: white; border: none; font-weight: bold; flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 0.85rem; border-radius: 8px;">
+                                <button class="btn btn-sm stat-card__btn-1" onclick="app.quickPasteJson()">
                                     📋 <span data-i18n="quick_paste">لصق كبسولة</span>
                                 </button>
-                                <button class="btn btn-sm" onclick="app.quickCleanDuplicates()" style="background: transparent; border: 1px solid var(--border); color: var(--text-title); font-weight: bold; flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 0.85rem; border-radius: 8px;">
+                                <button class="btn btn-sm stat-card__btn-2" onclick="app.quickCleanDuplicates()">
                                     🧹 <span data-i18n="quick_clean">تنظيف المكررات</span>
                                 </button>
                             </div>
@@ -226,114 +229,114 @@
                     </div>
 
                     <!-- Orphan Counter -->
-                    <div class="stat-card span-2" style="border-top: 4px solid #f4a261; padding: 25px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="stat-card span-2 dashboard__item-7">
                         <div>
-                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
-                                <span style="color:#f4a261; margin-left: 8px;">🧩</span>
+                            <h3 class="stat-card__title-1">
+                                <span class="stat-card__label-1">🧩</span>
                                 <span data-i18n="orphan_counter_title">الأسئلة اليتيمة (Orphan Counter)</span>
                             </h3>
-                            <p style="margin: 5px 0 15px 0; font-size: 0.85rem; color: var(--text-secondary);" data-i18n="orphan_counter_desc">الأسئلة التي لا تنتمي لأي تصنيف ولا تحتوي على أي وسوم.</p>
+                            <p data-i18n="orphan_counter_desc" class="stat-card__text-1">الأسئلة التي لا تنتمي لأي تصنيف ولا تحتوي على أي وسوم.</p>
                         </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
-                            <div style="display: flex; align-items: baseline; gap: 8px;">
-                                <div id="orphan-count-value" style="font-size: 3rem; font-weight: 900; color: #e76f51; line-height: 1;">0</div>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 700;" data-i18n="questions_word">سؤال عائم</span>
+                        <div class="stat-card__item-1-1">
+                            <div class="stat-card__item-4">
+                                <div id="orphan-count-value" class="stat-card__orphan-count-value">0</div>
+                                <span data-i18n="questions_word" class="stat-card__label-3">سؤال عائم</span>
                             </div>
-                            <button class="btn btn-primary" onclick="app.filterOrphans()" style="font-weight: bold; border-radius: 8px; height: 40px; padding: 0 15px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
+                            <button class="btn btn-primary stat-card__btn-3" onclick="app.filterOrphans()">
                                 🔧 <span data-i18n="quick_organize">تنظيم فوري</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Historical Quiz Chart -->
-                    <div class="stat-card span-2" style="border-top: 4px solid var(--primary); padding: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
-                                <span style="color:var(--primary); margin-left: 8px;">📈</span>
+                    <div class="stat-card span-2 dashboard__item-4">
+                        <div class="stat-card__item-1">
+                            <h3 class="stat-card__title-1">
+                                <span class="stat-card__label">📈</span>
                                 <span data-i18n="quiz_history_chart_title">منحنى الأداء التاريخي للدرجات</span>
                             </h3>
                         </div>
-                        <div id="chart-history-container" class="simple-chart" style="min-height: 180px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px dashed var(--border); padding: 10px;">
-                            <p style="color:var(--text-secondary); font-size:0.9rem; font-weight: 600;">جاري تحميل تاريخ الامتحانات...</p>
+                        <div id="chart-history-container" class="simple-chart stat-card__chart-history-container">
+                            <p class="stat-card__text">جاري تحميل تاريخ الامتحانات...</p>
                         </div>
                     </div>
 
                     <!-- Vulnerability Detector -->
-                    <div class="stat-card span-2" style="border-top: 4px solid #e63946; padding: 25px; display: flex; flex-direction: column;">
-                        <div style="margin-bottom: 15px;">
-                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
-                                <span style="color:#e63946; margin-left: 8px;">⚠️</span>
+                    <div class="stat-card span-2 dashboard__item-9">
+                        <div class="stat-card__item-5">
+                            <h3 class="stat-card__title-1">
+                                <span class="stat-card__label-4">⚠️</span>
                                 <span data-i18n="vulnerability_detector_title">رادار نقاط الضعف التلقائي</span>
                             </h3>
-                            <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);" data-i18n="vulnerability_detector_desc">أقسام ووسوم تحتاج مراجعة فورية بسبب انخفاض معدل درجاتك فيها عن 50%.</p>
+                            <p data-i18n="vulnerability_detector_desc" class="stat-card__text-2">أقسام ووسوم تحتاج مراجعة فورية بسبب انخفاض معدل درجاتك فيها عن 50%.</p>
                         </div>
-                        <div id="vulnerability-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; max-height: 180px; overflow-y: auto; padding-inline-end: 5px;">
-                            <p style="color:var(--text-secondary); font-size:0.9rem; font-weight: 600; text-align: center;">جاري فحص رادار الأداء...</p>
+                        <div id="vulnerability-container" class="stat-card__vulnerability-container">
+                            <p class="stat-card__text-3">جاري فحص رادار الأداء...</p>
                         </div>
                     </div>
 
                     <!-- Activity Heatmap -->
-                    <div class="stat-card span-4" style="grid-column: 1 / -1; border-top: 4px solid #2cb67d; padding: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);">
-                                <span style="color:#2cb67d; margin-left: 8px;">🟩</span>
+                    <div class="stat-card span-4 dashboard__item-10">
+                        <div class="stat-card__item-1">
+                            <h3 class="stat-card__title-1">
+                                <span class="stat-card__label-5">🟩</span>
                                 <span data-i18n="heatmap_title">خريطة النشاط السنوي (365 يوماً)</span>
                             </h3>
-                            <div style="display: flex; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); align-items: center;">
+                            <div class="stat-card__item-6">
                                 <span data-i18n="heatmap_less">أقل</span>
-                                <div style="width: 10px; height: 10px; background: rgba(128, 128, 128, 0.12); border-radius: 2px;"></div>
-                                <div style="width: 10px; height: 10px; background: rgba(244, 162, 97, 0.3); border-radius: 2px;"></div>
-                                <div style="width: 10px; height: 10px; background: rgba(244, 162, 97, 0.7); border-radius: 2px;"></div>
-                                <div style="width: 10px; height: 10px; background: rgba(114, 9, 183, 0.6); border-radius: 2px;"></div>
-                                <div style="width: 10px; height: 10px; background: rgba(114, 9, 183, 1); border-radius: 2px;"></div>
+                                <div class="stat-card__item-7"></div>
+                                <div class="stat-card__item-1-2"></div>
+                                <div class="stat-card__item-2-1"></div>
+                                <div class="stat-card__item-3-1"></div>
+                                <div class="stat-card__item-4-1"></div>
                                 <span data-i18n="heatmap_more">أكثر</span>
                             </div>
                         </div>
-                        <div id="heatmap-container" style="overflow-x: auto; width: 100%; display: flex; justify-content: center; padding-bottom: 10px;">
+                        <div id="heatmap-container" class="stat-card__heatmap-container">
                             <!-- SVG Grid here -->
                         </div>
                     </div>
 
                     <!-- Row 3: Storage Quota -->
-                    <div class="stat-card" style="grid-column: 1 / -1; border-top: 4px solid var(--success-color); display: flex; flex-direction: row; align-items: center; gap: 30px; padding: 25px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 250px;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                                <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(42, 157, 143, 0.1); color: var(--success-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">💾</div>
+                    <div class="stat-card dashboard__item-11">
+                        <div class="stat-card__item-8">
+                            <div class="stat-card__item-9">
+                                <div class="stat-card__item-10">💾</div>
                                 <div>
-                                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-title);" data-i18n="storage_title">سعة التخزين</h3>
-                                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);" data-i18n="storage_desc">المساحة المخصصة محلياً</p>
+                                    <h3 data-i18n="storage_title" class="stat-card__title-1">سعة التخزين</h3>
+                                    <p data-i18n="storage_desc" class="stat-card__text-4">المساحة المخصصة محلياً</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="flex: 2; min-width: 300px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; margin-bottom: 10px;">
-                                <span id="storage-used-text" style="color: var(--text-title);" data-i18n="loading">جاري الحساب...</span>
-                                <span id="storage-percent-text" style="color: var(--success-color);">0%</span>
+                        <div class="stat-card__item-1-3">
+                            <div class="stat-card__item-11">
+                                <span id="storage-used-text" data-i18n="loading" class="stat-card__storage-used-text">جاري الحساب...</span>
+                                <span id="storage-percent-text" class="stat-card__storage-percent-text">0%</span>
                             </div>
-                            <div class="chart-bar-bg" style="height: 14px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
-                                <div id="storage-bar-fill" class="chart-bar-fill" style="width: 0%; background: #8B6F3E; height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                            <div class="chart-bar-bg stat-card__item-1-4">
+                                <div id="storage-bar-fill" class="chart-bar-fill stat-card__storage-bar-fill"></div>
                             </div>
                         </div>
                         
-                        <div style="flex: 1; min-width: 200px; padding: 15px; background: rgba(67, 97, 238, 0.05); border: 1px solid rgba(67, 97, 238, 0.1); border-radius: 12px; display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 1.5rem;">🚀</span>
+                        <div class="stat-card__item-2-2">
+                            <span class="stat-card__label-6">🚀</span>
                             <div>
-                                <small style="display:block; color:var(--primary); font-weight:800; font-size: 0.8rem;" data-i18n="speed_system_active">نظام السرعة الفائقة مفعّل</small>
-                                <small style="color: var(--text-secondary); font-size: 0.75rem;" data-i18n="speed_system_desc">جاهز للتعامل مع آلاف الأسئلة.</small>
+                                <small data-i18n="speed_system_active" class="stat-card__item-12">نظام السرعة الفائقة مفعّل</small>
+                                <small data-i18n="speed_system_desc" class="stat-card__item-1-5">جاهز للتعامل مع آلاف الأسئلة.</small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card" style="grid-column: 1 / -1; background: rgba(114, 9, 183, 0.05); border: 1.5px dashed var(--primary); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 10px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 1.5rem;">💎</span>
+                    <div class="stat-card dashboard__item-12">
+                        <div class="stat-card__item-13">
+                            <span class="stat-card__label-6">💎</span>
                             <div>
-                                <h4 style="margin:0; color: var(--text-title);" data-i18n="raw_export_title">بيانات البنك الخام</h4>
-                                <p style="margin:0; font-size: 0.8rem; color: var(--text-secondary);" data-i18n="raw_export_desc">نسخ مصفوفة الأسئلة بالكامل للاستخدام الخارجي.</p>
+                                <h4 data-i18n="raw_export_title" class="stat-card__title-3">بيانات البنك الخام</h4>
+                                <p data-i18n="raw_export_desc" class="stat-card__text-5">نسخ مصفوفة الأسئلة بالكامل للاستخدام الخارجي.</p>
                             </div>
                         </div>
-                        <button class="btn" onclick="app.copyRawJson()" style="background: var(--primary); color: white; border: none; font-weight: 700; height: 42px; padding: 0 25px;">
+                        <button class="btn stat-card__btn-4" onclick="app.copyRawJson()">
                             📋 <span data-i18n="btn_copy_raw_structure">نسخ الهيكل</span>
                         </button>
                     </div>
@@ -351,7 +354,7 @@
                 <!-- Container for Notebooks -->
                 <div id="notebooks-container"></div>
 
-                <div class="empty-state" id="notebooks-empty-state" style="padding:100px 20px; text-align:center; opacity:0.3;"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:48px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <div class="empty-state notebooks__empty-state" id="notebooks-empty-state"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="notebooks__icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                     <p data-i18n="no_notebooks">لا توجد دفاتر حالياً. قم بإنشاء دفتر لتنظيم أسئلتك.</p>
                 </div>
             </section>
@@ -370,16 +373,16 @@
                     <!-- Mobile: Filter Drawer Toggle (shown via CSS on small screens) -->
                     <button id="filter-toggle-btn" onclick="app.openFilterDrawer()" aria-label="فتح الفلاتر">⚙️ <span data-i18n="filters">فلاتر</span></button>
                     
-                    <div class="filter-row-top" style="display: flex; width: 100%; gap: 12px; align-items: center; flex-wrap: wrap;">
-                        <input type="text" id="filter-search" class="form-control" placeholder="بحث بكلمات السؤال أو الوسوم..." style="flex: 3; min-width: 200px;" data-i18n-placeholder="filter_search_placeholder">
-                        <button id="smartSearchBtn" class="btn btn-action shadow-sm" title="محرك الاختيار المتقدم" style="background-color: var(--primary); color: var(--btn-text); flex: 1; min-width: 150px; justify-content: center; border-radius: 20px;">
+                    <div class="filter-row-top questions__item">
+                        <input type="text" id="filter-search" class="form-control questions__filter-search" placeholder="بحث بكلمات السؤال أو الوسوم..." data-i18n-placeholder="filter_search_placeholder">
+                        <button id="smartSearchBtn" class="btn btn-smart-search btn-action shadow-sm questions__smartsearchbtn" title="محرك الاختيار المتقدم">
                             <span class="icon">🎯</span>
                             <span class="btn-text" data-i18n="smart_selection">تحديد ذكي</span>
                         </button>
-                        <button class="btn" onclick="app.openPrintModal()" style="background-color: #7209b7; color: white; flex: 1; min-width: 150px; justify-content: center; border-radius: 20px;" data-i18n="print_pdf">🖨️ طباعة / تصدير PDF</button>
+                        <button class="btn questions__btn-1" onclick="app.openPrintModal()" data-i18n="print_pdf">🖨️ طباعة / تصدير PDF</button>
                     </div>
 
-                    <div class="filter-row-bottom" style="display: flex; flex-wrap: wrap; width: 100%; gap: 8px; align-items: center; margin-top: 10px;">
+                    <div class="filter-row-bottom questions__item-1">
                         <select id="filter-notebook" class="form-control filter-pill">
                             <option value="" data-i18n="all_notebooks">كل الدفاتر</option>
                         </select>
@@ -406,20 +409,20 @@
                 </div>
 
                 <!-- Bulk Actions Bar -->
-                <div id="bulk-actions-bar" class="bulk-actions-dock" style="display:none; margin-bottom: 20px;">
+                <div id="bulk-actions-bar" class="bulk-actions-dock questions__bulk-actions-bar">
                     <div class="bulk-select-group">
-                        <label class="custom-checkbox" for="bulk-select-all" style="margin: 0; cursor:pointer; display: flex; align-items: center; gap: 8px;">
+                        <label class="custom-checkbox bulk-actions-bar__item" for="bulk-select-all">
                             <input type="checkbox" id="bulk-select-all">
                             <span class="checkmark"></span>
-                            <span id="bulk-count" style="font-weight:bold;">تم تحديد 0</span>
+                            <span id="bulk-count" class="bulk-actions-bar__bulk-count">تم تحديد 0</span>
                         </label>
                     </div>
-                    <div class="bulk-btn-group" style="display:flex; gap:10px; flex: 1; justify-content: center; flex-wrap: wrap;">
-                        <select id="bulk-notebook-move" class="form-control bulk-select-move" style="max-width: 200px;">
+                    <div class="bulk-btn-group bulk-actions-bar__item-1">
+                        <select id="bulk-notebook-move" class="form-control bulk-select-move bulk-actions-bar__bulk-notebook-move">
                             <option value="">نقل إلى دفتر...</option>
                         </select>
                         <button class="btn btn-sm btn-info" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" title="اختيار أسئلة بناءً على معايير محددة" data-i18n="smart_selection">🎯 تحديد ذكي</button>
-                        <button class="btn btn-sm btn-primary" onclick="app.bridgeToExam()" style="background: var(--accent); color: white; border: none; font-weight: 600;" data-i18n="exam_simulation">🚀 محاكاة اختبار</button>
+                        <button class="btn btn-sm btn-primary bulk-actions-bar__btn-1" onclick="app.bridgeToExam()" data-i18n="exam_simulation">🚀 محاكاة اختبار</button>
                     </div>
                     <div class="bulk-danger-group">
                         <button class="btn btn-danger btn-sm bulk-delete-btn" onclick="app.bulkDelete()" data-i18n="delete">🗑️ حذف المحدد</button>
@@ -436,7 +439,7 @@
                     <div class="pagination-group">
                         <span id="page-info" class="pagination-info-badge">الصفحة 1 من 1</span>
                         <div class="pagination-input-wrapper">
-                            <span style="font-size: 0.8rem; opacity: 0.8;" data-i18n="show_label">عرض:</span>
+                            <span data-i18n="show_label" class="questions__label">عرض:</span>
                             <input type="number" id="input-items-per-page" value="20" min="1" max="200" onchange="app.updateItemsPerPage(this.value)">
                         </div>
                     </div>
@@ -449,9 +452,9 @@
 
                 <div id="questions-container"></div>
 
-                <div class="empty-state" id="questions-empty-state" style="display:none; padding:100px 20px; text-align:center; opacity:0.3;">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:48px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <p style="font-weight:600; font-size:1.1rem;" data-i18n="no_questions">بنك الأسئلة فارغ. يرجى إضافة أسئلة للبدء.</p>
+                <div class="empty-state questions__empty-state" id="questions-empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="notebooks__icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <p data-i18n="no_questions" class="questions__text">بنك الأسئلة فارغ. يرجى إضافة أسئلة للبدء.</p>
                 </div>
             </section>
 
@@ -461,151 +464,149 @@
 
                 
                 <!-- Setup Phase -->
-                <div id="quiz-setup" style="max-width: 650px; margin: 0 auto;">
-                    <div class="stat-card" style="background: var(--surface-color); border-radius: 16px; padding: 30px; box-shadow: var(--shadow-md); border: 1px solid var(--border);">
-                        <h3 style="margin-bottom: 25px; color: var(--primary); font-weight: bold; border-bottom: 2px dashed var(--border); padding-bottom: 15px;" data-i18n="quiz_setup">⚙️ إعدادات الاختبار</h3>
+                <div id="quiz-setup" class="layout__quiz-setup">
+                    <div class="stat-card layout__item">
+                        <h3 data-i18n="quiz_setup" class="stat-card__title-4">⚙️ إعدادات الاختبار</h3>
                         
-                        <div class="form-group" style="margin-bottom: 20px;">
-                            <label for="quiz-notebook" style="font-weight: 600; display: block; margin-bottom: 8px;" data-i18n="quiz_scope">📚 النطاق (اختر الدفتر)</label>
-                            <select id="quiz-notebook" class="form-control" style="height: 50px; font-size: 1.05rem; border-radius: 10px;"></select>
-                            <small style="color: var(--text-secondary); margin-top: 5px; display: block;" data-i18n="quiz_scope_hint">اتركه فارغاً لاختبار شامل من جميع الدفاتر.</small>
+                        <div class="form-group stat-card__item-14">
+                            <label for="quiz-notebook" data-i18n="quiz_scope" class="stat-card__item-15">📚 النطاق (اختر الدفتر)</label>
+                            <select id="quiz-notebook" class="form-control stat-card__quiz-notebook"></select>
+                            <small data-i18n="quiz_scope_hint" class="stat-card__item-16">اتركه فارغاً لاختبار شامل من جميع الدفاتر.</small>
                         </div>
                         
-                        <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
-                            <div class="form-group" style="flex: 1; min-width: 150px;">
-                                <label for="quiz-count" style="font-weight: 600; display: block; margin-bottom: 8px;" data-i18n="quiz_count">🔢 عدد الأسئلة</label>
-                                <input type="number" id="quiz-count" class="form-control" value="20" min="1" style="height: 50px; font-size: 1.1rem; text-align: center; border-radius: 10px;">
+                        <div class="stat-card__item-1-6">
+                            <div class="form-group stat-card__item-17">
+                                <label for="quiz-count" data-i18n="quiz_count" class="stat-card__item-15">🔢 عدد الأسئلة</label>
+                                <input type="number" id="quiz-count" class="form-control stat-card__quiz-count" value="20" min="1">
                             </div>
-                            <div class="form-group" style="flex: 1; min-width: 150px;">
-                                <label for="quiz-time" style="font-weight: 600; display: block; margin-bottom: 8px;" data-i18n="quiz_time">⏱️ الوقت (بالدقائق)</label>
-                                <input type="number" id="quiz-time" class="form-control" value="15" min="1" style="height: 50px; font-size: 1.1rem; text-align: center; border-radius: 10px;">
+                            <div class="form-group stat-card__item-17">
+                                <label for="quiz-time" data-i18n="quiz_time" class="stat-card__item-15">⏱️ الوقت (بالدقائق)</label>
+                                <input type="number" id="quiz-time" class="form-control stat-card__quiz-count" value="15" min="1">
                             </div>
                         </div>
                         
-                        <div style="display:flex; flex-direction: column; gap: 12px;">
-                            <button class="btn" onclick="app.startQuiz()" style="width: 100%; height: 55px; font-size: 1.2rem; justify-content:center; font-weight:bold; background: linear-gradient(135deg, var(--success-color), #20c997); color: white; border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(42, 157, 143, 0.3);" data-i18n="quiz_start">بدء الاختبار الآن 🚀</button>
-                            <div style="display:flex; gap: 12px; flex-wrap: wrap;">
-                                <button class="btn" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" title="خيارات اختيار متقدمة" style="flex:1; min-width:150px; justify-content:center; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); height: 45px; border-radius: 10px;" data-i18n="quiz_custom">🛠️ تخصيص دقيق</button>
-                                <button class="btn" onclick="app.bridgeToExam('quiz')" style="flex:1; min-width:150px; justify-content:center; background: rgba(67, 97, 238, 0.1); color: var(--primary); border: 1px solid rgba(67, 97, 238, 0.2); height: 45px; border-radius: 10px;" data-i18n="quiz_bridge">🌐 محاكاة شاملة</button>
+                        <div class="stat-card__item-2-3">
+                            <button class="btn stat-card__btn-5" onclick="app.startQuiz()" data-i18n="quiz_start">بدء الاختبار الآن 🚀</button>
+                            <div class="stat-card__item-18">
+                                <button class="btn stat-card__btn-6" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" title="خيارات اختيار متقدمة" data-i18n="quiz_custom">🛠️ تخصيص دقيق</button>
+                                <button class="btn stat-card__btn-1-1" onclick="app.bridgeToExam('quiz')" data-i18n="quiz_bridge">🌐 محاكاة شاملة</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Active Phase -->
-                <div id="quiz-active" style="display:none; max-width: 800px; margin: 0 auto; padding-bottom: 120px;">
+                <div id="quiz-active" class="layout__quiz-active">
                     
-                    <div style="background: var(--surface-color); padding: 20px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
-                            <div style="display: flex; align-items: center; gap: 15px;">
-                                <div style="background: rgba(231, 111, 81, 0.1); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(231, 111, 81, 0.2);">
-                                    <h3 id="quiz-timer" style="color: #e76f51; font-family: 'Courier New', Courier, monospace; font-size: 1.6rem; margin: 0; font-weight: bold; letter-spacing: 2px;">15:00</h3>
+                    <div class="layout__item-1">
+                        <div class="layout__item-2">
+                            <div class="layout__item-3">
+                                <div class="layout__item-4">
+                                    <h3 id="quiz-timer" class="layout__quiz-timer">15:00</h3>
                                 </div>
-                                <div style="font-weight: bold; font-size: 1.1rem; color: var(--text-title);"><span data-i18n="quiz_q_prefix">السؤال</span> <span id="quiz-current-idx" style="color: var(--primary); font-size: 1.4rem;">1</span> <span data-i18n="quiz_q_of">من</span> <span id="quiz-total">10</span></div>
+                                <div class="layout__item-1-1"><span data-i18n="quiz_q_prefix">السؤال</span> <span id="quiz-current-idx" class="layout__quiz-current-idx">1</span> <span data-i18n="quiz_q_of">من</span> <span id="quiz-total">10</span></div>
                             </div>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn" id="btn-zen-mode" onclick="app.toggleZenMode()" title="وضع التركيز" style="background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px;">🔲 تركيز</button>
+                            <div class="layout__item-1-2">
+                                <button class="btn layout__btn-zen-mode" id="btn-zen-mode" onclick="app.toggleZenMode()" title="وضع التركيز">🔲 تركيز</button>
                             </div>
                         </div>
-                        <div style="height: 8px; width: 100%; background: var(--bg-main); border-radius: 10px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
-                            <div id="quiz-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px;"></div>
+                        <div class="layout__item-1-3">
+                            <div id="quiz-progress-bar" class="layout__quiz-progress-bar"></div>
                         </div>
                     </div>
                     
-                    <div id="quiz-question-container" style="background: var(--surface-color); border-radius: 16px; min-height: 250px; padding: 30px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 25px; transition: var(--transition);">
+                    <div id="quiz-question-container" class="layout__quiz-question-container">
                         <!-- Question rendered here -->
                     </div>
 
                     <!-- Floating Bottom Navigation Dock -->
                     <div class="quiz-nav-dock">
                         <!-- Reveal Row (Top part of dock) -->
-                        <div style="display: flex; gap: 10px; width: 100%;">
-                            <button class="btn" onclick="app.quizRevealAnswer()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border);" data-i18n="reveal_answer">كشف الإجابة 👁️</button>
-                            <button class="btn" onclick="app.quizRevealExplanation()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border);" data-i18n="reveal_explain">كشف التفسير 💡</button>
+                        <div class="layout__item-5">
+                            <button class="btn layout__btn" onclick="app.quizRevealAnswer()" data-i18n="reveal_answer">كشف الإجابة 👁️</button>
+                            <button class="btn layout__btn" onclick="app.quizRevealExplanation()" data-i18n="reveal_explain">كشف التفسير 💡</button>
                         </div>
                         <!-- Navigation Row (Bottom part of dock) -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
-                            <button class="btn" id="btn-quiz-prev" onclick="app.quizNav(-1)" style="background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); height: 42px; font-size: 0.95rem; flex: 1; justify-content: center;" data-i18n="prev_arrow">« السابق</button>
-                            <button class="btn" id="btn-quiz-next" onclick="app.quizNav(1)" style="background: var(--primary); color: white; height: 42px; font-size: 0.95rem; flex: 1.5; justify-content: center;" data-i18n="next_arrow">التالي »</button>
-                            <button class="btn btn-danger" onclick="app.submitQuiz()" style="height: 42px; font-size: 0.95rem; flex: 1; justify-content: center; font-weight: bold; background: #e76f51; color: white; border: none;" data-i18n="quiz_finish">إنهاء 🏁</button>
+                        <div class="layout__item-1-4">
+                            <button class="btn layout__btn-quiz-prev" id="btn-quiz-prev" onclick="app.quizNav(-1)" data-i18n="prev_arrow">« السابق</button>
+                            <button class="btn layout__btn-quiz-next" id="btn-quiz-next" onclick="app.quizNav(1)" data-i18n="next_arrow">التالي »</button>
+                            <button class="btn btn-danger layout__btn-2" onclick="app.submitQuiz()" data-i18n="quiz_finish">إنهاء 🏁</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Result Phase -->
-                <div id="quiz-result" style="display:none; max-width: 600px; margin: 40px auto 0; text-align: center; background: var(--surface-color); padding: 50px 30px; border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--border);">
-                    <div style="font-size: 5rem; margin-bottom: 20px;">🏆</div>
-                    <h2 style="color: var(--text-title); font-size: 2rem; margin-bottom: 10px;" data-i18n="quiz_complete">اكتمل الاختبار!</h2>
-                    <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 30px;" data-i18n="quiz_result_desc">إليك ملخص أدائك في هذا الاختبار.</p>
+                <div id="quiz-result" class="layout__quiz-result">
+                    <div class="layout__item-6">🏆</div>
+                    <h2 data-i18n="quiz_complete" class="layout__title">اكتمل الاختبار!</h2>
+                    <p data-i18n="quiz_result_desc" class="layout__text">إليك ملخص أدائك في هذا الاختبار.</p>
                     
-                    <div style="background: rgba(67, 97, 238, 0.05); border: 2px dashed var(--primary); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
-                        <h1 id="quiz-score" style="font-size: 4.5rem; color: var(--primary); margin: 0; font-weight: 900; line-height: 1;">8 / 10</h1>
+                    <div class="layout__item-1-5">
+                        <h1 id="quiz-score" class="layout__quiz-score">8 / 10</h1>
                     </div>
                     
-                    <p id="quiz-feedback" style="margin-bottom: 40px; font-size: 1.2rem; color: var(--text-title); font-weight: bold;"></p>
+                    <p id="quiz-feedback" class="layout__quiz-feedback"></p>
                     
-                    <button class="btn" onclick="document.getElementById('quiz-result').style.display='none'; document.getElementById('quiz-setup').style.display='block';" style="background: var(--primary); color: white; padding: 15px 40px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; border: none; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); width: 100%; justify-content: center;" data-i18n="quiz_restart">إجراء اختبار جديد 🔄</button>
+                    <button class="btn layout__btn-1" onclick="document.getElementById('quiz-result').style.display='none'; document.getElementById('quiz-setup').style.display='block';" data-i18n="quiz_restart">إجراء اختبار جديد 🔄</button>
                 </div>
             </section>
 
             <!-- Settings View -->
             <section id="settings" class="view-section">
                 <!-- Group 1: Typography & Interface Language -->
-                <div class="settings-group-section" style="margin-bottom: 30px;">
-                    <h3 class="settings-group-title" style="margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
+                <div class="settings-group-section settings__item">
+                    <h3 class="settings-group-title settings__title">
                         <span>🌐</span> <span data-i18n="group_lang_typo">اللغة والمظهر البصري</span>
                     </h3>
-                    <div class="dashboard-grid" style="gap: 20px; margin-top: 15px;">
+                    <div class="dashboard-grid settings__item-1">
                         <!-- Font Size Control -->
-                        <div class="stat-card" style="border-top:4px solid #4cc9f0; display:flex; flex-direction:column;">
-                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-                                <div style="background:#4cc9f0; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900;">Aa</div>
-                                <h3 style="margin:0;" data-i18n="font_size_title">تحكم في حجم الخط</h3>
+                        <div class="stat-card settings__item-2">
+                            <div class="stat-card__item-19">
+                                <div class="stat-card__item-20">Aa</div>
+                                <h3 data-i18n="font_size_title" class="stat-card__title-5">تحكم في حجم الخط</h3>
                             </div>
-                            <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:auto;" data-i18n="font_size_desc">اضبط حجم الخط ليناسب راحة عينك — مهم خصوصاً للعربي.</p>
-                            <div style="margin-top:20px;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                                    <label for="font-size-slider" style="font-size:0.85rem; color:var(--text-body);" data-i18n="font_size_current">حجم الخط الحالي</label>
-                                    <strong id="font-size-value" style="color:var(--primary);">16px</strong>
+                            <p data-i18n="font_size_desc" class="stat-card__text-6">اضبط حجم الخط ليناسب راحة عينك — مهم خصوصاً للعربي.</p>
+                            <div class="stat-card__item-1-7">
+                                <div class="stat-card__item-21">
+                                    <label for="font-size-slider" data-i18n="font_size_current" class="stat-card__item-22">حجم الخط الحالي</label>
+                                    <strong id="font-size-value" class="sidebar__icon">16px</strong>
                                 </div>
-                                <input type="range" id="font-size-slider" min="13" max="22" value="16" step="1"
-                                    style="width:100%; accent-color:var(--primary);"
-                                    oninput="app.setFontSize(this.value)">
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-body); opacity:0.6; margin-top:4px;">
+                                <input type="range" id="font-size-slider" min="13" max="22" value="16" step="1" oninput="app.setFontSize(this.value)" class="stat-card__font-size-slider">
+                                <div class="stat-card__item-1-8">
                                     <span data-i18n="font_size_small">13px صغير</span><span data-i18n="font_size_large">22px كبير</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Interface Direction Card -->
-                        <div class="stat-card" style="border-top: 4px solid var(--success-color); display: flex; flex-direction: column;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                                <div style="background: var(--success-color); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🌐</div>
-                                <h3 style="margin:0;" data-i18n="interface_lang">تخصيص لغة الواجهة</h3>
+                        <div class="stat-card settings__item-1-1">
+                            <div class="stat-card__item-23">
+                                <div class="stat-card__item-24">🌐</div>
+                                <h3 data-i18n="interface_lang" class="stat-card__title-5">تخصيص لغة الواجهة</h3>
                             </div>
-                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="interface_desc">تحكم في اتجاه نصوص الواجهة والأسئلة ليتناسب مع المادة العلمية (عربي/إنجليزي).</p>
-                            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-                                <button class="btn" id="btn-dir-rtl" onclick="app.setLanguage('ar')" style="flex:1; min-width: 120px; justify-content:center; height: 42px; font-size: 0.85rem;" data-i18n="lang_ar">العربية (RTL)</button>
-                                <button class="btn" id="btn-dir-ltr" onclick="app.setLanguage('en')" style="flex:1; min-width: 120px; justify-content:center; background: var(--bg-main); color: var(--text-title); border: 1px solid var(--border); height: 42px; font-size: 0.85rem;" data-i18n="lang_en">English (LTR)</button>
+                            <p data-i18n="interface_desc" class="stat-card__text-7">تحكم في اتجاه نصوص الواجهة والأسئلة ليتناسب مع المادة العلمية (عربي/إنجليزي).</p>
+                            <div class="stat-card__item-1-9">
+                                <button class="btn stat-card__btn-dir-rtl" id="btn-dir-rtl" onclick="app.setLanguage('ar')" data-i18n="lang_ar">العربية (RTL)</button>
+                                <button class="btn stat-card__btn-dir-ltr" id="btn-dir-ltr" onclick="app.setLanguage('en')" data-i18n="lang_en">English (LTR)</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Group 2: AI & Customization -->
-                <div class="settings-group-section" style="margin-bottom: 30px;">
-                    <h3 class="settings-group-title" style="margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
+                <div class="settings-group-section settings__item">
+                    <h3 class="settings-group-title settings__title">
                         <span>🎨</span> <span data-i18n="group_ai_custom">الذكاء الاصطناعي والتخصيص</span>
                     </h3>
-                    <div class="dashboard-grid" style="gap: 20px; margin-top: 15px;">
+                    <div class="dashboard-grid settings__item-1">
                         <!-- AI Assistant Card -->
-                        <div class="stat-card" style="border-top: 4px solid #7209b7; display: flex; flex-direction: column;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                                <div style="background: #7209b7; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🤖</div>
-                                <h3 style="margin:0;" data-i18n="ai_assistant">مساعد الذكاء الاصطناعي</h3>
+                        <div class="stat-card settings__item-3">
+                            <div class="stat-card__item-23">
+                                <div class="stat-card__item-25">🤖</div>
+                                <h3 data-i18n="ai_assistant" class="stat-card__title-5">مساعد الذكاء الاصطناعي</h3>
                             </div>
-                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="ai_desc">قم بتوليد برومبتات (Prompts) مخصصة لأي ذكاء اصطناعي (مثل ChatGPT) لإنشاء أسئلة متوافقة تماماً مع بنية النظام.</p>
-                            <button class="btn" onclick="app.openAiPromptModal()" style="width:100%; justify-content:center; background: linear-gradient(135deg, #4361ee, #7209b7); height: 45px; margin-top: 20px; font-weight: 600; border: none; box-shadow: 0 4px 12px rgba(114, 9, 183, 0.2);" data-i18n="ai_btn">
+                            <p data-i18n="ai_desc" class="stat-card__text-7">قم بتوليد برومبتات (Prompts) مخصصة لأي ذكاء اصطناعي (مثل ChatGPT) لإنشاء أسئلة متوافقة تماماً مع بنية النظام.</p>
+                            <button class="btn stat-card__btn-7" onclick="app.openAiPromptModal()" data-i18n="ai_btn">
                                 ✨ تخصيص البرومبت الذكي
                             </button>
                         </div>
@@ -613,61 +614,61 @@
 
 
                         <!-- Institution Identity -->
-                        <div class="stat-card" style="border-top:4px solid #3a0ca3; display:flex; flex-direction:column;">
-                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-                                <div style="background:#3a0ca3; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🏫</div>
-                                <h3 style="margin:0;" data-i18n="institution_title">هوية المؤسسة</h3>
+                        <div class="stat-card settings__item-1-2">
+                            <div class="stat-card__item-19">
+                                <div class="stat-card__item-26">🏫</div>
+                                <h3 data-i18n="institution_title" class="stat-card__title-5">هوية المؤسسة</h3>
                             </div>
-                            <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:10px;" data-i18n="institution_desc">اسم المدرسة وشعارها يظهران تلقائياً في ترويسة كل PDF تطبعه.</p>
-                            <label for="institution-name" style="font-size:0.85rem; color:var(--text-body); margin-bottom:5px; display:block;" data-i18n="institution_title">اسم المؤسسة</label>
-                            <input type="text" id="institution-name" class="form-control" placeholder="اسم المدرسة / الجامعة / المؤسسة" data-i18n-placeholder="institution_name_placeholder" style="margin-bottom:10px;">
-                            <input type="file" id="institution-logo-upload" accept="image/*" style="display:none;" onchange="app.handleInstitutionLogoUpload(event)">
+                            <p data-i18n="institution_desc" class="stat-card__text-8">اسم المدرسة وشعارها يظهران تلقائياً في ترويسة كل PDF تطبعه.</p>
+                            <label for="institution-name" data-i18n="institution_title" class="stat-card__item-27">اسم المؤسسة</label>
+                            <input type="text" id="institution-name" class="form-control stat-card__institution-name" placeholder="اسم المدرسة / الجامعة / المؤسسة" data-i18n-placeholder="institution_name_placeholder">
+                            <input type="file" id="institution-logo-upload" accept="image/*" onchange="app.handleInstitutionLogoUpload(event)" class="stat-card__institution-logo-upload">
                             <input type="hidden" id="institution-logo-b64">
-                            <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
-                                <button class="btn btn-secondary" onclick="document.getElementById('institution-logo-upload').click()" style="flex:1; justify-content:center;" data-i18n="btn_upload_logo">📁 رفع شعار</button>
-                                <img id="institution-logo-preview" style="display:none; height:40px; border-radius:6px; border:1px solid var(--border);">
+                            <div class="stat-card__item-1-10">
+                                <button class="btn btn-secondary stat-card__btn-8" onclick="document.getElementById('institution-logo-upload').click()" data-i18n="btn_upload_logo">📁 رفع شعار</button>
+                                <img id="institution-logo-preview" class="stat-card__institution-logo-preview">
                             </div>
-                            <div style="display:flex; gap:8px; margin-top:auto;">
-                                <button class="btn" style="flex:2; justify-content:center; background:#3a0ca3; color:white; border:none;" onclick="app.saveInstitution()" data-i18n="btn_save_identity">💾 حفظ الهوية</button>
-                                <button class="btn btn-secondary" style="flex:1; justify-content:center; color: var(--danger-color); border: 1.5px solid var(--border);" onclick="app.clearInstitution()" data-i18n="btn_remove">🗑️ إزالة</button>
+                            <div class="stat-card__item-2-4">
+                                <button class="btn stat-card__btn-9" onclick="app.saveInstitution()" data-i18n="btn_save_identity">💾 حفظ الهوية</button>
+                                <button class="btn btn-secondary stat-card__btn-1-2" onclick="app.clearInstitution()" data-i18n="btn_remove">🗑️ إزالة</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Group 3: Maintenance & Database tools -->
-                <div class="settings-group-section" style="margin-bottom: 30px;">
-                    <h3 class="settings-group-title" style="margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; color: var(--text-title); display: flex; align-items: center; gap: 8px;">
+                <div class="settings-group-section settings__item">
+                    <h3 class="settings-group-title settings__title">
                         <span>🛠️</span> <span data-i18n="group_maintenance">الصيانة وقاعدة البيانات</span>
                     </h3>
-                    <div class="dashboard-grid" style="gap: 20px; margin-top: 15px;">
+                    <div class="dashboard-grid settings__item-1">
                         <!-- Maintenance Tools Card -->
-                        <div class="stat-card" style="border-top: 4px solid var(--danger-color); display: flex; flex-direction: column;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                                <div style="background: var(--danger-color); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🛠️</div>
-                                <h3 style="margin:0;" data-i18n="maintenance_tools">أدوات الصيانة والدمج</h3>
+                        <div class="stat-card settings__item-4">
+                            <div class="stat-card__item-23">
+                                <div class="stat-card__item-28">🛠️</div>
+                                <h3 data-i18n="maintenance_tools" class="stat-card__title-5">أدوات الصيانة والدمج</h3>
                             </div>
-                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="maintenance_desc">تنظيف البيانات المكررة ودمج الوسوم والتصنيفات المتشابهة (مثلاً "كيمياء" و "كيميا") لضمان دقة البحث.</p>
-                            <div style="display:flex; flex-direction:column; gap:8px; margin-top: 20px;">
-                                <button class="btn btn-sm" onclick="app.openTagNormalizer()" style="width:100%; justify-content:center; gap:8px; background: var(--bg-main); color: var(--text-title); border: 1.5px solid var(--border);" data-i18n="tag_normalizer">
+                            <p data-i18n="maintenance_desc" class="stat-card__text-7">تنظيف البيانات المكررة ودمج الوسوم والتصنيفات المتشابهة (مثلاً "كيمياء" و "كيميا") لضمان دقة البحث.</p>
+                            <div class="stat-card__item-1-11">
+                                <button class="btn btn-sm stat-card__btn-10" onclick="app.openTagNormalizer()" data-i18n="tag_normalizer">
                                     🏷️ تنظيف وتحسين الوسوم
                                 </button>
-                                <button class="btn btn-sm" onclick="app.openCategoryNormalizer()" style="width:100%; justify-content:center; gap:8px; background: var(--bg-main); color: var(--text-title); border: 1.5px solid var(--border);" data-i18n="cat_normalizer">
+                                <button class="btn btn-sm stat-card__btn-10" onclick="app.openCategoryNormalizer()" data-i18n="cat_normalizer">
                                     📂 تنظيف وتحسين التصنيفات
                                 </button>
                             </div>
                         </div>
 
                         <!-- Backup & Reset Card -->
-                        <div class="stat-card" style="border-top: 4px solid #f4a261; display: flex; flex-direction: column;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                                <div style="background: #f4a261; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💾</div>
-                                <h3 style="margin:0;" data-i18n="backup_title">النسخ الاحتياطي</h3>
+                        <div class="stat-card settings__item-1-3">
+                            <div class="stat-card__item-23">
+                                <div class="stat-card__item-29">💾</div>
+                                <h3 data-i18n="backup_title" class="stat-card__title-5">النسخ الاحتياطي</h3>
                             </div>
-                            <p style="color: var(--text-secondary); margin-bottom: auto; font-size: 0.9rem; line-height: 1.6;" data-i18n="backup_desc">تصدير كافة بيانات البنك في ملف JSON واحد للنسخ الاحتياطي أو مشاركته مع الآخرين.</p>
-                            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-                                <button class="btn" onclick="app.exportToJSON()" style="flex:1; min-width: 120px; justify-content:center; background: #f4a261; color:white; border:none; height: 42px; font-size:0.85rem;" data-i18n="export_json">تصدير النسخة 📁</button>
-                                <button class="btn" onclick="app.clearAllData(this)" style="flex:1; min-width: 120px; justify-content:center; background: #e76f51; color:white; border:none; height: 42px; font-size:0.85rem;" data-i18n="clear_all">حذف الكل 🗑️</button>
+                            <p data-i18n="backup_desc" class="stat-card__text-7">تصدير كافة بيانات البنك في ملف JSON واحد للنسخ الاحتياطي أو مشاركته مع الآخرين.</p>
+                            <div class="stat-card__item-1-9">
+                                <button class="btn stat-card__btn-11" onclick="app.exportToJSON()" data-i18n="export_json">تصدير النسخة 📁</button>
+                                <button class="btn stat-card__btn-1-3" onclick="app.clearAllData(this)" data-i18n="clear_all">حذف الكل 🗑️</button>
                             </div>
                         </div>
                     </div>
@@ -677,20 +678,20 @@
             <!-- Import Hub View -->
             <section id="import-hub" class="view-section">
                 <!-- Global Import Settings -->
-                <div class="stat-card" style="border-top: 4px solid var(--accent); margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 1.5rem;">⚙️</span>
-                            <h3 style="margin:0;" data-i18n="import_settings">إعدادات الاستيراد</h3>
+                <div class="stat-card import-hub__item">
+                    <div class="stat-card__item-30">
+                        <div class="stat-card__item-13">
+                            <span class="stat-card__label-6">⚙️</span>
+                            <h3 data-i18n="import_settings" class="stat-card__title-5">إعدادات الاستيراد</h3>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                            <div class="import-notebook-select" style="display: flex; align-items: center; gap: 8px;">
-                                <label for="import-notebook" style="font-size: 0.9rem; font-weight: 600; color: var(--text-title);" data-i18n="nav_notebooks">الدفتر المستهدف:</label>
-                                <select id="import-notebook" class="form-control" style="width: 200px; height: 38px;"></select>
+                        <div class="stat-card__item-1-12">
+                            <div class="import-notebook-select stat-card__item-31">
+                                <label for="import-notebook" data-i18n="nav_notebooks" class="stat-card__item-32">الدفتر المستهدف:</label>
+                                <select id="import-notebook" class="form-control stat-card__import-notebook"></select>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" id="import-auto-distribute" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);">
-                                <label for="import-auto-distribute" style="font-size: 0.85rem; font-weight: 600; color: var(--text-title); cursor: pointer;" data-i18n="auto_distribute">🧠 توزيع تلقائي للملفات</label>
+                            <div class="stat-card__item-31">
+                                <input type="checkbox" id="import-auto-distribute" checked="" class="stat-card__import-auto-distribute">
+                                <label for="import-auto-distribute" data-i18n="auto_distribute" class="stat-card__item-33">🧠 توزيع تلقائي للملفات</label>
                             </div>
                         </div>
                     </div>
@@ -698,88 +699,88 @@
 
                 <div class="hub-grid">
                     <!-- Card 1: Smart Text & JSON Paste -->
-                    <div class="stat-card" style="border-top: 4px solid #f4a261; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <span style="font-size: 1.3rem;">📝</span>
-                            <h3 style="margin:0;" data-i18n="import_paste_label">استيراد نصي ذكي</h3>
+                    <div class="stat-card settings__item-1-3">
+                        <div class="stat-card__item-23">
+                            <span class="stat-card__label-7">📝</span>
+                            <h3 data-i18n="import_paste_label" class="stat-card__title-5">استيراد نصي ذكي</h3>
                         </div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px;" data-i18n="import_paste_desc">ألصق نص JSON أو نصاً طبيعياً حرّاً وسيقوم النظام بتحليله آلياً.</p>
-                        <textarea id="import-paste-area" class="modern-textarea" style="width: 100%; height: 150px; background: var(--bg-main); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; font-family: monospace; font-size: 0.8rem; margin-bottom: 15px;" placeholder='[ { "type": "mcq", "question": "...", "answer": "..." } ]'></textarea>
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto;">
-                            <button class="btn btn-primary" onclick="app.importFromPaste()" style="width: 100%; height: 42px; font-weight: 700; background: var(--primary); color: #fff; border: none; border-radius: 8px; justify-content: center;" data-i18n="import_json_btn">
+                        <p data-i18n="import_paste_desc" class="stat-card__text-9">ألصق نص JSON أو نصاً طبيعياً حرّاً وسيقوم النظام بتحليله آلياً.</p>
+                        <textarea id="import-paste-area" class="modern-textarea stat-card__import-paste-area" placeholder="[ { &quot;type&quot;: &quot;mcq&quot;, &quot;question&quot;: &quot;...&quot;, &quot;answer&quot;: &quot;...&quot; } ]"></textarea>
+                        <div class="stat-card__item-1-13">
+                            <button class="btn btn-primary stat-card__btn-12" onclick="app.importFromPaste()" data-i18n="import_json_btn">
                                 🚀 استيراد JSON
                             </button>
-                            <button class="btn btn-success" onclick="app.smartTextImport()" style="width: 100%; height: 42px; font-weight: 700; background: var(--success-color); color: #fff; border: none; border-radius: 8px; justify-content: center;" data-i18n="import_smart_btn">
+                            <button class="btn btn-success stat-card__btn-1-4" onclick="app.smartTextImport()" data-i18n="import_smart_btn">
                                 🧠 استيراد ذكي من النص
                             </button>
-                            <button class="btn btn-secondary" id="btn-copy-raw-structure" onclick="app.copyRawStructure()" style="width: 100%; height: 42px; font-weight: 600; justify-content: center; background: var(--bg-main); border: 1px solid var(--border); color: var(--text-title);" title="نسخ كافة الأسئلة بصيغة JSON خام">
+                            <button class="btn btn-secondary stat-card__btn-copy-raw-structure" id="btn-copy-raw-structure" onclick="app.copyRawStructure()" title="نسخ كافة الأسئلة بصيغة JSON خام">
                                 📋 <span data-i18n="btn_copy_raw_structure">نسخ الهيكل الخام</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Card 2: Certified Medical References -->
-                    <div class="stat-card" style="border-top: 4px solid #7209b7; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <span style="font-size: 1.3rem;">📚</span>
-                            <h3 style="margin:0;" data-i18n="import_ref_title">المصادر المعتمدة</h3>
+                    <div class="stat-card settings__item-3">
+                        <div class="stat-card__item-23">
+                            <span class="stat-card__label-7">📚</span>
+                            <h3 data-i18n="import_ref_title" class="stat-card__title-5">المصادر المعتمدة</h3>
                         </div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px;" data-i18n="import_ref_desc">حمّل بنوك أسئلة كاملة ومراجعة جاهزة لمناهج الزمالة والامتحانات الطبية.</p>
+                        <p data-i18n="import_ref_desc" class="stat-card__text-10">حمّل بنوك أسئلة كاملة ومراجعة جاهزة لمناهج الزمالة والامتحانات الطبية.</p>
                         
-                        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                            <select id="reference-selector" class="form-control" style="width: 100%; height: 42px; background: var(--card-bg);">
+                        <div class="stat-card__item-1-14">
+                            <select id="reference-selector" class="form-control stat-card__reference-selector">
                                 <option value="" data-i18n="select_ref_placeholder">--- اختر المرجع المطلوب ---</option>
                             </select>
-                            <button class="btn" id="btn-preview-ref" style="width: 100%; height: 42px; background: #7209b7; color: white; border: none; font-weight: 600; justify-content: center; border-radius: 8px;">
+                            <button class="btn stat-card__btn-preview-ref" id="btn-preview-ref">
                                 <span data-i18n="btn_preview_ref">معاينة وفحص 📡</span>
                             </button>
                         </div>
 
                         <!-- Reference Details Panel -->
-                        <div id="reference-details-panel" style="display: none; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 0.85rem;">
-                            <h4 id="ref-detail-name" style="margin: 0 0 4px 0; color: var(--primary); font-weight: 700;"></h4>
-                            <p id="ref-detail-desc" style="margin: 0 0 6px 0; color: var(--text-secondary); font-size: 0.8rem;"></p>
-                            <span id="ref-detail-version" class="badge" style="background: var(--border); color: var(--text-title); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px;"></span>
-                            <button id="btn-copy-ref-link" style="margin-top:8px; width:100%; height:34px; justify-content:center; background:transparent; border:1px solid var(--primary); color:var(--primary); border-radius:6px; font-size:0.78rem; font-weight:600; cursor:pointer; gap:4px; display:flex; align-items:center;">
+                        <div id="reference-details-panel" class="stat-card__reference-details-panel">
+                            <h4 id="ref-detail-name" class="stat-card__ref-detail-name"></h4>
+                            <p id="ref-detail-desc" class="stat-card__ref-detail-desc"></p>
+                            <span id="ref-detail-version" class="badge stat-card__ref-detail-version"></span>
+                            <button id="btn-copy-ref-link" class="stat-card__btn-copy-ref-link">
                                 <span data-i18n="btn_copy_share_link">نسخ رابط الاستيراد السريع 🔗</span>
                             </button>
                             
                             <!-- Preview Area -->
-                            <div id="ref-preview-area" style="display: none; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
-                                <div id="ref-preview-questions-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 100px; overflow-y: auto; font-size: 0.75rem; background: var(--card-bg); padding: 6px; border-radius: 4px;"></div>
+                            <div id="ref-preview-area" class="stat-card__ref-preview-area">
+                                <div id="ref-preview-questions-list" class="stat-card__ref-preview-questions-list"></div>
                             </div>
                         </div>
 
-                        <div style="margin-top: auto;">
-                            <button class="btn" id="btn-confirm-ref-import" disabled style="width: 100%; height: 42px; background: var(--success-color); color: white; border: none; font-weight: 700; justify-content: center; border-radius: 8px; opacity: 0.5; cursor: not-allowed;">
+                        <div class="stat-card__item-3-2">
+                            <button class="btn stat-card__btn-confirm-ref-import" id="btn-confirm-ref-import" disabled="">
                                 <span data-i18n="btn_confirm_ref_import">تأكيد الاستيراد الآمن 🚀</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Card 3: URL Direct Download & Local Upload -->
-                    <div class="stat-card" style="border-top: 4px solid #2a9d8f; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                            <span style="font-size: 1.3rem;">🔗</span>
-                            <h3 style="margin:0;" data-i18n="direct_link">الملفات والروابط</h3>
+                    <div class="stat-card import-hub__item-2">
+                        <div class="stat-card__item-23">
+                            <span class="stat-card__label-7">🔗</span>
+                            <h3 data-i18n="direct_link" class="stat-card__title-5">الملفات والروابط</h3>
                         </div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px;" data-i18n="import_url_hint">قم باستيراد ملفات بنك الأسئلة محلياً أو حمّلها من رابط سحابي مباشر.</p>
+                        <p data-i18n="import_url_hint" class="stat-card__text-11">قم باستيراد ملفات بنك الأسئلة محلياً أو حمّلها من رابط سحابي مباشر.</p>
                         
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                            <input type="url" id="import-url" class="form-control" style="width: 100%; height: 42px; background: var(--card-bg);" placeholder="https://example.com/questions.json">
-                            <button class="btn" id="btn-import-url" onclick="app.importFromUrl(event)" style="width: 100%; height: 42px; background: var(--primary); color: white; border: none; font-weight: 600; justify-content: center; border-radius: 8px;">
+                        <div class="stat-card__item-1-15">
+                            <input type="url" id="import-url" class="form-control stat-card__reference-selector" placeholder="https://example.com/questions.json">
+                            <button class="btn stat-card__btn-import-url" id="btn-import-url" onclick="app.importFromUrl(event)">
                                 <span data-i18n="import_fetch">جلب البيانات 📡</span>
                             </button>
                         </div>
 
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto;">
-                            <button class="btn btn-secondary" id="btn-copy-direct-link" style="width: 100%; height: 42px; background: transparent; border: 1.5px solid var(--primary); color: var(--primary); font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                        <div class="stat-card__item-1-13">
+                            <button class="btn btn-secondary stat-card__btn-copy-direct-link" id="btn-copy-direct-link">
                                 <span data-i18n="btn_gen_direct_share_link">رابط استيراد مباشر 🔗</span>
                             </button>
                             
-                            <label for="import-file" class="btn btn-secondary" style="width: 100%; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--border); color: var(--text-title); border: none; border-radius: 8px; margin: 0;">
+                            <label for="import-file" class="btn btn-secondary stat-card__item-34">
                                 <span data-i18n="import_file_btn">📂 رفع ملف JSON/CSV</span>
-                                <input type="file" id="import-file" style="display:none;" accept=".json,.csv,.gz,.json.gz,application/json,application/gzip,application/x-gzip">
+                                <input type="file" id="import-file" accept=".json,.csv,.gz,.json.gz,application/json,application/gzip,application/x-gzip" class="stat-card__institution-logo-upload">
                             </label>
                         </div>
                     </div>
@@ -794,14 +795,14 @@
                 <div class="export-hub-grid">
                     
                     <!-- Left: Format & Scope Selection -->
-                    <div style="display:flex; flex-direction:column; gap:20px;">
-                        <div class="stat-card" style="border: 2px solid var(--border-color); position: relative; overflow: visible;">
-                            <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--primary); border-radius: var(--radius-lg);"></div>
-                            <h3 style="margin-bottom:15px; display: flex; align-items: center; gap: 8px;">
-                                <span style="background: var(--primary); color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">1</span>
+                    <div class="layout__item-7">
+                        <div class="stat-card layout__item-8">
+                            <div class="stat-card__item-35"></div>
+                            <h3 class="stat-card__title-6">
+                                <span class="stat-card__label-8">1</span>
                                 <span data-i18n="export_format_title">اختر الصيغة النهائية</span>
                             </h3>
-                            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px;">
+                            <div class="stat-card__item-1-16">
                                 <div class="export-format-card active" data-format="json" onclick="app.selectExportFormat('json')">
                                     <div class="format-icon">📄</div>
                                     <div class="format-name">JSON</div>
@@ -835,16 +836,16 @@
                             </div>
                         </div>
 
-                        <div class="stat-card" style="border: 2px solid var(--border-color); position: relative; overflow: visible;">
-                            <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--success-color); border-radius: var(--radius-lg);"></div>
-                            <h3 style="margin-bottom:15px; display: flex; align-items: center; gap: 8px;">
-                                <span style="background: var(--success-color); color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">2</span>
+                        <div class="stat-card layout__item-8">
+                            <div class="stat-card__item-36"></div>
+                            <h3 class="stat-card__title-6">
+                                <span class="stat-card__label-9">2</span>
                                 <span data-i18n="export_scope_title">تخصيص نطاق الأسئلة (Scope)</span>
                             </h3>
                             
                             <div class="export-scope-grid">
                                 <label class="export-scope-option" for="scope-all">
-                                    <input type="radio" id="scope-all" name="export-scope" value="all" checked onchange="app.updateExportSummary()">
+                                    <input type="radio" id="scope-all" name="export-scope" value="all" checked="" onchange="app.updateExportSummary()">
                                     <div class="scope-info">
                                         <span class="scope-icon">🌍</span>
                                         <div class="scope-text">
@@ -885,37 +886,37 @@
                                 </label>
                             </div>
                             <!-- Advanced Universal Selection Hub Trigger -->
-                            <div id="export-custom-options" style="display:none; margin-top:20px; padding: 25px; border: 2px dashed var(--primary); border-radius: 15px; background: rgba(67, 97, 238, 0.05); text-align: center; animation: slideDown 0.3s ease-out;">
-                                <div style="margin-bottom: 20px;">
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-bottom: 8px;" data-i18n="smart_selection_engine">🎯 محرك الاختيار الذكي</div>
-                                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;" data-i18n="selection_engine_desc">يمكنك تخصيص اختيارك بدقة بناءً على الدفاتر، الأوسمة، الصعوبة، أو أنواع الأسئلة.</p>
+                            <div id="export-custom-options" class="stat-card__export-custom-options">
+                                <div class="stat-card__item-14">
+                                    <div data-i18n="smart_selection_engine" class="stat-card__item-37">🎯 محرك الاختيار الذكي</div>
+                                    <p data-i18n="selection_engine_desc" class="stat-card__text-12">يمكنك تخصيص اختيارك بدقة بناءً على الدفاتر، الأوسمة، الصعوبة، أو أنواع الأسئلة.</p>
                                 </div>
                                 
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                                    <div style="background: var(--surface-color); padding: 15px 30px; border-radius: 12px; border: 1px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 5px;" data-i18n="current_selection_count">عدد الأسئلة المختارة حالياً:</div>
-                                        <div id="selection-main-count" style="font-size: 2.2rem; font-weight: 900; color: var(--primary);">0</div>
+                                <div class="stat-card__item-1-17">
+                                    <div class="stat-card__item-38">
+                                        <div data-i18n="current_selection_count" class="stat-card__item-39">عدد الأسئلة المختارة حالياً:</div>
+                                        <div id="selection-main-count" class="stat-card__selection-main-count">0</div>
                                     </div>
                                     
-                                    <button class="btn btn-primary btn-lg" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" style="padding: 0 40px; height: 55px; font-weight: bold; border-radius: 12px; box-shadow: 0 8px 20px rgba(67, 97, 238, 0.2); display: flex; align-items: center; gap: 10px; justify-content: center;">
-                                        <span style="font-size: 1.3rem;">⚙️</span> <span data-i18n="smart_selection">فتح محرك الاختيار المتقدم</span>
+                                    <button class="btn btn-primary btn-lg stat-card__btn-13" onclick="app.renderSelectionHub(); app.openModal('selection-modal')">
+                                        <span class="stat-card__label-7">⚙️</span> <span data-i18n="smart_selection">فتح محرك الاختيار المتقدم</span>
                                     </button>
                                 </div>
 
                                 <!-- Intelligent Random Choice (Kept inside custom options) -->
-                                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: right;">
-                                    <label class="custom-checkbox" for="export-smart-random" style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
+                                <div class="stat-card__item-2-5">
+                                    <label class="custom-checkbox stat-card__item-40" for="export-smart-random">
                                         <input type="checkbox" id="export-smart-random" onchange="app.updateExportSummary()">
-                                        <span class="checkmark" style="margin-top: 3px;"></span>
+                                        <span class="checkmark stat-card__label-10"></span>
                                         <div>
-                                            <strong style="font-size: 1rem;" data-i18n="smart_random">🎲 اختيار عشوائي ذكي</strong>
-                                            <div style="font-size:0.85rem; color:var(--text-secondary); margin-top: 4px;" data-i18n="smart_random_desc">سيتم اختيار عدد محدد من الأسئلة عشوائياً من ضمن المعايير التي اخترتها في المحرك.</div>
+                                            <strong data-i18n="smart_random" class="stat-card__item-41">🎲 اختيار عشوائي ذكي</strong>
+                                            <div data-i18n="smart_random_desc" class="stat-card__item-42">سيتم اختيار عدد محدد من الأسئلة عشوائياً من ضمن المعايير التي اخترتها في المحرك.</div>
                                         </div>
                                     </label>
-                                    <div id="export-random-count-container" style="display:none; margin-top:15px; background: var(--surface-color); padding: 15px; border-radius: 10px; border: 1px solid var(--border-color);">
-                                        <div style="display:flex; align-items:center; gap:12px;">
-                                            <label for="export-random-count" style="font-weight: bold;" data-i18n="random_count_label">عدد الأسئلة المطلوب استخراجه:</label>
-                                            <input type="number" id="export-random-count" class="form-control" value="20" min="1" style="width:100px; text-align: center; font-weight: bold;" oninput="app.updateExportSummary()">
+                                    <div id="export-random-count-container" class="stat-card__export-random-count-container">
+                                        <div class="stat-card__item-43">
+                                            <label for="export-random-count" data-i18n="random_count_label" class="stat-card__item-44">عدد الأسئلة المطلوب استخراجه:</label>
+                                            <input type="number" id="export-random-count" class="form-control stat-card__export-random-count" value="20" min="1" oninput="app.updateExportSummary()">
                                         </div>
                                     </div>
                                 </div>
@@ -926,14 +927,14 @@
                     </div>
 
                     <!-- Right: Content & PDF Settings -->
-                    <div style="display:flex; flex-direction:column; gap:20px;">
-                        <div class="stat-card" style="border: 2px solid var(--border-color); position: relative; overflow: visible;">
-                            <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--secondary); border-radius: var(--radius-lg);"></div>
-                            <h3 style="margin-bottom:15px; display: flex; align-items: center; gap: 8px;">
-                                <span style="background: var(--secondary); color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">3</span>
+                    <div class="layout__item-7">
+                        <div class="stat-card layout__item-8">
+                            <div class="stat-card__item-45"></div>
+                            <h3 class="stat-card__title-6">
+                                <span class="stat-card__label-11">3</span>
                                 <span data-i18n="content_options_title">خيارات المحتوى والترتيب</span>
                             </h3>
-                            <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div class="stat-card__item-1-18">
                                 <div class="form-group">
                                     <label for="export-sort-order" data-i18n="sort_order_label">ترتيب الأسئلة في الملف</label>
                                     <select id="export-sort-order" class="form-control" onchange="app.updateExportSummary()">
@@ -944,19 +945,19 @@
                                         <option value="difficulty" data-i18n="sort_difficulty">حسب مستوى الصعوبة</option>
                                     </select>
                                 </div>
-                                <div style="display:grid; grid-template-columns: 1fr; gap:10px;">
-                                    <label class="custom-checkbox" for="export-include-explain" style="cursor:pointer;">
-                                        <input type="checkbox" id="export-include-explain" checked onchange="app.updateExportSummary()">
+                                <div class="stat-card__item-1-19">
+                                    <label class="custom-checkbox stat-card__item-46" for="export-include-explain">
+                                        <input type="checkbox" id="export-include-explain" checked="" onchange="app.updateExportSummary()">
                                         <span class="checkmark"></span>
                                         <span data-i18n="include_explain">تضمين الشرح والتعليقات التعليمية</span>
                                     </label>
-                                    <label class="custom-checkbox" for="export-include-images" style="cursor:pointer;">
-                                        <input type="checkbox" id="export-include-images" checked onchange="app.updateExportSummary()">
+                                    <label class="custom-checkbox stat-card__item-46" for="export-include-images">
+                                        <input type="checkbox" id="export-include-images" checked="" onchange="app.updateExportSummary()">
                                         <span class="checkmark"></span>
                                         <span data-i18n="include_images">تضمين الصور التوضيحية</span>
                                     </label>
-                                    <label class="custom-checkbox" for="export-include-answers" style="cursor:pointer;">
-                                        <input type="checkbox" id="export-include-answers" checked onchange="app.updateExportSummary()">
+                                    <label class="custom-checkbox stat-card__item-46" for="export-include-answers">
+                                        <input type="checkbox" id="export-include-answers" checked="" onchange="app.updateExportSummary()">
                                         <span class="checkmark"></span>
                                         <span data-i18n="include_answers">تضمين الإجابات الصحيحة</span>
                                     </label>
@@ -965,8 +966,8 @@
                         </div>
 
                         <!-- PDF Advanced Options -->
-                        <div class="stat-card" id="pdf-advanced-card" style="display:none; border: 2px solid var(--primary); background: rgba(67, 97, 238, 0.02);">
-                            <h3 style="margin-bottom:15px; color:var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <div class="stat-card layout__pdf-advanced-card" id="pdf-advanced-card">
+                            <h3 class="stat-card__title-7">
                                 <span data-i18n="pdf_print_settings">📄 إعدادات الطباعة الاحترافية</span>
                             </h3>
                             <div class="grid-2-cols">
@@ -991,12 +992,12 @@
                                 <input type="text" id="pdf-custom-header" class="form-control" placeholder="مثال: مادة الأحياء - الفترة الثانية" data-i18n-placeholder="header_title_placeholder">
                             </div>
                             <div class="grid-2-cols">
-                                <label class="custom-checkbox" for="pdf-show-images" style="cursor:pointer;">
-                                    <input type="checkbox" id="pdf-show-images" checked>
+                                <label class="custom-checkbox stat-card__item-46" for="pdf-show-images">
+                                    <input type="checkbox" id="pdf-show-images" checked="">
                                     <span class="checkmark"></span>
                                     <span data-i18n="show_images_label">إظهار الصور</span>
                                 </label>
-                                <label class="custom-checkbox" for="pdf-two-columns" style="cursor:pointer;">
+                                <label class="custom-checkbox stat-card__item-46" for="pdf-two-columns">
                                     <input type="checkbox" id="pdf-two-columns">
                                     <span class="checkmark"></span>
                                     <span data-i18n="two_columns_label">نظام العمودين (توفير ورق)</span>
@@ -1005,15 +1006,15 @@
                         </div>
 
                         <!-- Word Advanced Options -->
-                        <div class="stat-card" id="word-advanced-card" style="display:none; border: 2px solid var(--primary); background: rgba(67, 97, 238, 0.02);">
-                            <h3 style="margin-bottom:15px; color:var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <div class="stat-card layout__pdf-advanced-card" id="word-advanced-card">
+                            <h3 class="stat-card__title-7">
                                 <span data-i18n="pdf_print_settings">📄 إعدادات Word الاحترافية</span>
                             </h3>
                             <div class="grid-2-cols">
                                 <div class="form-group">
                                     <label for="word-direction" data-i18n="file_lang_dir">لغة الملف واتجاهه</label>
                                     <select id="word-direction" class="form-control">
-                                        <option value="rtl" selected>العربية (RTL)</option>
+                                        <option value="rtl" selected="">العربية (RTL)</option>
                                         <option value="ltr">English / Latin (LTR)</option>
                                     </select>
                                 </div>
@@ -1031,20 +1032,20 @@
                                 <input type="text" id="word-custom-header" class="form-control" placeholder="مثال: مادة الرمد - بنك الأسئلة الشامل" data-i18n-placeholder="header_title_placeholder">
                             </div>
                             <div class="grid-2-cols">
-                                <label class="custom-checkbox" for="word-include-explain" style="cursor:pointer;">
-                                    <input type="checkbox" id="word-include-explain" checked>
+                                <label class="custom-checkbox stat-card__item-46" for="word-include-explain">
+                                    <input type="checkbox" id="word-include-explain" checked="">
                                     <span class="checkmark"></span>
                                     <span data-i18n="include_explain">تضمين الشرح</span>
                                 </label>
-                                <label class="custom-checkbox" for="word-bold-question" style="cursor:pointer;">
-                                    <input type="checkbox" id="word-bold-question" checked>
+                                <label class="custom-checkbox stat-card__item-46" for="word-bold-question">
+                                    <input type="checkbox" id="word-bold-question" checked="">
                                     <span class="checkmark"></span>
                                     <span data-i18n="bold_question_label">تغميق نص السؤال (Bold)</span>
                                 </label>
                             </div>
                         </div>
                         
-                        <div id="btn-export-interactive-html" class="export-card group border-2 border-slate-200 dark:border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition-all hover:-translate-y-1 hover:shadow-xl bg-white dark:bg-slate-900 overflow-hidden relative" style="margin-bottom: 20px;">
+                        <div id="btn-export-interactive-html" class="export-card group border-2 border-slate-200 dark:border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition-all hover:-translate-y-1 hover:shadow-xl bg-white dark:bg-slate-900 overflow-hidden relative stat-card__item-14">
                           <div class="flex items-start justify-between gap-4">
                             <div class="flex items-center gap-4">
                               <div class="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-500 rounded-xl group-hover:scale-110 transition-transform font-bold text-xl shrink-0">
@@ -1063,143 +1064,273 @@
 
                         <div class="export-action-card">
                             <div id="export-summary" class="export-summary-text" data-i18n="loading">جاري تحليل البيانات...</div>
-                            <button class="btn btn-primary btn-lg" onclick="app.executeExport()" style="width:100%; height: 60px; font-size: 1.2rem; border-radius: 16px; background: #6B5B8A; border: none; opacity: 0.9; box-shadow: 0 10px 20px rgba(107, 91, 138, 0.3);">
+                            <button class="btn btn-primary btn-lg layout__btn-3" onclick="app.executeExport()">
                                 <span data-i18n="start_export_btn">🚀 البدء في توليد الملف الآن</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <!-- Topic Graph View -->
+            <section id="topic-graph" class="view-section">
+                <div class="flex-between stat-card__item-14">
+                    <div>
+                        <h2 data-i18n="nav_topic_graph" class="layout__title-1">الخريطة الشبكية لتصنيفات الأسئلة</h2>
+                        <p class="layout__text-1">عرض مرئي تفاعلي لتوزيع الأسئلة وفجوات التغطية بناءً على التصنيفات والوسوم.</p>
+                    </div>
+                    <div class="layout__item-1-6">
+                        <button class="btn btn-secondary layout__graph-btn-reset" id="graph-btn-reset">
+                            <span>🔄</span> <span data-i18n="reset">إعادة ضبط</span>
+                        </button>
+                        <button class="btn btn-primary layout__graph-btn-reset" id="graph-btn-play">
+                            <span id="graph-play-icon">⏸️</span> <span id="graph-play-text">إيقاف مؤقت</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="topic-graph-layout layout__item-1-7">
+                    <!-- Left: Canvas Area -->
+                    <div class="stat-card graph-canvas-card layout__item-9">
+                        <!-- Control & Filter Overlay at top of canvas -->
+                        <div class="graph-toolbar stat-card__item-47">
+                            <div class="stat-card__item-48">
+                                <label class="stat-card__item-49">
+                                    <span>🔍 النطاق:</span>
+                                    <select id="graph-scope-select" class="form-control stat-card__graph-scope-select">
+                                        <option value="all" selected="">كل الأسئلة</option>
+                                        <option value="filtered">المفلترة حالياً</option>
+                                    </select>
+                                </label>
+                                <label class="stat-card__item-49">
+                                    <span>⚙️ التجميع:</span>
+                                    <select id="graph-group-select" class="form-control stat-card__graph-group-select">
+                                        <option value="tags" selected="">الوسوم (Tags)</option>
+                                        <option value="categories">التصنيفات (Categories)</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div id="graph-stats-summary" class="stat-card__graph-stats-summary">
+                                0 عقدة | 0 روابط
+                            </div>
+                        </div>
+
+                        <!-- Canvas Container -->
+                        <div id="graph-canvas-container" class="stat-card__graph-canvas-container">
+                            <canvas id="topic-graph-canvas" class="stat-card__topic-graph-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right: Info Panel -->
+                    <div class="layout__item-1-8">
+                        <!-- Selected Node Info Card -->
+                        <div class="stat-card layout__item-10">
+                            <h3 class="stat-card__title-8">
+                                <span>📊</span> <span id="graph-panel-title">تفاصيل العقدة</span>
+                            </h3>
+
+                            <div id="graph-panel-empty" class="stat-card__graph-panel-empty">
+                                <span class="stat-card__label-12">🩺</span>
+                                <p class="stat-card__text-13">قم بالمرور أو النقر فوق أي عقدة في الشبكة لعرض تفاصيل التغطية والأسئلة المرتبطة.</p>
+                            </div>
+
+                            <div id="graph-panel-details" class="stat-card__graph-panel-details">
+                                <div class="stat-card__item-50">
+                                    <div class="stat-card__item-51">اسم الوسم/التصنيف</div>
+                                    <div id="graph-node-name" class="stat-card__graph-node-name"></div>
+                                </div>
+
+                                <div class="grid-2-cols stat-card__item-1-20">
+                                    <div class="stat-card__item-52">
+                                        <div class="stat-card__item-53">عدد الأسئلة</div>
+                                        <div id="graph-node-count" class="stat-card__graph-node-count">0</div>
+                                    </div>
+                                    <div class="stat-card__item-52">
+                                        <div class="stat-card__item-53">متوسط الصعوبة</div>
+                                        <div id="graph-node-difficulty" class="stat-card__graph-node-difficulty">غير محدد</div>
+                                    </div>
+                                </div>
+
+                                <!-- Difficulty Breakdown bars -->
+                                <div class="stat-card__item-2-6">
+                                    <div class="stat-card__item-54">توزيع الصعوبة:</div>
+                                    <div class="stat-card__item-1-21">
+                                        <div id="graph-bar-easy" title="سهل" class="stat-card__graph-bar-easy"></div>
+                                        <div id="graph-bar-medium" title="متوسط" class="stat-card__graph-bar-medium"></div>
+                                        <div id="graph-bar-hard" title="صعب" class="stat-card__graph-bar-hard"></div>
+                                    </div>
+                                    <div class="stat-card__item-2-7">
+                                        <span>سهل: <span id="graph-txt-easy">0</span></span>
+                                        <span>متوسط: <span id="graph-txt-medium">0</span></span>
+                                        <span>صعب: <span id="graph-txt-hard">0</span></span>
+                                    </div>
+                                </div>
+
+                                <!-- Questions Preview List -->
+                                <div class="stat-card__item-3-3">
+                                    <div class="stat-card__item-55">الأسئلة المرتبطة:</div>
+                                    <div id="graph-node-questions" class="stat-card__graph-node-questions">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Legend Card -->
+                        <div class="stat-card layout__item-1-9">
+                            <h4 class="stat-card__title-9">دليل الألوان (الصعوبة السائدة):</h4>
+                            <div class="stat-card__item-2-6">
+                                <div class="stat-card__item-56">
+                                    <span class="stat-card__label-13"></span>
+                                    <span class="stat-card__label-1-1">سهل (غالبية سهلة)</span>
+                                </div>
+                                <div class="stat-card__item-56">
+                                    <span class="stat-card__label-14"></span>
+                                    <span class="stat-card__label-1-1">متوسط (غالبية متوسطة)</span>
+                                </div>
+                                <div class="stat-card__item-56">
+                                    <span class="stat-card__label-15"></span>
+                                    <span class="stat-card__label-1-1">صعب (غالبية صعبة)</span>
+                                </div>
+                                <div class="stat-card__item-56">
+                                    <span class="stat-card__label-16"></span>
+                                    <span class="stat-card__label-1-1">غير محدد الصعوبة</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
+
     </main>
 
     <!-- Universal Selection Modal (The Heart of Selection Engine) -->
     <div class="modal-overlay" id="selection-modal">
-        <div class="modal-content" style="width: 95%; max-width: 850px; max-height: 90vh; border: 3px solid var(--primary); box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column;">
-            <div class="modal-header" style="background: var(--primary); color: white; border-bottom: none; padding: 20px;">
-                <h3 class="modal-title" style="font-size: 1.5rem;" data-i18n="selection_modal_title">🎯 محرك الاختيار المتقدم</h3>
-                <button class="close-modal" onclick="app.closeModal('selection-modal')" style="color: white; font-size: 2rem;">&times;</button>
+        <div class="modal-content layout__item-11">
+            <div class="modal-header modal__item">
+                <h3 class="modal-title stat-card__label-6" data-i18n="selection_modal_title">🎯 محرك الاختيار المتقدم</h3>
+                <button class="close-modal modal__btn" onclick="app.closeModal('selection-modal')">×</button>
             </div>
             
-            <div class="modal-body" style="padding: 20px; background: var(--bg-main); overflow-y: auto; flex: 1; color: var(--text-body);">
+            <div class="modal-body modal__item-1">
                 <!-- Instructions Bar -->
-                <div style="background: rgba(67, 97, 238, 0.1); border: 1px solid var(--primary); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-body); display: flex; gap: 12px; align-items: center;">
-                    <span style="font-size: 1.2rem;">💡</span>
+                <div class="modal__item-2">
+                    <span class="modal__label">💡</span>
                     <span data-i18n="how_to_use"><strong>كيف تستخدم النظام؟</strong> اختر المعايير من البطاقات بالأسفل، وسيتحدث العداد تلقائياً.</span>
                 </div>
 
                 <!-- Live Result Badge -->
-                <div style="background: var(--surface-color); padding: 20px; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 25px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                    <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;" data-i18n="total_selected_qs">إجمالي الأسئلة المختارة بناءً على فلاترك:</div>
-                    <div id="selection-live-count" style="font-size: 3rem; font-weight: 900; color: var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.1);">0</div>
+                <div class="modal__item-1-1">
+                    <div data-i18n="total_selected_qs" class="modal__item-3">إجمالي الأسئلة المختارة بناءً على فلاترك:</div>
+                    <div id="selection-live-count" class="modal__selection-live-count">0</div>
                 </div>
 
-                <div id="selection-hub-content" class="selection-hub" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div id="selection-hub-content" class="selection-hub modal__selection-hub-content">
                     
                     <!-- البطاقة 1: الدفاتر -->
-                    <div class="stat-card" style="margin:0; padding:20px; border:1px solid var(--border); background: var(--surface-color);">
-                        <div class="group-header" style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
-                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary); display: inline-block;" data-i18n="select_notebooks">📁 اختر من الدفاتر</span>
-                            <div class="group-actions" style="font-size: 0.85rem;">
-                                <button onclick="app.toggleGroupSelection('notebooks', true)" style="border:none; background:none; color:var(--accent); cursor:pointer; font-weight:bold;" data-i18n="select_all">تحديد الكل</button> | 
-                                <button onclick="app.toggleGroupSelection('notebooks', false)" style="border:none; background:none; color:var(--danger-color); cursor:pointer;" data-i18n="cancel">إلغاء</button>
+                    <div class="stat-card modal__item-4">
+                        <div class="group-header stat-card__item-57">
+                            <span data-i18n="select_notebooks" class="stat-card__label-17">📁 اختر من الدفاتر</span>
+                            <div class="group-actions stat-card__item-58">
+                                <button onclick="app.toggleGroupSelection('notebooks', true)" data-i18n="select_all" class="stat-card__btn-14">تحديد الكل</button> | 
+                                <button onclick="app.toggleGroupSelection('notebooks', false)" data-i18n="cancel" class="stat-card__btn-1-5">إلغاء</button>
                             </div>
                         </div>
-                        <label for="sel-nb-search" class="sr-only" style="display:none;">البحث في الدفاتر</label>
-                        <input type="text" id="sel-nb-search" class="form-control" placeholder="بحث في الدفاتر..." style="margin-bottom: 10px; height: 35px; font-size: 0.85rem;" oninput="app.state.selectionSearch.notebooks = this.value; app.renderSelectionHub()" data-i18n-placeholder="search_notebooks_placeholder">
-                        <div id="sel-notebooks" class="scrollable-selection-list" style="max-height: 200px;"></div>
+                        <label for="sel-nb-search" class="sr-only stat-card__institution-logo-upload">البحث في الدفاتر</label>
+                        <input type="text" id="sel-nb-search" class="form-control stat-card__sel-nb-search" placeholder="بحث في الدفاتر..." oninput="app.state.selectionSearch.notebooks = this.value; app.renderSelectionHub()" data-i18n-placeholder="search_notebooks_placeholder">
+                        <div id="sel-notebooks" class="scrollable-selection-list stat-card__sel-notebooks"></div>
                     </div>
 
                     <!-- البطاقة 2: الأنواع -->
-                    <div class="stat-card" style="margin:0; padding:20px; border:1px solid var(--border); background: var(--surface-color);">
-                        <div class="group-header" style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
-                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary); display: inline-block;" data-i18n="select_types">📝 اختر حسب النوع</span>
-                            <div class="group-actions" style="font-size: 0.85rem;">
-                                <button onclick="app.toggleGroupSelection('types', true)" style="border:none; background:none; color:var(--accent); cursor:pointer; font-weight:bold;" data-i18n="all">الكل</button> | 
-                                <button onclick="app.toggleGroupSelection('types', false)" style="border:none; background:none; color:var(--danger-color); cursor:pointer;" data-i18n="cancel">إلغاء</button>
+                    <div class="stat-card modal__item-4">
+                        <div class="group-header stat-card__item-57">
+                            <span data-i18n="select_types" class="stat-card__label-17">📝 اختر حسب النوع</span>
+                            <div class="group-actions stat-card__item-58">
+                                <button onclick="app.toggleGroupSelection('types', true)" data-i18n="all" class="stat-card__btn-14">الكل</button> | 
+                                <button onclick="app.toggleGroupSelection('types', false)" data-i18n="cancel" class="stat-card__btn-1-5">إلغاء</button>
                             </div>
                         </div>
-                        <div id="sel-types" class="scrollable-selection-list" style="max-height: 200px;">
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('types', 'mcq')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-type-mcq" style="pointer-events: none;"> <span data-i18n="type_mcq_full">اختيار من متعدد (MCQ)</span>
+                        <div id="sel-types" class="scrollable-selection-list stat-card__sel-notebooks">
+                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'mcq')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-type-mcq" class="stat-card__chk-type-mcq"> <span data-i18n="type_mcq_full">اختيار من متعدد (MCQ)</span>
                             </div>
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('types', 'boolean')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-type-boolean" style="pointer-events: none;"> <span data-i18n="type_boolean_full">صح / خطأ (T/F)</span>
+                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'boolean')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-type-boolean" class="stat-card__chk-type-mcq"> <span data-i18n="type_boolean_full">صح / خطأ (T/F)</span>
                             </div>
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('types', 'match')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-type-match" style="pointer-events: none;"> <span data-i18n="type_match_full">مزاوجة (Match)</span>
+                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'match')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-type-match" class="stat-card__chk-type-mcq"> <span data-i18n="type_match_full">مزاوجة (Match)</span>
                             </div>
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('types', 'written')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-type-written" style="pointer-events: none;"> <span data-i18n="type_written">مقالي</span>
+                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'written')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-type-written" class="stat-card__chk-type-mcq"> <span data-i18n="type_written">مقالي</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- البطاقة 3: الصعوبة -->
-                    <div class="stat-card" style="margin:0; padding:20px; border:1px solid var(--border); background: var(--surface-color);">
-                        <div class="group-header" style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
-                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary); display: inline-block;" data-i18n="all_levels">⚡ مستوى الصعوبة</span>
-                            <div class="group-actions" style="font-size: 0.85rem;">
-                            <button onclick="app.toggleGroupSelection('difficulties', true)" style="border:none; background:none; color:var(--accent); cursor:pointer; font-weight:bold;" data-i18n="all">الكل</button> | 
-                                <button onclick="app.toggleGroupSelection('difficulties', false)" style="border:none; background:none; color:var(--danger-color); cursor:pointer;" data-i18n="cancel">إلغاء</button>
+                    <div class="stat-card modal__item-4">
+                        <div class="group-header stat-card__item-57">
+                            <span data-i18n="all_levels" class="stat-card__label-17">⚡ مستوى الصعوبة</span>
+                            <div class="group-actions stat-card__item-58">
+                            <button onclick="app.toggleGroupSelection('difficulties', true)" data-i18n="all" class="stat-card__btn-14">الكل</button> | 
+                                <button onclick="app.toggleGroupSelection('difficulties', false)" data-i18n="cancel" class="stat-card__btn-1-5">إلغاء</button>
                             </div>
                         </div>
-                        <div id="sel-difficulties" class="scrollable-selection-list" style="max-height: 180px;">
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('difficulties', 'easy')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-diff-easy" style="pointer-events: none;"> <span data-i18n="difficulty_easy">سهل (Easy)</span>
+                        <div id="sel-difficulties" class="scrollable-selection-list stat-card__sel-difficulties">
+                            <div class="selection-item stat-card__item-60" onclick="app.toggleSelectionCriteria('difficulties', 'easy')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-diff-easy" class="stat-card__chk-type-mcq"> <span data-i18n="difficulty_easy">سهل (Easy)</span>
                             </div>
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('difficulties', 'medium')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-diff-medium" style="pointer-events: none;"> <span data-i18n="difficulty_medium">متوسط (Medium)</span>
+                            <div class="selection-item stat-card__item-60" onclick="app.toggleSelectionCriteria('difficulties', 'medium')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-diff-medium" class="stat-card__chk-type-mcq"> <span data-i18n="difficulty_medium">متوسط (Medium)</span>
                             </div>
-                            <div class="selection-item" onclick="app.toggleSelectionCriteria('difficulties', 'hard')" style="padding: 10px; border-radius: 8px; margin-bottom: 5px; cursor: pointer; border: 1px solid var(--border);" role="button" tabindex="0">
-                                <input type="checkbox" id="chk-diff-hard" style="pointer-events: none;"> <span data-i18n="difficulty_hard">صعب (Hard)</span>
+                            <div class="selection-item stat-card__item-60" onclick="app.toggleSelectionCriteria('difficulties', 'hard')" role="button" tabindex="0">
+                                <input type="checkbox" id="chk-diff-hard" class="stat-card__chk-type-mcq"> <span data-i18n="difficulty_hard">صعب (Hard)</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- البطاقة 4: التصنيفات -->
-                    <div class="stat-card" style="margin:0; padding:20px; border:1px solid var(--border); background: var(--surface-color);">
-                        <div class="group-header" style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
-                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary); display: inline-block;" data-i18n="stat_total_categories">📦 التصنيفات</span>
+                    <div class="stat-card modal__item-4">
+                        <div class="group-header stat-card__item-57">
+                            <span data-i18n="stat_total_categories" class="stat-card__label-17">📦 التصنيفات</span>
                         </div>
-                        <label for="sel-cat-search" class="sr-only" style="display:none;">البحث في التصنيفات</label>
-                        <input type="text" id="sel-cat-search" class="form-control" placeholder="بحث في التصنيفات..." data-i18n-placeholder="search_placeholder" style="margin-bottom: 10px; height: 35px; font-size: 0.85rem;" oninput="app.state.selectionSearch.categories = this.value; app.renderSelectionHub()">
-                        <div id="sel-categories" class="scrollable-selection-list" style="max-height: 180px;"></div>
+                        <label for="sel-cat-search" class="sr-only stat-card__institution-logo-upload">البحث في التصنيفات</label>
+                        <input type="text" id="sel-cat-search" class="form-control stat-card__sel-nb-search" placeholder="بحث في التصنيفات..." data-i18n-placeholder="search_placeholder" oninput="app.state.selectionSearch.categories = this.value; app.renderSelectionHub()">
+                        <div id="sel-categories" class="scrollable-selection-list stat-card__sel-difficulties"></div>
                     </div>
 
                     <!-- البطاقة 5: الوسوم (عريض) -->
-                    <div class="stat-card" style="grid-column: 1 / -1; margin:0; padding:20px; border:1px solid var(--border); background: var(--surface-color);">
-                        <div class="group-header" style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
-                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary); display: inline-block;" data-i18n="all_tags">🏷️ الوسوم (Tags)</span>
-                            <button onclick="app.toggleGroupSelection('tags', false)" style="border:none; background:none; color:var(--danger-color); cursor:pointer; font-size:0.85rem;" data-i18n="cancel">إلغاء الكل</button>
+                    <div class="stat-card modal__item-4-1">
+                        <div class="group-header stat-card__item-57">
+                            <span data-i18n="all_tags" class="stat-card__label-17">🏷️ الوسوم (Tags)</span>
+                            <button onclick="app.toggleGroupSelection('tags', false)" data-i18n="cancel" class="stat-card__btn-15">إلغاء الكل</button>
                         </div>
-                        <label for="sel-tag-search" class="sr-only" style="display:none;">البحث في الوسوم</label>
-                        <input type="text" id="sel-tag-search" class="form-control" placeholder="بحث في الوسوم..." style="margin-bottom: 10px; height: 35px; font-size: 0.85rem;" oninput="app.state.selectionSearch.tags = this.value; app.renderSelectionHub()" data-i18n-placeholder="search_placeholder">
-                        <div id="sel-tags" class="scrollable-selection-list" style="max-height: 200px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;"></div>
+                        <label for="sel-tag-search" class="sr-only stat-card__institution-logo-upload">البحث في الوسوم</label>
+                        <input type="text" id="sel-tag-search" class="form-control stat-card__sel-nb-search" placeholder="بحث في الوسوم..." oninput="app.state.selectionSearch.tags = this.value; app.renderSelectionHub()" data-i18n-placeholder="search_placeholder">
+                        <div id="sel-tags" class="scrollable-selection-list stat-card__sel-tags"></div>
                     </div>
                 </div>
 
                 <!-- Presets Section -->
-                <div style="margin-top: 30px; padding: 20px; background: var(--surface-color); border-radius: 15px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <span style="font-weight: bold; font-size: 1.1rem;" data-i18n="presets_title">📋 قوالبك الجاهزة (Presets)</span>
-                        <button class="btn btn-sm btn-success" onclick="app.saveSelectionPreset()" style="background: var(--success-color); color: white; font-weight: bold; padding: 8px 15px;" data-i18n="save_settings">💾 حفظ الإعدادات الحالية</button>
+                <div class="modal__item-3-1">
+                    <div class="stat-card__item-2">
+                        <span data-i18n="presets_title" class="modal__label-1">📋 قوالبك الجاهزة (Presets)</span>
+                        <button class="btn btn-sm btn-success modal__btn-1" onclick="app.saveSelectionPreset()" data-i18n="save_settings">💾 حفظ الإعدادات الحالية</button>
                     </div>
-                    <div id="sel-presets" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div id="sel-presets" class="modal__sel-presets">
                         <!-- سيتم التوليد هنا بواسطة JS -->
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer" style="display: flex; gap: 20px; justify-content: space-between; padding: 25px; background: var(--bg-main); border-top: 2px solid var(--border);">
+            <div class="modal-footer modal__item-2-1">
                 <div>
-                    <button class="btn btn-info" onclick="app.applyCriteriaToSelection()" style="background: #17a2b8; color: white; border: none; font-weight: bold; height: 50px; padding: 0 25px; border-radius: 10px;" data-i18n="apply_to_main">
+                    <button class="btn btn-info modal__btn-2" onclick="app.applyCriteriaToSelection()" data-i18n="apply_to_main">
                         🎯 حدد هذه الأسئلة في القائمة الرئيسية
                     </button>
                 </div>
-                <div style="display: flex; gap: 15px;">
-                    <button class="btn btn-secondary" onclick="app.resetSelectionCriteria()" style="background: #6c757d; border: none; font-weight: bold; border-radius: 10px; padding: 0 20px;" data-i18n="clear_all">🧹 مسح الكل</button>
-                    <button class="btn btn-primary" onclick="app.bridgeToExam('smart'); app.closeModal('selection-modal')" style="padding: 0 60px; font-weight: 900; background: var(--primary); border: none; font-size: 1.2rem; border-radius: 10px; height: 55px; box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);" data-i18n="confirm_start">✅ اعتماد البدء</button>
+                <div class="modal__item-1-2">
+                    <button class="btn btn-secondary modal__btn-3" onclick="app.resetSelectionCriteria()" data-i18n="clear_all">🧹 مسح الكل</button>
+                    <button class="btn btn-primary modal__btn-1-1" onclick="app.bridgeToExam('smart'); app.closeModal('selection-modal')" data-i18n="confirm_start">✅ اعتماد البدء</button>
                 </div>
             </div>
         </div>
@@ -1211,13 +1342,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="notebook_details">تفاصيل الدفتر</h3>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal">×</button>
             </div>
             <form id="notebook-form">
                 <input type="hidden" id="notebook-id">
                 <div class="form-group">
                     <label for="notebook-name" data-i18n="notebook_name_label">اسم الدفتر</label>
-                    <input type="text" id="notebook-name" class="form-control" required placeholder="مثال: رمد، جراحة..." data-i18n-placeholder="notebook_name_placeholder">
+                    <input type="text" id="notebook-name" class="form-control" required="" placeholder="مثال: رمد، جراحة..." data-i18n-placeholder="notebook_name_placeholder">
                 </div>
                 <div class="form-group">
                     <label for="notebook-desc" data-i18n="notebook_desc_label">الوصف (اختياري)</label>
@@ -1225,7 +1356,7 @@
                 </div>
                 <div class="form-group">
                     <label for="notebook-color" data-i18n="notebook_color_label">لون الدفتر</label>
-                    <input type="color" id="notebook-color" class="form-control" value="#4361ee" style="height: 40px; padding: 2px;">
+                    <input type="color" id="notebook-color" class="form-control modal__notebook-color" value="#4361ee">
                 </div>
                 <div class="form-group">
                     <label for="notebook-parent" data-i18n="nb_parent">الدفتر الأب (اختياري)</label>
@@ -1237,42 +1368,43 @@
                     <label for="notebook-target-count" data-i18n="notebook_target_count_label">عدد الأسئلة المستهدف (اختياري)</label>
                     <input type="number" id="notebook-target-count" class="form-control" placeholder="مثال: 500" min="0">
                 </div>
-                <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" data-i18n="save_notebook">حفظ الدفتر</button>
+                <button type="submit" class="btn modal__btn-4" data-i18n="save_notebook">حفظ الدفتر</button>
             </form>
         </div>
     </div>
 
     <!-- Add/Edit Question Modal -->
     <div class="modal-overlay" id="question-modal">
-        <div class="modal-content" style="width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content layout__item-12">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="question_details">تفاصيل السؤال</h3>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal">×</button>
             </div>
             <form id="question-form">
                 <input type="hidden" id="question-id">
                 
-                <div class="smart-fill-container" style="margin-bottom: 20px; padding: 15px; background: rgba(67, 97, 238, 0.05); border: 1.5px dashed var(--primary); border-radius: var(--radius-lg); transition: var(--transition);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="const b = document.getElementById('smart-fill-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-                        <span style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px;" data-i18n="smart_fill">
-                            <span style="font-size: 1.2rem;">⚡</span> ملء تلقائي ذكي (JSON / CSV)
+                <div class="smart-fill-container modal__item-5">
+                    <div onclick="const b = document.getElementById('smart-fill-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';" class="modal__item-6">
+                        <span data-i18n="smart_fill" class="modal__label-2">
+                            <span class="modal__label">⚡</span> ملء تلقائي ذكي (JSON / CSV)
                         </span>
-                        <span style="color: var(--primary); font-size: 0.8rem; opacity: 0.8;">▼</span>
+                        <span class="modal__label-1-1">▼</span>
                     </div>
-                    <div id="smart-fill-body" style="display: none; margin-top: 15px;">
-                        <textarea id="single-q-smart-fill" class="form-control" rows="3" placeholder="لصق كود JSON لسؤال واحد هنا...&#10;مثال: { &quot;question&quot;: &quot;السؤال؟&quot;, &quot;type&quot;: &quot;mcq&quot;, ... }" style="font-family: monospace; font-size: 0.85rem; border: 1px solid rgba(67, 97, 238, 0.3); background: var(--bg-main);" data-i18n-placeholder="smart_fill_placeholder"></textarea>
-                        <button type="button" class="btn btn-sm" onclick="app.smartFillSingleQuestion()" style="margin-top: 10px; width: 100%; justify-content: center; background: var(--primary); color: white; font-weight: 600; border: none; height: 40px;" data-i18n="smart_fill_btn">استخراج وتعبئة البيانات 🚀</button>
+                    <div id="smart-fill-body" class="modal__smart-fill-body">
+                        <textarea id="single-q-smart-fill" class="form-control modal__single-q-smart-fill" rows="3" placeholder="لصق كود JSON لسؤال واحد هنا...
+مثال: { &quot;question&quot;: &quot;السؤال؟&quot;, &quot;type&quot;: &quot;mcq&quot;, ... }" data-i18n-placeholder="smart_fill_placeholder"></textarea>
+                        <button type="button" class="btn btn-sm modal__btn-5" onclick="app.smartFillSingleQuestion()" data-i18n="smart_fill_btn">استخراج وتعبئة البيانات 🚀</button>
                     </div>
                 </div>
                 
-                <div class="flex-between" style="gap: 10px;">
-                    <div class="form-group" style="flex: 1;">
+                <div class="flex-between stat-card__item-1-20">
+                    <div class="form-group modal__item-7">
                         <label for="question-notebook" data-i18n="notebook_label">الدفتر</label>
-                        <select id="question-notebook" class="form-control" required></select>
+                        <select id="question-notebook" class="form-control" required=""></select>
                     </div>
-                    <div class="form-group" style="flex: 1;">
+                    <div class="form-group modal__item-7">
                         <label for="question-type" data-i18n="qtype_select_label">نوع السؤال</label>
-                        <select id="question-type" class="form-control" required>
+                        <select id="question-type" class="form-control" required="">
                             <option value="mcq" data-i18n="qtype_mcq">اختيار من متعدد (MCQ)</option>
                             <option value="boolean" data-i18n="qtype_tf">صح / خطأ (Boolean)</option>
                             <option value="match" data-i18n="qtype_match">مزاوجة (Match)</option>
@@ -1283,34 +1415,34 @@
 
                 <div class="form-group">
                     <label for="question-text" data-i18n="question_text_label">نص السؤال</label>
-                    <textarea id="question-text" class="form-control" rows="3" required></textarea>
+                    <textarea id="question-text" class="form-control" rows="3" required=""></textarea>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 15px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px;">
-                    <label style="display:block; margin-bottom:5px;" data-i18n="image_upload_label">صورة توضيحية (اختياري - سيتم ضغطها تلقائياً)</label>
-                    <input type="file" id="question-image-upload" class="form-control" accept="image/png, image/jpeg, image/webp" style="margin-bottom:10px;">
+                <div class="form-group modal__item-3-2">
+                    <label data-i18n="image_upload_label" class="modal__item-8">صورة توضيحية (اختياري - سيتم ضغطها تلقائياً)</label>
+                    <input type="file" id="question-image-upload" class="form-control stat-card__institution-name" accept="image/png, image/jpeg, image/webp">
                     <input type="hidden" id="question-image-base64">
-                    <img id="question-image-preview" style="max-width:100%; max-height:200px; display:none; border-radius:8px; border:1px solid var(--border-color); margin-bottom:5px;">
-                    <button type="button" id="btn-remove-image" class="btn btn-danger btn-sm" style="display:none;" onclick="app.removeImage()" data-i18n="remove_image">إزالة الصورة</button>
+                    <img id="question-image-preview" class="modal__question-image-preview">
+                    <button type="button" id="btn-remove-image" class="btn btn-danger btn-sm stat-card__institution-logo-upload" onclick="app.removeImage()" data-i18n="remove_image">إزالة الصورة</button>
                 </div>
 
                 <!-- Dynamic Fields Container -->
-                <div id="dynamic-fields-container" style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border-color);">
+                <div id="dynamic-fields-container" class="modal__dynamic-fields-container">
                     <!-- Populated by JS -->
                 </div>
 
-                <div class="flex-between" style="gap: 10px;">
-                    <div class="form-group" style="flex: 1;">
+                <div class="flex-between stat-card__item-1-20">
+                    <div class="form-group modal__item-7">
                         <label for="question-difficulty" data-i18n="difficulty_label">الصعوبة</label>
-                        <select id="question-difficulty" class="form-control" required>
+                        <select id="question-difficulty" class="form-control" required="">
                             <option value="easy">سهل (Easy)</option>
                             <option value="medium">متوسط (Medium)</option>
                             <option value="hard">صعب (Hard)</option>
                         </select>
                     </div>
-                    <div class="form-group" style="flex: 1;">
+                    <div class="form-group modal__item-7">
                         <label for="question-category" data-i18n="category_label">التصنيف (Category)</label>
-                        <input type="text" id="question-category" class="form-control" placeholder="مثال: جغرافيا، علوم..." required>
+                        <input type="text" id="question-category" class="form-control" placeholder="مثال: جغرافيا، علوم..." required="">
                     </div>
                 </div>
 
@@ -1320,28 +1452,39 @@
                     <datalist id="tags-list"></datalist>
                 </div>
 
+                <div class="flex-between stat-card__item-1-20">
+                    <div class="form-group modal__item-7">
+                        <label for="question-reference-book" data-i18n="reference_book_label">كتاب المرجع (Reference Book)</label>
+                        <input type="text" id="question-reference-book" class="form-control" placeholder="اسم الكتاب المرجعي">
+                    </div>
+                    <div class="form-group modal__item-7">
+                        <label for="question-reference-page" data-i18n="reference_page_label">رقم الصفحة (Page Number)</label>
+                        <input type="text" id="question-reference-page" class="form-control" placeholder="رقم الصفحة">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="question-explain" data-i18n="explain_label">شرح الإجابة (Explain)</label>
                     <textarea id="question-explain" class="form-control" rows="2" placeholder="شرح يظهر للطالب بعد الإجابة"></textarea>
                 </div>
 
-                <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" data-i18n="save_question">حفظ السؤال</button>
-                <p style="text-align:center; font-size:0.8rem; color:var(--text-secondary); margin-top:10px;" data-i18n="auto_save_msg">يتم حفظ المسودة تلقائياً (Auto-save) أثناء الكتابة.</p>
+                <button type="submit" class="btn modal__btn-4" data-i18n="save_question">حفظ السؤال</button>
+                <p data-i18n="auto_save_msg" class="modal__text">يتم حفظ المسودة تلقائياً (Auto-save) أثناء الكتابة.</p>
             </form>
         </div>
     </div>
 
     <!-- AI Prompt Modal -->
     <div class="modal-overlay" id="ai-prompt-modal">
-        <div class="modal-content" style="width: 95%; max-width: 680px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content layout__item-13">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="ai_assistant_title">🤖 مساعد الذكاء الاصطناعي</h3>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal">×</button>
             </div>
-            <p style="color:var(--text-secondary); margin-bottom:15px; line-height:1.6;" data-i18n="ai_instructions">خصّص البرومبت أدناه ثم انسخه وأرسله لأي نموذج ذكاء اصطناعي (ChatGPT، Gemini، Claude...) للحصول على أسئلة جاهزة للاستيراد مباشرة.</p>
+            <p data-i18n="ai_instructions" class="modal__text-1">خصّص البرومبت أدناه ثم انسخه وأرسله لأي نموذج ذكاء اصطناعي (ChatGPT، Gemini، Claude...) للحصول على أسئلة جاهزة للاستيراد مباشرة.</p>
             
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                <div class="form-group" style="margin:0; grid-column: span 2;">
+            <div class="modal__item-1-3">
+                <div class="form-group modal__item-9">
                     <label data-i18n="lbl_task_type">نوع المهمة الكبرى</label>
                     <select id="ai-task-type" class="form-control" onchange="app.regeneratePrompt()">
                         <option value="scratch" data-i18n="opt_task_scratch">توليد أسئلة جديدة من الصفر 🎯</option>
@@ -1351,11 +1494,11 @@
                         <option value="clinical_case" data-i18n="opt_task_clinical_case">توليد سيناريوهات حالات إكلينيكية معقدة 🩺</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin:0;">
+                <div class="form-group stat-card__title-5">
                     <label data-i18n="topic_label">الموضوع / المادة</label>
                     <input type="text" id="ai-topic" class="form-control" value="التاريخ الإسلامي" oninput="app.regeneratePrompt()">
                 </div>
-                <div class="form-group" style="margin:0;">
+                <div class="form-group stat-card__title-5">
                     <label>مستوى الصعوبة</label>
                     <select id="ai-difficulty" class="form-control" onchange="app.regeneratePrompt()">
                         <option value="متنوع">متنوع</option>
@@ -1364,50 +1507,50 @@
                         <option value="صعب">صعب</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin:0;">
+                <div class="form-group stat-card__title-5">
                     <label data-i18n="language_label">اللغة</label>
                     <select id="ai-lang" class="form-control" onchange="app.regeneratePrompt()">
-                        <option value="الإنجليزية" selected>الإنجليزية</option>
+                        <option value="الإنجليزية" selected="">الإنجليزية</option>
                         <option value="العربية">العربية</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin:0; grid-column: span 2;">
+                <div class="form-group modal__item-9">
                     <label data-i18n="target_audience_label">الفئة المستهدفة / المستوى الدراسي</label>
                     <input type="text" id="ai-level" class="form-control" value="طلاب الجامعات" placeholder="مثال: طلاب الابتدائية، محترفين..." oninput="app.regeneratePrompt()">
                 </div>
             </div>
 
-            <div class="form-group" style="margin-bottom: 20px;">
+            <div class="form-group stat-card__item-14">
                 <label data-i18n="count_by_type_label">تحديد عدد الأسئلة لكل نوع:</label>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; background:var(--bg-main); padding:15px; border-radius:12px; border:1.5px solid #000;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.9rem; flex:1;">اختيار من متعدد (MCQ)</span>
-                        <input type="number" id="ai-count-mcq" class="form-control" value="5" min="0" style="width:70px; padding:4px 8px;" oninput="app.regeneratePrompt()">
+                <div class="modal__item-10">
+                    <div class="sidebar__item">
+                        <span class="modal__label-3">اختيار من متعدد (MCQ)</span>
+                        <input type="number" id="ai-count-mcq" class="form-control modal__ai-count-mcq" value="5" min="0" oninput="app.regeneratePrompt()">
                     </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.9rem; flex:1;">صح / خطأ (Boolean)</span>
-                        <input type="number" id="ai-count-boolean" class="form-control" value="2" min="0" style="width:70px; padding:4px 8px;" oninput="app.regeneratePrompt()">
+                    <div class="sidebar__item">
+                        <span class="modal__label-3">صح / خطأ (Boolean)</span>
+                        <input type="number" id="ai-count-boolean" class="form-control modal__ai-count-mcq" value="2" min="0" oninput="app.regeneratePrompt()">
                     </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.9rem; flex:1;">مزاوجة (Match)</span>
-                        <input type="number" id="ai-count-match" class="form-control" value="1" min="0" style="width:70px; padding:4px 8px;" oninput="app.regeneratePrompt()">
+                    <div class="sidebar__item">
+                        <span class="modal__label-3">مزاوجة (Match)</span>
+                        <input type="number" id="ai-count-match" class="form-control modal__ai-count-mcq" value="1" min="0" oninput="app.regeneratePrompt()">
                     </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.9rem; flex:1;">مقالي (Written)</span>
-                        <input type="number" id="ai-count-written" class="form-control" value="2" min="0" style="width:70px; padding:4px 8px;" oninput="app.regeneratePrompt()">
+                    <div class="sidebar__item">
+                        <span class="modal__label-3">مقالي (Written)</span>
+                        <input type="number" id="ai-count-written" class="form-control modal__ai-count-mcq" value="2" min="0" oninput="app.regeneratePrompt()">
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
                 <label data-i18n="ready_prompt_label">البرومبت الجاهز للنسخ:</label>
-                <textarea id="ai-prompt-text" class="form-control" rows="18" style="font-size:0.82rem; font-family:monospace; direction:ltr; text-align:left;"></textarea>
+                <textarea id="ai-prompt-text" class="form-control modal__ai-prompt-text" rows="18"></textarea>
             </div>
 
-            <button class="btn" onclick="app.copyAiPrompt()" style="width:100%; justify-content:center; padding:14px; font-size:1rem; background:linear-gradient(135deg,#4361ee,#7209b7);" data-i18n="ai_btn">
+            <button class="btn modal__btn-6" onclick="app.copyAiPrompt()" data-i18n="ai_btn">
                 <span data-i18n="copy_prompt_btn">📋 نسخ البرومبت بالكامل</span>
             </button>
-            <p style="text-align:center; font-size:0.8rem; color:var(--text-secondary); margin-top:10px;" data-i18n="after_ai_msg">بعد الحصول على الأسئلة من الـ AI، الصق النتيجة في قسم الاستيراد في الإعدادات.</p>
+            <p data-i18n="after_ai_msg" class="modal__text">بعد الحصول على الأسئلة من الـ AI، الصق النتيجة في قسم الاستيراد في الإعدادات.</p>
         </div>
     </div>
 
@@ -1416,11 +1559,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="pdf_export_title">تصدير كـ PDF (الطباعة)</h3>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal">×</button>
             </div>
             <div class="form-group">
                 <label for="print-notebook" data-i18n="select_print_notebook">اختر الدفتر للطباعة</label>
-                <select id="print-notebook" class="form-control" required data-i18n="all_notebooks"></select>
+                <select id="print-notebook" class="form-control" required="" data-i18n="all_notebooks"></select>
             </div>
             <div class="form-group">
                 <label for="print-direction" data-i18n="text_direction">اتجاه النص</label>
@@ -1431,28 +1574,32 @@
             </div>
             <div class="form-group">
                 <label for="print-mode" data-i18n="paper_type">نوع الورقة</label>
-                <select id="print-mode" class="form-control" required>
+                <select id="print-mode" class="form-control" required="">
                     <option value="questions-only" data-i18n="pdf_layout_qs">أسئلة فقط (امتحان)</option>
                     <option value="with-answers" data-i18n="pdf_layout_ans">أسئلة + إجابات (مذاكرة)</option>
                     <option value="exam-annex" data-i18n="pdf_layout_annex">أسئلة مع ملحق إجابات</option>
                 </select>
             </div>
-            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:15px; line-height: 1.5;" data-i18n="print_hint">سيتم فتح نافذة الطباعة الافتراضية. اختر "Save as PDF" أو "حفظ بتنسيق PDF" من قائمة الطابعات للاحتفاظ بالملف.</p>
-            <button class="btn" onclick="app.executePrint()" style="width: 100%; justify-content: center;" data-i18n="print_btn">تجهيز وطباعة المذكرة</button>
+            <div class="form-group modal__item-4-2">
+                <input type="checkbox" id="toggle-show-references" class="modal__toggle-show-references">
+                <label for="toggle-show-references" data-i18n="toggle_show_references" class="modal__item-11">إظهار المراجع الطبية الموثقة في ورقة الأسئلة</label>
+            </div>
+            <p data-i18n="print_hint" class="modal__text-2">سيتم فتح نافذة الطباعة الافتراضية. اختر "Save as PDF" أو "حفظ بتنسيق PDF" من قائمة الطابعات للاحتفاظ بالملف.</p>
+            <button class="btn modal__btn-7" onclick="app.executePrint()" data-i18n="print_btn">تجهيز وطباعة المذكرة</button>
         </div>
     </div>
 
     <!-- Duplicate Alert Modal -->
-    <div class="modal-overlay" id="duplicate-modal" style="z-index: 200;">
-        <div class="modal-content" style="border-top: 4px solid var(--danger-color);">
+    <div class="modal-overlay layout__duplicate-modal" id="duplicate-modal">
+        <div class="modal-content layout__item-14">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="duplicate_warning">⚠️ تحذير: سؤال مكرر</h3>
-                <button class="close-modal" onclick="document.getElementById('duplicate-modal').classList.remove('active')">&times;</button>
+                <button class="close-modal" onclick="document.getElementById('duplicate-modal').classList.remove('active')">×</button>
             </div>
-            <p id="duplicate-msg" style="margin-bottom: 20px; line-height: 1.5;"></p>
-            <div style="display:flex; gap:10px;">
-                <button class="btn" id="btn-force-save" style="flex:1;" data-i18n="save_anyway">حفظ على أي حال</button>
-                <button class="btn btn-danger" onclick="document.getElementById('duplicate-modal').classList.remove('active')" style="flex:1;" data-i18n="cancel_save">إلغاء المتابعة</button>
+            <p id="duplicate-msg" class="modal__duplicate-msg"></p>
+            <div class="layout__item-1-2">
+                <button class="btn modal__btn-force-save" id="btn-force-save" data-i18n="save_anyway">حفظ على أي حال</button>
+                <button class="btn btn-danger modal__btn-force-save" onclick="document.getElementById('duplicate-modal').classList.remove('active')" data-i18n="cancel_save">إلغاء المتابعة</button>
             </div>
         </div>
     </div>
@@ -1461,26 +1608,26 @@
     <div id="print-container"></div>
 
     <!-- Floating Undo/Redo -->
-    <div style="position:fixed; bottom:20px; left:20px; display:flex; gap:10px; z-index:100;">
-        <button id="btn-undo" class="btn" style="background:var(--surface-color); color:var(--text-primary); border:1px solid var(--border-color); box-shadow:var(--shadow); display:none;" onclick="app.undo()" title="تراجع" data-i18n-title="msg_undo" data-i18n="undo">↩️ تراجع</button>
-        <button id="btn-redo" class="btn" style="background:var(--surface-color); color:var(--text-primary); border:1px solid var(--border-color); box-shadow:var(--shadow); display:none;" onclick="app.redo()" title="إعادة" data-i18n-title="msg_redo" data-i18n="redo">↪️ إعادة</button>
+    <div class="layout__item-9-1">
+        <button id="btn-undo" class="btn layout__btn-undo" onclick="app.undo()" title="تراجع" data-i18n-title="msg_undo" data-i18n="undo">↩️ تراجع</button>
+        <button id="btn-redo" class="btn layout__btn-undo" onclick="app.redo()" title="إعادة" data-i18n-title="msg_redo" data-i18n="redo">↪️ إعادة</button>
     </div>
 
     <!-- Project Report / About Modal -->
     <div class="modal-overlay" id="project-report-modal">
-        <div class="modal-content" style="width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content layout__item-15">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="project_report_title">📄 تقرير المشروع والتعريف بالنظام</h3>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal">×</button>
             </div>
             
-            <div id="project-report-content" style="line-height:1.8; color:var(--text-body);">
+            <div id="project-report-content" class="modal__project-report-content">
                 <!-- ARABIC CONTENT -->
                 <div id="report-ar" class="lang-section ar" dir="rtl">
-                    <div style="text-align:center; margin-bottom:25px; padding:20px; background:var(--bg-main); border-radius:12px; border:1.5px solid #000;">
-                        <h1 style="color:var(--primary); margin-bottom:10px;">QBank - نظام إدارة بنوك الأسئلة المتطور (v16.6.1)</h1>
-                        <div style="background: var(--primary); color: white; display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px;">الإصدار 16.6.1</div>
-                        <p style="font-weight:600;">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
+                    <div class="modal__item-12">
+                        <h1 class="modal__title">QBank - نظام إدارة بنوك الأسئلة المتطور (v16.6.1)</h1>
+                        <div class="modal__item-13">الإصدار 16.6.1</div>
+                        <p class="modal__text-3">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
                     </div>
 
                     <h3>🚀 مقدمة</h3>
@@ -1500,7 +1647,7 @@
 
                     <h3>🛠️ التقنيات المستخدمة</h3>
                     <ul>
-                        <li><strong>HTML5 & CSS3:</strong> تصميم عصري (Bento Grid) مع دعم كامل للوضع الليلي (Dark Mode).</li>
+                        <li><strong>HTML5 &amp; CSS3:</strong> تصميم عصري (Bento Grid) مع دعم كامل للوضع الليلي (Dark Mode).</li>
                         <li><strong>JavaScript (Vanilla):</strong> منطق برمجي قوي بدون مكتبات خارجية لضمان السرعة.</li>
                         <li><strong>IndexedDB:</strong> قاعدة بيانات محلية داخل المتصفح بسعة تخزين كبيرة.</li>
                         <li><strong>Responsive Design:</strong> واجهة متجاوبة تماماً مع الهواتف والأجهزة اللوحية.</li>
@@ -1555,27 +1702,27 @@
                         </ul>
                     </div>
 
-                    <div id="changelog-container" style="margin-top:40px; border-top:3px solid var(--primary); padding:30px; background: var(--bg-main); border-radius: 16px; border: 1.5px solid var(--border); box-shadow: var(--shadow-sm);">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">📜</div>
-                                <h3 style="margin:0; font-size: 1.4rem;">سجل التغييرات (CHANGELOG)</h3>
+                    <div id="changelog-container" class="modal__changelog-container">
+                        <div class="modal__item-14">
+                            <div class="stat-card__item-43">
+                                <div class="modal__item-15">📜</div>
+                                <h3 class="modal__title-1">سجل التغييرات (CHANGELOG)</h3>
                             </div>
-                            <span style="font-size:0.75rem; background:rgba(67, 97, 238, 0.1); color:var(--primary); padding:6px 14px; border-radius:20px; font-weight: 700; border: 1px solid var(--primary);">تحديث تلقائي من النظام</span>
+                            <span class="modal__label-4">تحديث تلقائي من النظام</span>
                         </div>
-                        <div id="changelog-content" style="background:var(--card-bg); padding:25px; border-radius:12px; font-size:0.95rem; line-height:1.8; max-height:500px; overflow-y:auto; border:1.5px solid var(--border); font-family: 'Inter', system-ui, -apple-system, sans-serif; color:var(--text-primary); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
+                        <div id="changelog-content" class="modal__changelog-content">
                             جاري تحميل سجل التغييرات من الملف... ⏳
                         </div>
-                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:15px; text-align:center; font-style: italic;">يتم استيراد هذه البيانات ديناميكياً من ملف <code>CHANGELOG.md</code> لضمان الحداثة.</p>
+                        <p class="modal__text-4">يتم استيراد هذه البيانات ديناميكياً من ملف <code>CHANGELOG.md</code> لضمان الحداثة.</p>
                     </div>
                 </div>
 
                 <!-- ENGLISH CONTENT -->
-                <div id="report-en" class="lang-section en" dir="ltr" style="display:none;">
-                    <div style="text-align:center; margin-bottom:25px; padding:20px; background:var(--bg-main); border-radius:12px; border:1.5px solid #000;">
-                        <h1 style="color:var(--primary); margin-bottom:10px;">QBank - Advanced Question Bank Manager (V16.6.1)</h1>
-                        <div style="background: var(--primary); color: white; display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px;">Version 16.6.1</div>
-                        <p style="font-weight:600;">A complete system for managing questions, quizzes, and professional exports. Designed for students and lecturers to ensure the best educational and organizational experience.</p>
+                <div id="report-en" class="lang-section en stat-card__institution-logo-upload" dir="ltr">
+                    <div class="modal__item-12">
+                        <h1 class="modal__title">QBank - Advanced Question Bank Manager (V16.6.1)</h1>
+                        <div class="modal__item-13">Version 16.6.1</div>
+                        <p class="modal__text-3">A complete system for managing questions, quizzes, and professional exports. Designed for students and lecturers to ensure the best educational and organizational experience.</p>
                     </div>
 
                     <h3>🚀 Introduction</h3>
@@ -1595,7 +1742,7 @@
 
                     <h3>🛠️ Technologies Used</h3>
                     <ul>
-                        <li><strong>HTML5 & CSS3:</strong> Modern design (Bento Grid) with full Dark Mode support.</li>
+                        <li><strong>HTML5 &amp; CSS3:</strong> Modern design (Bento Grid) with full Dark Mode support.</li>
                         <li><strong>JavaScript (Vanilla):</strong> Strong logic without external libraries to ensure speed.</li>
                         <li><strong>IndexedDB:</strong> In-browser local database with large storage capacity.</li>
                         <li><strong>Responsive Design:</strong> Fully responsive interface for phones and tablets.</li>
@@ -1649,45 +1796,45 @@
                         </ul>
                     </div>
 
-                    <div id="changelog-container-en" style="margin-top:40px; border-top:3px solid var(--primary); padding:30px; background: var(--bg-main); border-radius: 16px; border: 1.5px solid var(--border); box-shadow: var(--shadow-sm);">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">📜</div>
-                                <h3 style="margin:0; font-size: 1.4rem;">Changelog</h3>
+                    <div id="changelog-container-en" class="modal__changelog-container">
+                        <div class="modal__item-14">
+                            <div class="stat-card__item-43">
+                                <div class="modal__item-15">📜</div>
+                                <h3 class="modal__title-1">Changelog</h3>
                             </div>
-                            <span style="font-size:0.75rem; background:rgba(67, 97, 238, 0.1); color:var(--primary); padding:6px 14px; border-radius:20px; font-weight: 700; border: 1px solid var(--primary);">System Auto-update</span>
+                            <span class="modal__label-4">System Auto-update</span>
                         </div>
-                        <div id="changelog-content-en" style="background:var(--card-bg); padding:25px; border-radius:12px; font-size:0.95rem; line-height:1.8; max-height:500px; overflow-y:auto; border:1.5px solid var(--border); font-family: 'Inter', system-ui, -apple-system, sans-serif; color:var(--text-primary); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
+                        <div id="changelog-content-en" class="modal__changelog-content">
                             Loading changelog from file... ⏳
                         </div>
-                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:15px; text-align:center; font-style: italic;">This data is dynamically imported from <code>CHANGELOG.md</code> to ensure accuracy.</p>
+                        <p class="modal__text-4">This data is dynamically imported from <code>CHANGELOG.md</code> to ensure accuracy.</p>
                     </div>
                 </div>
             </div>
 
-            <div style="margin-top:25px; display:flex; gap:10px;">
-                <button class="btn" onclick="app.copyProjectReport()" style="flex:1; justify-content:center;" data-i18n="copy_report">📋 نسخ التقرير للنص</button>
-                <button class="btn" onclick="app.closeModal('project-report-modal')" style="flex:1; justify-content:center; background:var(--text-secondary);" data-i18n="close">إغلاق</button>
+            <div class="modal__item-2-2">
+                <button class="btn stat-card__btn-8" onclick="app.copyProjectReport()" data-i18n="copy_report">📋 نسخ التقرير للنص</button>
+                <button class="btn modal__btn-1-2" onclick="app.closeModal('project-report-modal')" data-i18n="close">إغلاق</button>
             </div>
         </div>
     </div>
 
     <div id="tag-normalizer-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content layout__item-16">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="tag_normalizer_title">🏷️ تنظيف وتحسين الوسوم</h3>
-                <button class="close-modal" onclick="app.closeModal('tag-normalizer-modal')">&times;</button>
+                <button class="close-modal" onclick="app.closeModal('tag-normalizer-modal')">×</button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-body);" data-i18n="tag_normalizer_desc">
+                <p data-i18n="tag_normalizer_desc" class="modal__text-5">
                     <span data-i18n="tag_normalizer_desc">يقوم هذا المحرك باكتشاف الوسوم المتشابهة (مثل "كيمياء" و "كيميا") واقتراح دمجها لتجنب التكرار.</span>
                 </p>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <button class="btn btn-sm" onclick="app.toggleAllNormalizer('tag-normalizer-modal', true)" style="flex:1;" data-i18n="select_all">تحديد الكل</button>
-                    <button class="btn btn-sm btn-secondary" onclick="app.toggleAllNormalizer('tag-normalizer-modal', false)" style="flex:1;" data-i18n="deselect_all">إلغاء التحديد</button>
+                <div class="modal__item-16">
+                    <button class="btn btn-sm modal__btn-force-save" onclick="app.toggleAllNormalizer('tag-normalizer-modal', true)" data-i18n="select_all">تحديد الكل</button>
+                    <button class="btn btn-sm btn-secondary modal__btn-force-save" onclick="app.toggleAllNormalizer('tag-normalizer-modal', false)" data-i18n="deselect_all">إلغاء التحديد</button>
                 </div>
-                <div id="tag-suggestions-container" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);" data-i18n="norm_analyzing">جاري تحليل الوسوم... ⏳</div>
+                <div id="tag-suggestions-container" class="modal__tag-suggestions-container">
+                    <div data-i18n="norm_analyzing" class="modal__item-17">جاري تحليل الوسوم... ⏳</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1699,21 +1846,21 @@
     
     <!-- Category Normalizer Modal -->
     <div id="category-normalizer-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content layout__item-16">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="cat_normalizer_title">📂 تنظيف وتحسين التصنيفات</h3>
-                <button class="close-modal" onclick="app.closeModal('category-normalizer-modal')">&times;</button>
+                <button class="close-modal" onclick="app.closeModal('category-normalizer-modal')">×</button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-body);" data-i18n="cat_normalizer_desc">
+                <p data-i18n="cat_normalizer_desc" class="modal__text-5">
                     <span data-i18n="cat_normalizer_desc">دمج التصنيفات المتشابهة لضمان دقة التنظيم (مثلاً: "جراحة" و "جراحه").</span>
                 </p>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <button class="btn btn-sm" onclick="app.toggleAllNormalizer('category-normalizer-modal', true)" style="flex:1;" data-i18n="select_all">تحديد الكل</button>
-                    <button class="btn btn-sm btn-secondary" onclick="app.toggleAllNormalizer('category-normalizer-modal', false)" style="flex:1;" data-i18n="deselect_all">إلغاء التحديد</button>
+                <div class="modal__item-16">
+                    <button class="btn btn-sm modal__btn-force-save" onclick="app.toggleAllNormalizer('category-normalizer-modal', true)" data-i18n="select_all">تحديد الكل</button>
+                    <button class="btn btn-sm btn-secondary modal__btn-force-save" onclick="app.toggleAllNormalizer('category-normalizer-modal', false)" data-i18n="deselect_all">إلغاء التحديد</button>
                 </div>
-                <div id="category-suggestions-container" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);" data-i18n="norm_analyzing">جاري تحليل التصنيفات... ⏳</div>
+                <div id="category-suggestions-container" class="modal__tag-suggestions-container">
+                    <div data-i18n="norm_analyzing" class="modal__item-17">جاري تحليل التصنيفات... ⏳</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1736,16 +1883,16 @@
         <div class="filter-drawer-handle"></div>
         <div class="filter-drawer-title" data-i18n="filter_title">🔍 فلاتر البحث</div>
         <div class="filter-drawer-grid">
-            <div style="grid-column: span 2;">
-                <label style="font-size:0.82rem; font-weight:600; color:var(--text-body); margin-bottom:4px; display:block;" data-i18n="filter_search">البحث</label>
+            <div class="layout__item-17">
+                <label data-i18n="filter_search" class="layout__item-18">البحث</label>
                 <input type="text" id="filter-search-drawer" class="form-control" placeholder="ابحث هنا..." oninput="const fs=document.getElementById('filter-search'); if(fs){fs.value=this.value; fs.dispatchEvent(new Event('input'));}">
             </div>
             <div>
-                <label style="font-size:0.82rem; font-weight:600; color:var(--text-body); margin-bottom:4px; display:block;" data-i18n="filter_notebook">الدفتر</label>
+                <label data-i18n="filter_notebook" class="layout__item-18">الدفتر</label>
                 <select id="filter-notebook-drawer" class="form-control" onchange="document.getElementById('filter-notebook').value=this.value; app.renderQuestions();"></select>
             </div>
             <div>
-                <label style="font-size:0.82rem; font-weight:600; color:var(--text-body); margin-bottom:4px; display:block;" data-i18n="filter_type">النوع</label>
+                <label data-i18n="filter_type" class="layout__item-18">النوع</label>
                 <select id="filter-type-drawer" class="form-control" onchange="document.getElementById('filter-type').value=this.value; app.renderQuestions();">
                     <option value="" data-i18n="all_types">كل الأنواع</option>
                     <option value="mcq" data-i18n="type_mcq">اختيار متعدد</option>
@@ -1755,7 +1902,7 @@
                 </select>
             </div>
             <div>
-                <label style="font-size:0.82rem; font-weight:600; color:var(--text-body); margin-bottom:4px; display:block;" data-i18n="filter_difficulty">الصعوبة</label>
+                <label data-i18n="filter_difficulty" class="layout__item-18">الصعوبة</label>
                 <select id="filter-difficulty-drawer" class="form-control" onchange="document.getElementById('filter-difficulty').value=this.value; app.renderQuestions();">
                     <option value="" data-i18n="all_levels">كل المستويات</option>
                     <option value="easy" data-i18n="difficulty_easy">سهل</option>
@@ -1764,13 +1911,13 @@
                 </select>
             </div>
             <div>
-                <label style="font-size:0.82rem; font-weight:600; color:var(--text-body); margin-bottom:4px; display:block;" data-i18n="filter_category">التصنيف</label>
+                <label data-i18n="filter_category" class="layout__item-18">التصنيف</label>
                 <select id="filter-category-drawer" class="form-control" onchange="document.getElementById('filter-category').value=this.value; app.renderQuestions();"></select>
             </div>
         </div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn" style="flex:1;" onclick="app.closeFilterDrawer()" data-i18n="apply_changes">تطبيق</button>
-            <button class="btn btn-secondary" style="flex:1;" onclick="document.querySelectorAll('#filter-notebook,#filter-type,#filter-difficulty,#filter-category').forEach(s=>s.value=''); app.renderQuestions(); app.closeFilterDrawer();" data-i18n="reset">إعادة ضبط</button>
+        <div class="layout__item-3-1">
+            <button class="btn modal__btn-force-save" onclick="app.closeFilterDrawer()" data-i18n="apply_changes">تطبيق</button>
+            <button class="btn btn-secondary modal__btn-force-save" onclick="document.querySelectorAll('#filter-notebook,#filter-type,#filter-difficulty,#filter-category').forEach(s=>s.value=''); app.renderQuestions(); app.closeFilterDrawer();" data-i18n="reset">إعادة ضبط</button>
         </div>
     </div>
 
@@ -1796,10 +1943,8 @@
         <div class="command-palette-panel">
             <div class="cmd-search-wrap">
                 <span class="cmd-search-icon">⌘</span>
-                <input id="cmd-search" type="text" placeholder="ابحث عن أمر أو سؤال..." autocomplete="off"
-                    oninput="app._renderCommands(this.value)"
-                    onkeydown="if(event.key==='Escape') app.closeCommandPalette(); if(event.key==='ArrowDown'){event.preventDefault(); document.querySelector('.cmd-item')?.focus();}">
-                <kbd style="font-size:0.75rem; opacity:0.6;">Esc</kbd>
+                <input id="cmd-search" type="text" placeholder="ابحث عن أمر أو سؤال..." autocomplete="off" oninput="app._renderCommands(this.value)" onkeydown="if(event.key==='Escape') app.closeCommandPalette(); if(event.key==='ArrowDown'){event.preventDefault(); document.querySelector('.cmd-item')?.focus();}">
+                <kbd class="layout__item-19">Esc</kbd>
             </div>
             <div id="cmd-results" class="cmd-results"></div>
         </div>
@@ -1807,25 +1952,25 @@
 
     <!-- Duplicate Manager Modal -->
     <div class="modal-overlay" id="duplicates-modal">
-        <div class="modal-content" style="width: 95%; max-width: 1100px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-            <div class="modal-header" style="padding: 20px 28px; background: var(--primary); color: white; border-bottom: none;">
-                <h3 class="modal-title" style="color: white;" data-i18n="dup_manager_title">منظم التكرارات الذكي</h3>
-                <button class="close-modal" onclick="app.closeModal('duplicates-modal')" style="color: white;">&times;</button>
+        <div class="modal-content layout__item-20">
+            <div class="modal-header modal__item-18">
+                <h3 class="modal-title modal__title-2" data-i18n="dup_manager_title">منظم التكرارات الذكي</h3>
+                <button class="close-modal modal__title-2" onclick="app.closeModal('duplicates-modal')">×</button>
             </div>
             
-            <div class="modal-body" style="flex: 1; overflow-y: auto; padding: 28px; background: var(--bg-main);">
-                <div id="duplicates-loading" style="display:none; text-align:center; padding:50px;">
-                    <div class="spinner" style="margin-bottom: 15px;"></div>
+            <div class="modal-body modal__item-1-4">
+                <div id="duplicates-loading" class="modal__duplicates-loading">
+                    <div class="spinner stat-card__item-5"></div>
                     <p id="duplicates-progress-text" data-i18n="loading_msg">جاري معالجة البيانات... ⏳</p>
-                    <div id="duplicates-progress-bar" style="width:100%; height:8px; background:#ddd; border-radius:4px; margin-top:15px; overflow:hidden;">
-                        <div id="duplicates-progress-fill" style="width:0%; height:100%; background:var(--primary); transition: width 0.3s;"></div>
+                    <div id="duplicates-progress-bar" class="modal__duplicates-progress-bar">
+                        <div id="duplicates-progress-fill" class="modal__duplicates-progress-fill"></div>
                     </div>
                 </div>
 
-                <div id="duplicates-empty" style="display:none; text-align:center; padding:50px;">
-                    <div style="font-size: 5rem; margin-bottom: 20px;">✨</div>
-                    <h2 style="color: var(--text-title); margin-bottom: 10px;" data-i18n="dup_no_found">رائع! لا توجد أسئلة مكررة حالياً.</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 30px;">بنك الأسئلة الخاص بك نظيف ومنظم تماماً.</p>
+                <div id="duplicates-empty" class="modal__duplicates-loading">
+                    <div class="layout__item-6">✨</div>
+                    <h2 data-i18n="dup_no_found" class="modal__title-3">رائع! لا توجد أسئلة مكررة حالياً.</h2>
+                    <p class="modal__text-6">بنك الأسئلة الخاص بك نظيف ومنظم تماماً.</p>
                     <button class="btn btn-primary" onclick="DuplicatesUI.scan()" data-i18n="dup_scan_btn">بدء فحص التكرارات</button>
                 </div>
 
@@ -1838,14 +1983,14 @@
 
     <!-- ── QR Code Modal ── -->
     <div class="modal-overlay" id="qr-modal">
-        <div class="modal-content" style="max-width:380px; text-align:center;">
+        <div class="modal-content layout__item-21">
             <div class="modal-header">
                 <h3 data-i18n="qr_modal_title">▣ QR Code للسؤال</h3>
                 <button class="close-modal" onclick="app.closeModal('qr-modal')">✕</button>
             </div>
-            <div class="modal-body" style="display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px;">
-                <p id="qr-question-text" style="font-size:0.88rem; color:var(--text-body); line-height:1.6;"></p>
-                <div class="form-group" style="width: 100%; max-width: 280px;">
+            <div class="modal-body modal__item-1-5">
+                <p id="qr-question-text" class="modal__qr-question-text"></p>
+                <div class="form-group modal__item-19">
                     <select id="qr-content-mode" class="form-control" onchange="app.generateQRForMode()">
                         <option value="q_only" data-i18n="qr_q_only">السؤال فقط</option>
                         <option value="q_options" data-i18n="qr_q_options">السؤال + الخيارات (إن وجدت)</option>
@@ -1853,8 +1998,8 @@
                         <option value="all" data-i18n="qr_all">التفاصيل كاملة</option>
                     </select>
                 </div>
-                <div id="qr-code-container" style="width:250px; height:250px; border:1px solid var(--border); border-radius:12px; padding:15px; background:white; transition: opacity 0.3s ease; display:flex; align-items:center; justify-content:center;"></div>
-                <p style="font-size:0.8rem; color:var(--text-body); opacity:0.7;" data-i18n="qr_hint">الطالب يصور الكود بالموبايل ليقرأ التفاصيل فوراً</p>
+                <div id="qr-code-container" class="modal__qr-code-container"></div>
+                <p data-i18n="qr_hint" class="modal__text-1-1">الطالب يصور الكود بالموبايل ليقرأ التفاصيل فوراً</p>
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="app.downloadQRCode()" data-i18n="btn_download">⬇️ تحميل الصورة</button>
@@ -1865,20 +2010,18 @@
 
     <!-- ── JSON Fixer Modal ── -->
     <div class="modal-overlay" id="json-fixer-modal">
-        <div class="modal-content" style="max-width:700px;">
+        <div class="modal-content layout__item-22">
             <div class="modal-header">
                 <h3 data-i18n="json_fixer_title">🔧 مصلح ملف JSON</h3>
                 <button class="close-modal" onclick="app.closeModal('json-fixer-modal')">✕</button>
             </div>
-            <div class="modal-body" style="padding:20px;">
-                <div id="json-fixer-error" style="background:rgba(255,23,68,0.1); color:var(--danger-color); border:1px solid var(--danger-color); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:0.88rem; font-family:monospace;"></div>
-                <p style="font-size:0.85rem; color:var(--text-body); margin-bottom:10px;" data-i18n="json_fixer_hint">عدّل الملف مباشرةً ثم اضغط «تحقق واستورد»:</p>
-                <textarea id="json-fixer-editor"
-                    style="width:100%; height:340px; font-family:monospace; font-size:0.82rem; border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--bg-main); color:var(--text-title); resize:vertical; line-height:1.6;"
-                    spellcheck="false"></textarea>
+            <div class="modal-body modal__item-1-6">
+                <div id="json-fixer-error" class="modal__json-fixer-error"></div>
+                <p data-i18n="json_fixer_hint" class="modal__text-7">عدّل الملف مباشرةً ثم اضغط «تحقق واستورد»:</p>
+                <textarea id="json-fixer-editor" spellcheck="false" class="modal__json-fixer-editor"></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="app.validateAndImportJSON()" style="background:var(--primary); color:white;" data-i18n="btn_validate_import">✅ تحقق واستورد</button>
+                <button class="btn modal__btn-8" onclick="app.validateAndImportJSON()" data-i18n="btn_validate_import">✅ تحقق واستورد</button>
                 <button class="btn btn-secondary close-modal" onclick="app.closeModal('json-fixer-modal')" data-i18n="cancel">إلغاء</button>
             </div>
         </div>
@@ -1903,5 +2046,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="src/lib/qrcode.min.js"></script>
     <script type="module" src="app.js?v=16.6.1"></script>
-</body>
-</html>
+
+
+</body></html>

@@ -45,4 +45,21 @@ Line 2",
         const repaired = Helpers.sanitizeJsonString(input);
         expect(JSON.parse(repaired).text).toBe("Don't do it");
     });
+
+    it('should conditionally render reference citations in print HTML', () => {
+        const qList = [{
+            type: 'mcq',
+            question: 'What is Ophthalmology?',
+            options: ['A', 'B', 'C', 'D'],
+            answer: 'A',
+            reference: { book: 'Kanski Ophthalmology', page: '42' }
+        }];
+
+        const htmlWithRef = Helpers.generatePrintHTML('Test Title', qList, 'study', true);
+        expect(htmlWithRef).toContain('📖 Kanski Ophthalmology');
+        expect(htmlWithRef).toContain('ص/p. 42');
+
+        const htmlWithoutRef = Helpers.generatePrintHTML('Test Title', qList, 'study', false);
+        expect(htmlWithoutRef).not.toContain('📖 Kanski Ophthalmology');
+    });
 });

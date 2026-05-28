@@ -130,6 +130,10 @@ export const QuestionModule = {
             difficulty: document.getElementById('question-difficulty').value,
             tags: document.getElementById('question-tags').value.split(',').map(t => t.trim()).filter(t => t),
             explain: document.getElementById('question-explain').value,
+            reference: {
+                book: Helpers.sanitize(document.getElementById('question-reference-book').value.trim()),
+                page: Helpers.sanitize(document.getElementById('question-reference-page').value.trim())
+            }
         };
 
         if (type === 'mcq') {
@@ -229,6 +233,8 @@ export const QuestionModule = {
         document.getElementById('question-difficulty').value = q.difficulty;
         document.getElementById('question-tags').value = (q.tags || []).join(', ');
         document.getElementById('question-explain').value = q.explain || '';
+        document.getElementById('question-reference-book').value = q.reference?.book || '';
+        document.getElementById('question-reference-page').value = q.reference?.page || '';
 
         if (q.image) {
             document.getElementById('question-image-base64').value = q.image;

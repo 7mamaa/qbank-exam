@@ -2,7 +2,7 @@ import { Logger } from '../utils/logger.js?v=16.6.1';
 
 // --- Database Wrapper (Vanilla IndexedDB) ---
 const DB_NAME = 'QBankDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export const db = {
     // استخدام النطاق العالمي لضمان نسخة واحدة دائماً (Global Singleton)

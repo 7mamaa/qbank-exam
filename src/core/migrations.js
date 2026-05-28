@@ -6,7 +6,7 @@ import { Helpers } from '../utils/helpers.js?v=16.6.1';
  * Handles schema versioning and data transformations between versions.
  */
 export const Migrations = {
-    CURRENT_VERSION: 10,
+    CURRENT_VERSION: 11,
     STORAGE_KEY: 'qbank_schema_version',
 
     /**
@@ -87,10 +87,32 @@ export const Migrations = {
     },
 
     /**
-     * Example future migration
+     * Migration to V11: Initializing reference citation schema on old question models.
      */
-    async migrateToV11() {
-        // Logic for V11 (e.g. renaming a field)
-        return false;
+    async migrateToV11(questions) {
+        let changed = false;
+        const list = questions || [];
+        for (const q of list) {
+            if (!q.reference) {
+                q.reference = { book: '', page: '' };
+                await db.put('questions', q);
+                changed = true;
+            } else {
+                let updated = false;
+                if (typeof q.reference.book !== 'string') {
+                    q.reference.book = '';
+                    updated = true;
+                }
+                if (typeof q.reference.page !== 'string') {
+                    q.reference.page = '';
+                    updated = true;
+                }
+                if (updated) {
+                    await db.put('questions', q);
+                    changed = true;
+                }
+            }
+        }
+        return changed;
     }
 };

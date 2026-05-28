@@ -730,6 +730,10 @@ export const ExportModule = {
                     explain: cleanItem.explain,
                     image: cleanItem.image || null,
                     tags: cleanItem.tags,
+                    reference: {
+                        book: cleanItem.reference?.book || '',
+                        page: cleanItem.reference?.page || ''
+                    },
                     qNumber: cleanItem.qNumber,
                     createdAt: cleanItem.createdAt || Date.now()
                 };

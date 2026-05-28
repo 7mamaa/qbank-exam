@@ -16,6 +16,7 @@ import DuplicatesUI from './src/modules/duplicates-ui.js?v=16.6.1';
 import { UIComponents } from './src/ui/components.js?v=16.6.1';
 import { Helpers } from './src/utils/helpers.js?v=16.6.1';
 import { Logger } from './src/utils/logger.js?v=16.6.1';
+import { TopicGraph } from './src/ui/topicGraph.js?v=16.6.1';
 
 // Central Telemetry & Global Error Radar
 globalThis.onerror = (msg, url, line, col, error) => {
@@ -298,7 +299,8 @@ export const app = {
                 
                 const viewsRequiringRefresh = {
                     'questions': () => this.renderQuestions(),
-                    'notebooks': () => this.renderNotebooks()
+                    'notebooks': () => this.renderNotebooks(),
+                    'topic-graph': () => this.renderTopicGraph()
                 };
 
                 if (viewsRequiringRefresh[this.state.currentView]) {
@@ -647,6 +649,10 @@ export const app = {
         this.state.currentView = viewId;
         this.playSound('nav');
 
+        if (viewId !== 'topic-graph') {
+            TopicGraph.destroy();
+        }
+
         // Update Navigation UI
         document.querySelectorAll('.nav-item').forEach(item => {
             const isActive = item.dataset.target === viewId;
@@ -673,6 +679,7 @@ export const app = {
             },
             'dashboard': () => this.updateDashboard(),
             'quiz': () => this.updateNotebookDropdowns(),
+            'topic-graph': () => this.renderTopicGraph(),
             'export-hub': () => {
                 this.updateNotebookDropdowns();
                 this.renderSelectionHub();
@@ -965,6 +972,10 @@ export const app = {
                     difficulty: document.getElementById('question-difficulty').value,
                     tags: document.getElementById('question-tags').value,
                     explain: document.getElementById('question-explain').value,
+                    reference: {
+                        book: document.getElementById('question-reference-book').value,
+                        page: document.getElementById('question-reference-page').value
+                    },
                     image: document.getElementById('question-image-base64').value
                 };
                 localStorage.setItem('qbank_draft', JSON.stringify(draft));
@@ -1101,6 +1112,8 @@ export const app = {
         document.getElementById('question-difficulty').value = draft.difficulty || 'medium';
         document.getElementById('question-tags').value = draft.tags || '';
         document.getElementById('question-explain').value = draft.explain || '';
+        document.getElementById('question-reference-book').value = draft.reference?.book || '';
+        document.getElementById('question-reference-page').value = draft.reference?.page || '';
         if (draft.image) {
             document.getElementById('question-image-base64').value = draft.image;
             const preview = document.getElementById('question-image-preview');
@@ -1183,6 +1196,71 @@ export const app = {
         this.renderQuestions();
     },
     initSortable() { QuestionModule.initSortable(() => this.syncData()); },
+
+    renderTopicGraph() {
+        const canvas = document.getElementById('topic-graph-canvas');
+        if (!canvas) return;
+
+        if (TopicGraph.canvas !== canvas) {
+            TopicGraph.init(canvas);
+
+            const btnPlay = document.getElementById('graph-btn-play');
+            if (btnPlay) {
+                btnPlay.onclick = () => {
+                    TopicGraph.isPlaying = !TopicGraph.isPlaying;
+                    const iconEl = document.getElementById('graph-play-icon');
+                    const textEl = document.getElementById('graph-play-text');
+                    if (iconEl && textEl) {
+                        iconEl.textContent = TopicGraph.isPlaying ? '⏸️' : '▶️';
+                        textEl.textContent = TopicGraph.isPlaying ? (i18n.t('pause') || 'إيقاف مؤقت') : (i18n.t('play') || 'تشغيل');
+                    }
+                    if (TopicGraph.isPlaying) {
+                        TopicGraph.startSimulation();
+                    } else {
+                        if (TopicGraph.animationFrameId) {
+                            cancelAnimationFrame(TopicGraph.animationFrameId);
+                            TopicGraph.animationFrameId = null;
+                        }
+                    }
+                };
+            }
+
+            const btnReset = document.getElementById('graph-btn-reset');
+            if (btnReset) {
+                btnReset.onclick = () => {
+                    TopicGraph.nodes = [];
+                    const pool = TopicGraph.scope === 'filtered' ? this.state.virtual.filteredQuestions : this.state.questions;
+                    TopicGraph.buildGraph(pool);
+                };
+            }
+
+            const scopeSelect = document.getElementById('graph-scope-select');
+            if (scopeSelect) {
+                scopeSelect.onchange = (e) => {
+                    TopicGraph.scope = e.target.value;
+                    const pool = TopicGraph.scope === 'filtered' ? this.state.virtual.filteredQuestions : this.state.questions;
+                    TopicGraph.buildGraph(pool);
+                };
+            }
+
+            const groupSelect = document.getElementById('graph-group-select');
+            if (groupSelect) {
+                groupSelect.onchange = (e) => {
+                    TopicGraph.groupType = e.target.value;
+                    const pool = TopicGraph.scope === 'filtered' ? this.state.virtual.filteredQuestions : this.state.questions;
+                    TopicGraph.buildGraph(pool);
+                };
+            }
+        }
+
+        const scopeSelect = document.getElementById('graph-scope-select');
+        const groupSelect = document.getElementById('graph-group-select');
+        if (scopeSelect) TopicGraph.scope = scopeSelect.value;
+        if (groupSelect) TopicGraph.groupType = groupSelect.value;
+
+        const pool = TopicGraph.scope === 'filtered' ? this.state.virtual.filteredQuestions : this.state.questions;
+        TopicGraph.buildGraph(pool);
+    },
 
     renderNotebooks() { NotebookModule.renderNotebooks((id) => this.editNotebook(id), (id) => this.deleteNotebook(id), (id) => this.viewNotebook(id)); },
     async handleNotebookSubmit(e) { await NotebookModule.handleNotebookSubmit(e, () => this.syncData(), (id) => this.closeModal(id)); },
@@ -2455,6 +2533,7 @@ export const app = {
         const nbId = document.getElementById('print-notebook').value;
         const mode = document.getElementById('print-mode').value;
         const direction = document.getElementById('print-direction')?.value || 'rtl';
+        const showReferences = document.getElementById('toggle-show-references')?.checked || false;
         const notebook = this.state.notebooks.find(n => String(n.id) === String(nbId));
         
         if (!notebook) return alert(i18n.t('err_select_notebook'));
@@ -2466,7 +2545,7 @@ export const app = {
 
         // Use setTimeout to allow the loading overlay to render
         setTimeout(() => {
-            const html = Helpers.generatePrintHTML(notebook.name, qList, mode);
+            const html = Helpers.generatePrintHTML(notebook.name, qList, mode, showReferences);
             const container = document.getElementById('print-container');
             
             if (container) {
