@@ -54,6 +54,7 @@ export const TopicGraph = {
         const rect = container.getBoundingClientRect();
         const w = rect.width || 600;
         const h = rect.height || 500;
+        if (w === 0 || h === 0) return;
         
         // Only run resize if size actually changed to avoid layout thrashing/flash
         if (!force && Math.abs(this.width - w) < 2 && Math.abs(this.height - h) < 2) {
@@ -180,8 +181,9 @@ export const TopicGraph = {
         const pos = this.getMousePos(e);
 
         if (this.draggedNode) {
-            this.draggedNode.x = pos.x;
-            this.draggedNode.y = pos.y;
+            const border = this.draggedNode.r + 15;
+            this.draggedNode.x = Math.max(border, Math.min(this.width - border, pos.x));
+            this.draggedNode.y = Math.max(border, Math.min(this.height - border, pos.y));
             this.draggedNode.vx = 0;
             this.draggedNode.vy = 0;
             return;
@@ -226,10 +228,10 @@ export const TopicGraph = {
 
     // Touch Interaction Event Handlers
     onTouchStart(e) {
-        if (e.cancelable) e.preventDefault();
         const pos = this.getTouchPos(e);
         const node = this.findNodeAt(pos);
         if (node) {
+            if (e.cancelable) e.preventDefault();
             this.draggedNode = node;
             this.selectedNode = node;
             this.showNodeDetails(node);
@@ -243,8 +245,9 @@ export const TopicGraph = {
         if (!this.draggedNode) return;
         if (e.cancelable) e.preventDefault();
         const pos = this.getTouchPos(e);
-        this.draggedNode.x = pos.x;
-        this.draggedNode.y = pos.y;
+        const border = this.draggedNode.r + 10;
+        this.draggedNode.x = Math.max(border, Math.min(this.width - border, pos.x));
+        this.draggedNode.y = Math.max(border, Math.min(this.height - border, pos.y));
         this.draggedNode.vx = 0;
         this.draggedNode.vy = 0;
     },
@@ -324,13 +327,14 @@ export const TopicGraph = {
         const newNodes = [];
         const oldNodePositions = new Map(this.nodes.map(n => [n.id, { x: n.x, y: n.y }]));
         const isMobile = window.innerWidth <= 768;
+        const scaleFactor = Math.min(1, this.width / 600);
 
         nodeMap.forEach((data, id) => {
             const oldPos = oldNodePositions.get(id);
             // Dynamic larger nodes on mobile screens to facilitate tapping
-            const minR = isMobile ? 18 : 12;
-            const maxR = isMobile ? 35 : 30;
-            const r = Math.max(minR, Math.min(maxR, (isMobile ? 12 : 8) + data.count * 1.5));
+            const minR = isMobile ? (16 * scaleFactor) : 12;
+            const maxR = isMobile ? (30 * scaleFactor) : 30;
+            const r = Math.max(minR, Math.min(maxR, ((isMobile ? 10 : 8) + data.count * 1.2) * scaleFactor));
             const x = oldPos ? oldPos.x : (this.width / 2) + (Math.random() - 0.5) * 150;
             const y = oldPos ? oldPos.y : (this.height / 2) + (Math.random() - 0.5) * 150;
 
@@ -414,11 +418,12 @@ export const TopicGraph = {
         const n = nodes.length;
         if (n === 0) return;
 
-        const repulsion = 500; 
-        const spring = 0.05;   
-        const gravity = 0.04;   
-        const damping = 0.82;   
-        const minDistance = 65; 
+        const isMobile = window.innerWidth <= 768;
+        const repulsion = isMobile ? 300 : 500; 
+        const spring = isMobile ? 0.04 : 0.05;   
+        const gravity = isMobile ? 0.05 : 0.04;   
+        const damping = isMobile ? 0.76 : 0.82;   
+        const minDistance = isMobile ? 50 : 65; 
 
         const centerX = this.width / 2;
         const centerY = this.height / 2;
@@ -507,7 +512,7 @@ export const TopicGraph = {
             node.vx *= damping;
             node.vy *= damping;
 
-            const border = node.r + 15;
+            const border = node.r + (isMobile ? 12 : 15);
             node.x = Math.max(border, Math.min(this.width - border, node.x));
             node.y = Math.max(border, Math.min(this.height - border, node.y));
         });
@@ -530,13 +535,13 @@ export const TopicGraph = {
                 const active = this.selectedNode || this.hoveredNode;
                 if (edge.source === active || edge.target === active) {
                     opacity = 0.8;
-                    ctx.lineWidth = isMobile ? 3.5 : 2.5;
+                    ctx.lineWidth = isMobile ? 2 : 2.5;
                 } else {
                     opacity = 0.03;
-                    ctx.lineWidth = isMobile ? 1.5 : 1;
+                    ctx.lineWidth = isMobile ? 0.6 : 1;
                 }
             } else {
-                ctx.lineWidth = isMobile ? 2 : 1.5;
+                ctx.lineWidth = isMobile ? 1 : 1.5;
             }
 
             ctx.strokeStyle = `rgba(128, 128, 128, ${opacity})`;

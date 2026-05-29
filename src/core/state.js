@@ -88,5 +88,11 @@ export const state = {
         startTime: null,
         timerInterval: null,
         isFinished: false
-    }
+    },
+
+    /**
+     * @type {boolean} When true, BroadcastChannel sync messages are suppressed
+     * to prevent UI crashes during snapshot comparison/restore operations.
+     */
+    isComparing: false
 };

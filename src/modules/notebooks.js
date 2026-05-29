@@ -109,6 +109,9 @@ export const NotebookModule = {
             const el = document.getElementById(id);
             if (!el) return;
 
+            // Clear container completely to enforce DOM idempotency
+            el.innerHTML = "";
+
             if (id === 'notebook-parent') {
                 const currentEditId = document.getElementById('notebook-id').value;
                 const filteredOptions = optionsWithPaths.filter(opt => opt.id !== currentEditId);

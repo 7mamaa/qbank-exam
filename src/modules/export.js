@@ -1,4 +1,4 @@
-/* global pako, React, ReactPDF, app */
+/* global pako, app */
 import { state } from '../core/state.js?v=16.6.1';
 import { db } from '../core/db.js?v=16.6.1';
 import { QueryEngine } from '../core/query.js?v=16.6.1';
@@ -6,6 +6,7 @@ import { i18n } from '../core/i18n.js?v=16.6.1';
 import { Helpers } from '../utils/helpers.js?v=16.6.1';
 import { Logger } from '../utils/logger.js?v=16.6.1';
 import { UIComponents } from '../ui/components.js?v=16.6.1';
+import { pdfThemes } from '../ui/pdfThemes.js';
 
 async function validateIncomingPayload(payload, notebooks, activeNotebookId, autoDistribute) {
     if (!payload) throw new Error("الملف فارغ أو تالف");
@@ -201,46 +202,10 @@ async function validateIncomingPayload(payload, notebooks, activeNotebookId, aut
     throw new Error("صيغة ملف الاستيراد غير مدعومة هندسياً");
 }
 
-async function exportData() {
-    try {
-        // تجميع شجرة الدفاتر كاملة وعلاقات الأب والابن مع مصفوفة الأسئلة
-        const notebooks = globalThis.app?.state?.notebooks || [];
-        const questions = globalThis.app?.state?.questions || [];
-        
-        const exportEnvelope = {
-            version: "16.6.1",
-            exportDate: new Date().toISOString(),
-            notebooks: notebooks,
-            questions: questions
-        };
-
-        // تحويل الكبسولة المجمعة كاملة إلى نص
-        const jsonString = JSON.stringify(exportEnvelope);
-        
-        // إذا كان النظام يدعم الضغط، يتم تمرير الـ jsonString لمحرك الـ CompressionStream
-        // كود التنزيل القياسي المعتمد في التطبيق:
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `qbank_backup_${Date.now()}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        if (typeof UIComponents !== 'undefined') {
-            UIComponents.showToast("تم تصدير بنك الأسئلة بكامل الدفاتر والعلاقات بنجاح!", "success");
-        }
-    } catch (error) {
-        console.error("[Export Engine Crash]:", error);
-    }
-}
-
 export const ExportModule = {
     async validateIncomingPayload(payload, existingNotebooks = [], optionsOrActiveId = {}, autoDistributeOpt = undefined) {
-        let activeNotebookId = null;
-        let autoDistribute = true;
+        let activeNotebookId;
+        let autoDistribute;
 
         if (optionsOrActiveId && typeof optionsOrActiveId === 'object' && !Array.isArray(optionsOrActiveId)) {
             activeNotebookId = optionsOrActiveId.activeNotebookId;
@@ -305,6 +270,16 @@ export const ExportModule = {
                 i18n.locales.en['json_advanced_settings'] = '⚙️ Advanced JSON Settings';
                 i18n.locales.en['export_opt_beautify'] = 'Beautify JSON';
                 i18n.locales.en['export_opt_compress'] = 'Enable GZIP Compression';
+            }
+            if (i18n.locales.ar && !i18n.locales.ar['pdf_split_sessions_label']) {
+                i18n.locales.ar['pdf_split_sessions_label'] = 'تقسيم بنك الأسئلة إلى جلسات مذاكرة ذكية';
+                i18n.locales.ar['pdf_session_duration_label'] = 'مدة الجلسة الواحدة (بالدقائق):';
+                i18n.locales.ar['minutes_label'] = 'دقيقة';
+            }
+            if (i18n.locales.en && !i18n.locales.en['pdf_split_sessions_label']) {
+                i18n.locales.en['pdf_split_sessions_label'] = 'Split question bank into smart study sessions';
+                i18n.locales.en['pdf_session_duration_label'] = 'Session duration (in minutes):';
+                i18n.locales.en['minutes_label'] = 'min';
             }
         }
 
@@ -503,7 +478,7 @@ export const ExportModule = {
                     if (cellVal.startsWith('[') && cellVal.endsWith(']')) {
                         try {
                             q[key] = JSON.parse(cellVal);
-                        } catch (e) {
+                        } catch {
                             q[key] = cellVal.split('|');
                         }
                     } else {
@@ -570,7 +545,7 @@ export const ExportModule = {
                 try {
                     return JSON.parse(trimmed);
                 } catch (e2) {
-                    throw new Error("فشل تحليل ملف JSON: " + jsonErr.message);
+                    throw new Error("فشل تحليل ملف JSON: " + jsonErr.message, { cause: e2 });
                 }
             }
         }
@@ -582,7 +557,7 @@ export const ExportModule = {
             }
             return parsedCsv;
         } catch (csvErr) {
-            throw new Error("فشل تحليل ملف CSV: " + csvErr.message);
+            throw new Error("فشل تحليل ملف CSV: " + csvErr.message, { cause: csvErr });
         }
     },
 
@@ -662,7 +637,6 @@ export const ExportModule = {
                 activeNotebookId: manualTargetNb
             });
             const questions = validationResult.questions;
-            const newNotebooks = validationResult.newNotebooks || [];
             const floatingCount = validationResult.floatingCount || 0;
 
             const existingIds = new Set((globalThis.app?.state?.questions || state.questions || []).map(q => q.id));
@@ -773,8 +747,7 @@ export const ExportModule = {
      * المعالجة الصارمة للاستيراد: تمنع تمرير المراجع (References) وتمنع تصادم الـ IDs
      */
     async processStrictImport(parsedData, successCallback) {
-        let floatingCount = 0;
-        let newNotebooks = [];
+        let floatingCount;
         const autoDistribute = document.getElementById('import-auto-distribute') 
             ? document.getElementById('import-auto-distribute').checked 
             : true;
@@ -789,7 +762,6 @@ export const ExportModule = {
                 activeNotebookId
             });
             floatingCount = validationResult.floatingCount || 0;
-            newNotebooks = validationResult.newNotebooks || [];
             parsedData = validationResult.questions;
         } catch (validationError) {
             console.error("[Security Gate Abort]:", validationError.message);
@@ -1087,9 +1059,31 @@ export const ExportModule = {
             const showImages = document.getElementById('pdf-show-images')?.checked;
             const direction = document.getElementById('pdf-direction')?.value || 'rtl';
             const twoColumns = document.getElementById('pdf-two-columns')?.checked;
+            const selectedThemeName = document.getElementById('pdf-theme-selector')?.value || 'طابع تقني';
 
             const showAns = layout === 'with-answers';
             const isAnnex = layout === 'exam-annex';
+
+            // Inject the selected theme CSS dynamically
+            const themeCss = pdfThemes[selectedThemeName] || pdfThemes['طابع تقني'] || '';
+            const styleEl = document.createElement('style');
+            styleEl.id = 'dynamic-print-theme-styles';
+            styleEl.innerHTML = themeCss + `
+                @media print {
+                    .pdf-question-block, .question-card, .question-item, .explanation-box, .print-question, .answer-box {
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                        position: relative;
+                    }
+                }
+            `;
+            document.head.appendChild(styleEl);
+
+            // Clean up the style block once printing is closed
+            window.addEventListener('afterprint', () => {
+                const el = document.getElementById('dynamic-print-theme-styles');
+                if (el) el.remove();
+            }, { once: true });
 
             let answersAnnex = '';
             // Load institution identity for PDF header branding
@@ -1111,49 +1105,57 @@ export const ExportModule = {
                 <p>${i18n.t('export_total_qs', { count: pool.length })} | ${i18n.t('export_date', { date: new Date().toLocaleDateString(state.language === 'ar' ? 'ar-EG' : 'en-US') })}</p>
             </div>`;
 
-
             if (twoColumns) bodyHtml += `<div style="column-count: 2; column-gap: 30px; column-rule: 1px solid #eee;">`;
 
-            pool.forEach((q, idx) => {
+            const getQuestionDuration = (q) => {
+                if (q.type === 'mcq') return 1.5;
+                if (q.type === 'boolean') return 1.0;
+                if (q.type === 'match') return 2.5;
+                if (q.type === 'written') return 4.0;
+                return 2.0;
+            };
+
+            const renderSingleQuestionHtml = (q, idx) => {
+                let html = '';
                 const sQuestion = Helpers.sanitize(q.question);
                 const sExplain = Helpers.sanitize(q.explain || '');
-                bodyHtml += `<div class="print-question" style="page-break-inside: avoid; border: 1px solid #eee; padding: 15px; margin-bottom: 20px; border-radius: 8px;">`;
-                bodyHtml += `<h3 style="margin: 0 0 10px 0; font-size: 1.1rem; font-weight: 700;">${i18n.t('nav_questions')} ${idx + 1}: ${sQuestion}</h3>`;
+                html += `<div class="print-question" style="page-break-inside: avoid; border: 1px solid #eee; padding: 15px; margin-bottom: 20px; border-radius: 8px;">`;
+                html += `<h3 style="margin: 0 0 10px 0; font-size: 1.1rem; font-weight: 700;"><span class="accent-badge" style="margin-inline-end: 8px;">${i18n.t('nav_questions')} ${idx + 1}</span>${sQuestion}</h3>`;
                 
                 if (showImages && q.image) {
-                    bodyHtml += `<div style="text-align: center; margin: 15px 0;"><img src="${q.image}" style="max-width: 100%; max-height: 250px; border-radius: 4px; border: 1px solid #ccc;"></div>`;
+                    html += `<div style="text-align: center; margin: 15px 0;"><img src="${q.image}" style="max-width: 100%; max-height: 250px; border-radius: 4px; border: 1px solid #ccc;"></div>`;
                 }
 
                 const labels = direction === 'rtl' ? ['أ', 'ب', 'ج', 'د'] : ['A', 'B', 'C', 'D'];
 
                 if (q.type === 'mcq') {
-                    bodyHtml += `<ul style="list-style:none; padding-${direction === 'rtl' ? 'right' : 'left'}:20px; line-height:1.8; margin: 10px 0;">`;
+                    html += `<ul style="list-style:none; padding-${direction === 'rtl' ? 'right' : 'left'}:20px; line-height:1.8; margin: 10px 0;">`;
                     (q.options || []).forEach((o, oIdx) => {
                         const sOpt = Helpers.sanitize(o);
                         const isCorrect = showAns && o === q.answer;
-                        bodyHtml += `<li style="margin-bottom: 5px; ${isCorrect ? 'font-weight:bold; color:#2a9d8f; background: rgba(42, 157, 143, 0.05); padding: 2px 8px; border-radius: 4px;' : ''}">${labels[oIdx] || oIdx + 1}) ${sOpt}</li>`;
+                        html += `<li style="margin-bottom: 5px; ${isCorrect ? 'font-weight:bold; color:#2a9d8f; background: rgba(42, 157, 143, 0.05); padding: 2px 8px; border-radius: 4px;' : ''}">${labels[oIdx] || oIdx + 1}) ${sOpt}</li>`;
                     });
-                    bodyHtml += `</ul>`;
+                    html += `</ul>`;
                     if (isAnnex || showAns) {
                         const correctLabel = labels[q.options?.indexOf(q.answer)] || Helpers.sanitize(q.answer);
                         answersAnnex += `<div style="margin-bottom: 4px;"><strong>${idx + 1}.</strong> ${correctLabel}</div>`;
                     }
                 } else if (q.type === 'boolean') {
-                    bodyHtml += `<p style="margin: 10px 0;">( ${i18n.t('quiz_true')} / ${i18n.t('quiz_false')} )</p>`;
+                    html += `<p style="margin: 10px 0;">( ${i18n.t('quiz_true')} / ${i18n.t('quiz_false')} )</p>`;
                     const ansText = q.answer ? i18n.t('quiz_true') : i18n.t('quiz_false');
-                    if (showAns) bodyHtml += `<p style="color:#2a9d8f; font-weight:bold;">${i18n.t('export_answer')}: ${ansText}</p>`;
+                    if (showAns) html += `<div class="answer-box" style="color:#2a9d8f; font-weight:bold; padding: 10px; margin-top: 10px;">${i18n.t('export_answer')}: ${ansText}</div>`;
                     if (isAnnex || showAns) answersAnnex += `<div style="margin-bottom: 4px;"><strong>${idx + 1}.</strong> ${ansText}</div>`;
                 } else if (q.type === 'written') {
                     const ansText = Helpers.sanitize(q.answer || (q.keywords || []).join(' - '));
-                    if (showAns) bodyHtml += `<p style="color:#2a9d8f; margin: 10px 0;"><strong>${i18n.t('export_answer')}:</strong> ${ansText}</p>`;
-                    else bodyHtml += `<div style="height:100px; border-bottom:1px dashed #999; margin:15px 0;"></div>`;
+                    if (showAns) html += `<div class="answer-box" style="color:#2a9d8f; margin: 10px 0; padding: 10px;"><strong>${i18n.t('export_answer')}:</strong> ${ansText}</div>`;
+                    else html += `<div style="height:100px; border-bottom:1px dashed #999; margin:15px 0;"></div>`;
                     if (isAnnex || showAns) answersAnnex += `<div style="margin-bottom: 4px;"><strong>${idx + 1}.</strong> ${ansText}</div>`;
                 } else if (q.type === 'match') {
                     const pairs = q.pairs || [];
                     let rights = pairs.map(p => p.right);
                     if (!showAns) rights = [...rights].sort(() => Math.random() - 0.5);
                     const tableLabels = [i18n.t('q_pair_left'), i18n.t('export_answer'), i18n.t('q_pair_right')];
-                    bodyHtml += `
+                    html += `
                         <table style="width:100%; border-collapse: collapse; margin: 15px 0; border: 1.5px solid #000; table-layout: fixed;">
                             <thead><tr style="background: #f2f2f2;"><th style="border:1px solid #000;padding:8px;text-align:center;width:40%;font-weight:bold;">${tableLabels[0]}</th><th style="border:1px solid #000;padding:8px;text-align:center;width:20%;font-weight:bold;">${tableLabels[1]}</th><th style="border:1px solid #000;padding:8px;text-align:center;width:40%;font-weight:bold;">${tableLabels[2]}</th></tr></thead>
                             <tbody>
@@ -1172,9 +1174,68 @@ export const ExportModule = {
                         answersAnnex += `<div style="margin-bottom:12px;break-inside:avoid;"><strong>${idx+1}.</strong> ${solTable}</div>`;
                     }
                 }
-                if (showAns && q.explain) bodyHtml += `<p style="margin-top:10px;border-${direction==='rtl'?'right':'left'}:4px solid #4361ee;padding-${direction==='rtl'?'right':'left'}:10px;color:#555;background:rgba(67, 97, 238, 0.05);"><strong>💡 ${i18n.t('export_explain')}:</strong> ${sExplain}</p>`;
-                bodyHtml += `</div>`;
-            });
+                if (showAns && q.explain) html += `<div class="answer-box" style="margin-top:10px;border-${direction==='rtl'?'right':'left'}:4px solid #4361ee;padding-${direction==='rtl'?'right':'left'}:10px;color:#555;background:rgba(67, 97, 238, 0.05);"><strong>💡 ${i18n.t('export_explain')}:</strong> ${sExplain}</div>`;
+                html += `</div>`;
+                return html;
+            };
+
+            const splitSessions = document.getElementById('pdf-split-sessions')?.checked;
+            const sessionDurationLimit = parseFloat(document.getElementById('pdf-session-duration')?.value) || 45;
+
+            if (splitSessions) {
+                // Group pool into sessions
+                const sessions = [];
+                let currentSession = [];
+                let currentDur = 0;
+                
+                pool.forEach((q, idx) => {
+                    const qDur = getQuestionDuration(q);
+                    if (currentDur + qDur > sessionDurationLimit && currentSession.length > 0) {
+                        sessions.push(currentSession);
+                        currentSession = [ { q, idx } ];
+                        currentDur = qDur;
+                    } else {
+                        currentSession.push( { q, idx } );
+                        currentDur += qDur;
+                    }
+                });
+                if (currentSession.length > 0) {
+                    sessions.push(currentSession);
+                }
+
+                sessions.forEach((sQs, sIdx) => {
+                    const startNum = sQs[0].idx + 1;
+                    const endNum = sQs[sQs.length - 1].idx + 1;
+                    const estMin = Math.round(sQs.reduce((acc, item) => acc + getQuestionDuration(item.q), 0));
+                    
+                    bodyHtml += `
+                    <div class="session-cover-page" style="page-break-before: always; page-break-after: always; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px double #4361ee; padding: 40px; box-sizing: border-box; text-align: center; margin-top: 20px; margin-bottom: 40px;">
+                        <h1 style="font-size: 2.5rem; color: #4361ee; margin-bottom: 20px; font-weight: 800;">جلسة مذاكرة ذكية</h1>
+                        <h2 style="font-size: 1.8rem; color: var(--text-main); margin-bottom: 15px; font-weight: 700;">الجلسة رقم ${sIdx + 1}</h2>
+                        <p style="font-size: 1.2rem; color: #666; margin-bottom: 30px;">الوقت المقدر لهذه الجلسة: ${estMin} دقيقة</p>
+                        <div style="font-size: 1.1rem; color: #444; border-top: 1px solid #ddd; padding-top: 20px;">
+                            تبدأ هذه الجلسة من السؤال رقم ${startNum} إلى السؤال رقم ${endNum}
+                        </div>
+                    </div>
+                    `;
+
+                    sQs.forEach(({ q, idx }, sIdxLocal) => {
+                        bodyHtml += renderSingleQuestionHtml(q, idx);
+                        // Put exactly 2 questions per page inside the generated PDF session
+                        if (!twoColumns && (sIdxLocal + 1) % 2 === 0 && (sIdxLocal + 1) < sQs.length) {
+                            bodyHtml += `<div class="page-break" style="page-break-after: always; break-after: page;"></div>`;
+                        }
+                    });
+                });
+            } else {
+                pool.forEach((q, idx) => {
+                    bodyHtml += renderSingleQuestionHtml(q, idx);
+                    // Put exactly 2 questions per page inside the generated PDF
+                    if (!twoColumns && (idx + 1) % 2 === 0 && (idx + 1) < pool.length) {
+                        bodyHtml += `<div class="page-break" style="page-break-after: always; break-after: page;"></div>`;
+                    }
+                });
+            }
 
             if (twoColumns) bodyHtml += `</div>`;
             if (isAnnex && answersAnnex) {

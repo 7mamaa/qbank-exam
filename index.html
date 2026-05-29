@@ -139,89 +139,89 @@
             
             <!-- Dashboard View -->
             <section id="dashboard" class="view-section active">
-                <div class="dashboard__item">
-                    <div data-i18n="app_version_badge" class="dashboard__item-1">v16.6.1 pro</div>
-                    <h1 data-i18n="dashboard_title" class="dashboard__title">لوحة التحكم</h1>
-                    <p data-i18n="dashboard_desc" class="dashboard__text">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
+                <div class="dashboard-hero">
+                    <div data-i18n="app_version_badge" class="dashboard-hero__badge">v16.6.1 pro</div>
+                    <h1 data-i18n="dashboard_title" class="dashboard-hero__title">لوحة التحكم</h1>
+                    <p data-i18n="dashboard_desc" class="dashboard-hero__desc">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
                 </div>
                 <div class="dashboard-grid">
                     
                     <!-- Row 1: KPI Cards -->
-                    <div class="stat-card dashboard__item-2">
-                        <div class="stat-card__item">
+                    <div class="stat-card stat-card--standard">
+                        <div class="stat-card__watermark">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         </div>
                         <h3 data-i18n="stat_total_questions" class="stat-card__title">إجمالي الأسئلة</h3>
-                        <div class="value stat-card__stat-total-questions" id="stat-total-questions">0</div>
+                        <div class="value stat-card__value" id="stat-total-questions">0</div>
                     </div>
                     
-                    <div class="stat-card dashboard__item-2">
-                        <div class="stat-card__item">
+                    <div class="stat-card stat-card--standard">
+                        <div class="stat-card__watermark">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         </div>
                         <h3 data-i18n="stat_total_notebooks" class="stat-card__title">الدفاتر</h3>
-                        <div class="value stat-card__stat-total-questions" id="stat-total-notebooks">0</div>
+                        <div class="value stat-card__value" id="stat-total-notebooks">0</div>
                     </div>
                     
-                    <div class="stat-card dashboard__item-2">
-                        <div class="stat-card__item">
+                    <div class="stat-card stat-card--standard">
+                        <div class="stat-card__watermark">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
                         </div>
                         <h3 data-i18n="stat_total_categories" class="stat-card__title">التصنيفات</h3>
-                        <div class="value stat-card__stat-total-questions" id="stat-total-categories">0</div>
+                        <div class="value stat-card__value" id="stat-total-categories">0</div>
                     </div>
                     
-                    <div class="stat-card dashboard__item-3" onclick="app.showPinnedOnly()" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)';" role="button" tabindex="0">
-                        <div class="stat-card__item">
+                    <div class="stat-card stat-card--clickable" onclick="app.showPinnedOnly()" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)';" role="button" tabindex="0">
+                        <div class="stat-card__watermark">
                             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                         </div>
                         <h3 data-i18n="stat_pinned_questions" class="stat-card__title">الأسئلة المثبتة</h3>
-                        <div class="value stat-card__stat-total-questions" id="stat-pinned-questions">0</div>
+                        <div class="value stat-card__value" id="stat-pinned-questions">0</div>
                     </div>
 
 
                     <!-- Row 3: Charts -->
-                    <div class="stat-card span-2 dashboard__item-4">
-                        <div class="stat-card__item-1">
-                            <h3 class="stat-card__title-1"><span class="stat-card__label">📊</span><span data-i18n="chart_types_title">توزيع أنواع الأسئلة</span></h3>
+                    <div class="stat-card span-2 stat-card--border-primary">
+                        <div class="stat-card__header">
+                            <h3 class="stat-card__header-title"><span class="stat-card__icon-prefix--primary">📊</span><span data-i18n="chart_types_title">توزيع أنواع الأسئلة</span></h3>
                         </div>
-                        <div id="chart-types" class="simple-chart stat-card__chart-types">
-                            <p data-i18n="loading_data" class="stat-card__text">جاري تحميل البيانات...</p>
+                        <div id="chart-types" class="simple-chart stat-card__chart-container">
+                            <p data-i18n="loading_data" class="stat-card__helper-text">جاري تحميل البيانات...</p>
                         </div>
                     </div>
                     
-                    <div class="stat-card span-2 dashboard__item-5">
-                        <div class="stat-card__item-1">
-                            <h3 class="stat-card__title-1"><span class="stat-card__label-1">📈</span><span data-i18n="chart_difficulty_title">مستوى الصعوبة</span></h3>
+                    <div class="stat-card span-2 stat-card--border-orange">
+                        <div class="stat-card__header">
+                            <h3 class="stat-card__header-title"><span class="stat-card__icon-prefix--warning">📈</span><span data-i18n="chart_difficulty_title">مستوى الصعوبة</span></h3>
                         </div>
-                        <div id="chart-difficulty" class="simple-chart stat-card__chart-types">
-                            <p class="stat-card__text">جاري تحميل البيانات...</p>
+                        <div id="chart-difficulty" class="simple-chart stat-card__chart-container">
+                            <p class="stat-card__helper-text">جاري تحميل البيانات...</p>
                         </div>
                     </div>
                     
                     <!-- Daily Wrap & Quick Actions -->
-                    <div class="stat-card span-2 dashboard__item-6">
+                    <div class="stat-card span-2 stat-card--border-purple">
                         <div>
-                            <div class="stat-card__item-2">
-                                <h3 class="stat-card__title-1">
-                                    <span class="stat-card__label-2">🌅</span>
+                            <div class="stat-card__header-row">
+                                <h3 class="stat-card__header-title">
+                                    <span class="stat-card__icon-prefix--purple">🌅</span>
                                     <span data-i18n="daily_wrap_title">ملخص الأداء اليومي</span>
                                 </h3>
                             </div>
-                            <div id="daily-wrap-container" class="stat-card__daily-wrap-container">
+                            <div id="daily-wrap-container" class="stat-card__daily-wrap">
                                 جاري تحميل ملخص اليوم...
                             </div>
                         </div>
                         <div>
-                            <h4 data-i18n="quick_actions_title" class="stat-card__title-2">الوصول السريع ⚡</h4>
-                            <div class="quick-actions-row stat-card__item-3">
-                                <button class="btn btn-sm stat-card__btn" onclick="app.quickStartQuiz()">
+                            <h4 data-i18n="quick_actions_title" class="stat-card__subtitle">الوصول السريع ⚡</h4>
+                            <div class="quick-actions-row stat-card__actions-row">
+                                <button class="btn btn-sm stat-card__btn--primary" onclick="app.quickStartQuiz()">
                                     📝 <span data-i18n="quick_quiz">امتحان فوري</span>
                                 </button>
-                                <button class="btn btn-sm stat-card__btn-1" onclick="app.quickPasteJson()">
+                                <button class="btn btn-sm stat-card__btn--primary--accent" onclick="app.quickPasteJson()">
                                     📋 <span data-i18n="quick_paste">لصق كبسولة</span>
                                 </button>
-                                <button class="btn btn-sm stat-card__btn-2" onclick="app.quickCleanDuplicates()">
+                                <button class="btn btn-sm stat-card__btn--primary--outline" onclick="app.quickCleanDuplicates()">
                                     🧹 <span data-i18n="quick_clean">تنظيف المكررات</span>
                                 </button>
                             </div>
@@ -229,114 +229,114 @@
                     </div>
 
                     <!-- Orphan Counter -->
-                    <div class="stat-card span-2 dashboard__item-7">
+                    <div class="stat-card span-2 stat-card--border-orange-flex">
                         <div>
-                            <h3 class="stat-card__title-1">
-                                <span class="stat-card__label-1">🧩</span>
+                            <h3 class="stat-card__header-title">
+                                <span class="stat-card__icon-prefix--warning">🧩</span>
                                 <span data-i18n="orphan_counter_title">الأسئلة اليتيمة (Orphan Counter)</span>
                             </h3>
-                            <p data-i18n="orphan_counter_desc" class="stat-card__text-1">الأسئلة التي لا تنتمي لأي تصنيف ولا تحتوي على أي وسوم.</p>
+                            <p data-i18n="orphan_counter_desc" class="stat-card__description">الأسئلة التي لا تنتمي لأي تصنيف ولا تحتوي على أي وسوم.</p>
                         </div>
-                        <div class="stat-card__item-1-1">
-                            <div class="stat-card__item-4">
-                                <div id="orphan-count-value" class="stat-card__orphan-count-value">0</div>
-                                <span data-i18n="questions_word" class="stat-card__label-3">سؤال عائم</span>
+                        <div class="stat-card__inner-badge">
+                            <div class="stat-card__value-row">
+                                <div id="orphan-count-value" class="stat-card__orphan-value">0</div>
+                                <span data-i18n="questions_word" class="stat-card__orphan-label">سؤال عائم</span>
                             </div>
-                            <button class="btn btn-primary stat-card__btn-3" onclick="app.filterOrphans()">
+                            <button class="btn btn-primary stat-card__btn--primary--orphan" onclick="app.filterOrphans()">
                                 🔧 <span data-i18n="quick_organize">تنظيم فوري</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Historical Quiz Chart -->
-                    <div class="stat-card span-2 dashboard__item-4">
-                        <div class="stat-card__item-1">
-                            <h3 class="stat-card__title-1">
-                                <span class="stat-card__label">📈</span>
+                    <div class="stat-card span-2 stat-card--border-primary">
+                        <div class="stat-card__header">
+                            <h3 class="stat-card__header-title">
+                                <span class="stat-card__icon-prefix--primary">📈</span>
                                 <span data-i18n="quiz_history_chart_title">منحنى الأداء التاريخي للدرجات</span>
                             </h3>
                         </div>
-                        <div id="chart-history-container" class="simple-chart stat-card__chart-history-container">
-                            <p class="stat-card__text">جاري تحميل تاريخ الامتحانات...</p>
+                        <div id="chart-history-container" class="simple-chart stat-card__chart-history">
+                            <p class="stat-card__helper-text">جاري تحميل تاريخ الامتحانات...</p>
                         </div>
                     </div>
 
                     <!-- Vulnerability Detector -->
-                    <div class="stat-card span-2 dashboard__item-9">
-                        <div class="stat-card__item-5">
-                            <h3 class="stat-card__title-1">
-                                <span class="stat-card__label-4">⚠️</span>
+                    <div class="stat-card span-2 stat-card--border-danger">
+                        <div class="stat-card__vulnerability-header">
+                            <h3 class="stat-card__header-title">
+                                <span class="stat-card__icon-prefix--danger">⚠️</span>
                                 <span data-i18n="vulnerability_detector_title">رادار نقاط الضعف التلقائي</span>
                             </h3>
-                            <p data-i18n="vulnerability_detector_desc" class="stat-card__text-2">أقسام ووسوم تحتاج مراجعة فورية بسبب انخفاض معدل درجاتك فيها عن 50%.</p>
+                            <p data-i18n="vulnerability_detector_desc" class="stat-card__vulnerability-desc">أقسام ووسوم تحتاج مراجعة فورية بسبب انخفاض معدل درجاتك فيها عن 50%.</p>
                         </div>
-                        <div id="vulnerability-container" class="stat-card__vulnerability-container">
-                            <p class="stat-card__text-3">جاري فحص رادار الأداء...</p>
+                        <div id="vulnerability-container" class="stat-card__vulnerability-list">
+                            <p class="stat-card__helper-text--centered">جاري فحص رادار الأداء...</p>
                         </div>
                     </div>
 
                     <!-- Activity Heatmap -->
-                    <div class="stat-card span-4 dashboard__item-10">
-                        <div class="stat-card__item-1">
-                            <h3 class="stat-card__title-1">
-                                <span class="stat-card__label-5">🟩</span>
+                    <div class="stat-card span-4 stat-card--border-success">
+                        <div class="stat-card__header">
+                            <h3 class="stat-card__header-title">
+                                <span class="stat-card__icon-prefix--success">🟩</span>
                                 <span data-i18n="heatmap_title">خريطة النشاط السنوي (365 يوماً)</span>
                             </h3>
-                            <div class="stat-card__item-6">
+                            <div class="stat-card__legend-item">
                                 <span data-i18n="heatmap_less">أقل</span>
-                                <div class="stat-card__item-7"></div>
-                                <div class="stat-card__item-1-2"></div>
-                                <div class="stat-card__item-2-1"></div>
-                                <div class="stat-card__item-3-1"></div>
-                                <div class="stat-card__item-4-1"></div>
+                                <div class="stat-card__legend-square--empty"></div>
+                                <div class="stat-card__legend-square--low"></div>
+                                <div class="stat-card__legend-square--medium"></div>
+                                <div class="stat-card__legend-square--high"></div>
+                                <div class="stat-card__legend-square--max"></div>
                                 <span data-i18n="heatmap_more">أكثر</span>
                             </div>
                         </div>
-                        <div id="heatmap-container" class="stat-card__heatmap-container">
+                        <div id="heatmap-container" class="stat-card__heatmap">
                             <!-- SVG Grid here -->
                         </div>
                     </div>
 
                     <!-- Row 3: Storage Quota -->
-                    <div class="stat-card dashboard__item-11">
-                        <div class="stat-card__item-8">
-                            <div class="stat-card__item-9">
-                                <div class="stat-card__item-10">💾</div>
+                    <div class="stat-card stat-card--storage">
+                        <div class="stat-card__storage-section">
+                            <div class="stat-card__storage-header">
+                                <div class="stat-card__storage-icon">💾</div>
                                 <div>
-                                    <h3 data-i18n="storage_title" class="stat-card__title-1">سعة التخزين</h3>
-                                    <p data-i18n="storage_desc" class="stat-card__text-4">المساحة المخصصة محلياً</p>
+                                    <h3 data-i18n="storage_title" class="stat-card__header-title">سعة التخزين</h3>
+                                    <p data-i18n="storage_desc" class="stat-card__storage-text">المساحة المخصصة محلياً</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="stat-card__item-1-3">
-                            <div class="stat-card__item-11">
-                                <span id="storage-used-text" data-i18n="loading" class="stat-card__storage-used-text">جاري الحساب...</span>
-                                <span id="storage-percent-text" class="stat-card__storage-percent-text">0%</span>
+                        <div class="stat-card__storage-progress">
+                            <div class="stat-card__storage-values">
+                                <span id="storage-used-text" data-i18n="loading" class="stat-card__storage-used" aria-live="polite" role="status">جاري الحساب...</span>
+                                <span id="storage-percent-text" class="stat-card__storage-percent" aria-live="polite" role="status">0%</span>
                             </div>
-                            <div class="chart-bar-bg stat-card__item-1-4">
-                                <div id="storage-bar-fill" class="chart-bar-fill stat-card__storage-bar-fill"></div>
+                            <div class="chart-bar-bg stat-card__progress-track">
+                                <div id="storage-bar-fill" class="chart-bar-fill stat-card__progress-fill"></div>
                             </div>
                         </div>
                         
-                        <div class="stat-card__item-2-2">
-                            <span class="stat-card__label-6">🚀</span>
+                        <div class="stat-card__sync-box">
+                            <span class="stat-card__sync-icon">🚀</span>
                             <div>
-                                <small data-i18n="speed_system_active" class="stat-card__item-12">نظام السرعة الفائقة مفعّل</small>
-                                <small data-i18n="speed_system_desc" class="stat-card__item-1-5">جاهز للتعامل مع آلاف الأسئلة.</small>
+                                <small data-i18n="speed_system_active" class="stat-card__sync-title">نظام السرعة الفائقة مفعّل</small>
+                                <small data-i18n="speed_system_desc" class="stat-card__sync-message">جاهز للتعامل مع آلاف الأسئلة.</small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card dashboard__item-12">
-                        <div class="stat-card__item-13">
-                            <span class="stat-card__label-6">💎</span>
+                    <div class="stat-card dashboard-info-banner">
+                        <div class="dashboard-info-banner__info">
+                            <span class="stat-card__sync-icon">💎</span>
                             <div>
-                                <h4 data-i18n="raw_export_title" class="stat-card__title-3">بيانات البنك الخام</h4>
-                                <p data-i18n="raw_export_desc" class="stat-card__text-5">نسخ مصفوفة الأسئلة بالكامل للاستخدام الخارجي.</p>
+                                <h4 data-i18n="raw_export_title" class="dashboard-info-banner__title">بيانات البنك الخام</h4>
+                                <p data-i18n="raw_export_desc" class="dashboard-info-banner__desc">نسخ مصفوفة الأسئلة بالكامل للاستخدام الخارجي.</p>
                             </div>
                         </div>
-                        <button class="btn stat-card__btn-4" onclick="app.copyRawJson()">
+                        <button class="btn dashboard-info-banner__btn" onclick="app.copyRawJson()">
                             📋 <span data-i18n="btn_copy_raw_structure">نسخ الهيكل</span>
                         </button>
                     </div>
@@ -360,7 +360,7 @@
             </section>
 
             <!-- Questions View -->
-            <section id="questions" class="view-section">
+            <section id="questions" class="view-section view-section--questions">
                 <div class="flex-between">
                     <h2 data-i18n="question_bank">بنك الأسئلة</h2>
                     <button class="btn btn-primary-action" id="btn-add-question">
@@ -371,18 +371,18 @@
                 <!-- Advanced Filter Bar -->
                 <div class="filter-bar">
                     <!-- Mobile: Filter Drawer Toggle (shown via CSS on small screens) -->
-                    <button id="filter-toggle-btn" onclick="app.openFilterDrawer()" aria-label="فتح الفلاتر">⚙️ <span data-i18n="filters">فلاتر</span></button>
+                    <button id="filter-toggle-btn" onclick="app.openFilterDrawer()" aria-label="فتح الفلاتر" class="filter-toggle-btn">⚙️ <span data-i18n="filters">فلاتر</span></button>
                     
-                    <div class="filter-row-top questions__item">
+                    <div class="filter-row-top questions__filter-row-top">
                         <input type="text" id="filter-search" class="form-control questions__filter-search" placeholder="بحث بكلمات السؤال أو الوسوم..." data-i18n-placeholder="filter_search_placeholder">
-                        <button id="smartSearchBtn" class="btn btn-smart-search btn-action shadow-sm questions__smartsearchbtn" title="محرك الاختيار المتقدم">
+                        <button id="smartSearchBtn" class="btn btn-smart-search btn-action shadow-sm questions__btn--smart-search" title="محرك الاختيار المتقدم">
                             <span class="icon">🎯</span>
                             <span class="btn-text" data-i18n="smart_selection">تحديد ذكي</span>
                         </button>
-                        <button class="btn questions__btn-1" onclick="app.openPrintModal()" data-i18n="print_pdf">🖨️ طباعة / تصدير PDF</button>
+                        <button class="btn questions__btn--print" onclick="app.openPrintModal()" data-i18n="print_pdf">🖨️ طباعة / تصدير PDF</button>
                     </div>
 
-                    <div class="filter-row-bottom questions__item-1">
+                    <div class="filter-row-bottom questions__filter-row-bottom">
                         <select id="filter-notebook" class="form-control filter-pill">
                             <option value="" data-i18n="all_notebooks">كل الدفاتر</option>
                         </select>
@@ -417,7 +417,7 @@
                             <span id="bulk-count" class="bulk-actions-bar__bulk-count">تم تحديد 0</span>
                         </label>
                     </div>
-                    <div class="bulk-btn-group bulk-actions-bar__item-1">
+                    <div class="bulk-btn-group bulk-actions-bar__bulk">
                         <select id="bulk-notebook-move" class="form-control bulk-select-move bulk-actions-bar__bulk-notebook-move">
                             <option value="">نقل إلى دفتر...</option>
                         </select>
@@ -430,7 +430,7 @@
                 </div>
 
                 <!-- Advanced Horizontal Pagination Toolbar -->
-                <div id="pagination-controls" class="pagination-toolbar">
+                <div id="pagination-controls" class="pagination-toolbar pagination-controls">
                     <div class="pagination-group">
                         <button class="btn btn-sm" onclick="app.goToPage(1)" title="البداية" data-i18n-title="first_page">«</button>
                         <button class="btn btn-sm" id="btn-prev-page" onclick="app.changePage(-1)" data-i18n="prev">السابق</button>
@@ -439,7 +439,7 @@
                     <div class="pagination-group">
                         <span id="page-info" class="pagination-info-badge">الصفحة 1 من 1</span>
                         <div class="pagination-input-wrapper">
-                            <span data-i18n="show_label" class="questions__label">عرض:</span>
+                            <span data-i18n="show_label" class="questions__filter-label">عرض:</span>
                             <input type="number" id="input-items-per-page" value="20" min="1" max="200" onchange="app.updateItemsPerPage(this.value)">
                         </div>
                     </div>
@@ -454,159 +454,159 @@
 
                 <div class="empty-state questions__empty-state" id="questions-empty-state">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="notebooks__icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <p data-i18n="no_questions" class="questions__text">بنك الأسئلة فارغ. يرجى إضافة أسئلة للبدء.</p>
+                    <p data-i18n="no_questions" class="questions__empty-text">بنك الأسئلة فارغ. يرجى إضافة أسئلة للبدء.</p>
                 </div>
             </section>
 
             <!-- Quiz View -->
-            <section id="quiz" class="view-section">
+            <section id="quiz" class="view-section view-section--quiz">
 
 
                 
                 <!-- Setup Phase -->
-                <div id="quiz-setup" class="layout__quiz-setup">
-                    <div class="stat-card layout__item">
+                <div id="quiz-setup" class="quiz__setup quiz__setup">
+                    <div class="stat-card quiz__container">
                         <h3 data-i18n="quiz_setup" class="stat-card__title-4">⚙️ إعدادات الاختبار</h3>
                         
-                        <div class="form-group stat-card__item-14">
-                            <label for="quiz-notebook" data-i18n="quiz_scope" class="stat-card__item-15">📚 النطاق (اختر الدفتر)</label>
+                        <div class="form-group stat-card__label_for">
+                            <label for="quiz-notebook" data-i18n="quiz_scope" class="stat-card__watermark-15">📚 النطاق (اختر الدفتر)</label>
                             <select id="quiz-notebook" class="form-control stat-card__quiz-notebook"></select>
-                            <small data-i18n="quiz_scope_hint" class="stat-card__item-16">اتركه فارغاً لاختبار شامل من جميع الدفاتر.</small>
+                            <small data-i18n="quiz_scope_hint" class="stat-card__watermark-16">اتركه فارغاً لاختبار شامل من جميع الدفاتر.</small>
                         </div>
                         
-                        <div class="stat-card__item-1-6">
-                            <div class="form-group stat-card__item-17">
-                                <label for="quiz-count" data-i18n="quiz_count" class="stat-card__item-15">🔢 عدد الأسئلة</label>
+                        <div class="stat-card__form_group">
+                            <div class="form-group stat-card__label_for--17">
+                                <label for="quiz-count" data-i18n="quiz_count" class="stat-card__watermark-15">🔢 عدد الأسئلة</label>
                                 <input type="number" id="quiz-count" class="form-control stat-card__quiz-count" value="20" min="1">
                             </div>
-                            <div class="form-group stat-card__item-17">
-                                <label for="quiz-time" data-i18n="quiz_time" class="stat-card__item-15">⏱️ الوقت (بالدقائق)</label>
+                            <div class="form-group stat-card__label_for--17">
+                                <label for="quiz-time" data-i18n="quiz_time" class="stat-card__watermark-15">⏱️ الوقت (بالدقائق)</label>
                                 <input type="number" id="quiz-time" class="form-control stat-card__quiz-count" value="15" min="1">
                             </div>
                         </div>
                         
-                        <div class="stat-card__item-2-3">
-                            <button class="btn stat-card__btn-5" onclick="app.startQuiz()" data-i18n="quiz_start">بدء الاختبار الآن 🚀</button>
-                            <div class="stat-card__item-18">
-                                <button class="btn stat-card__btn-6" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" title="خيارات اختيار متقدمة" data-i18n="quiz_custom">🛠️ تخصيص دقيق</button>
-                                <button class="btn stat-card__btn-1-1" onclick="app.bridgeToExam('quiz')" data-i18n="quiz_bridge">🌐 محاكاة شاملة</button>
+                        <div class="stat-card__stat">
+                            <button class="btn stat-card__btn--primary-5" onclick="app.startQuiz()" data-i18n="quiz_start">بدء الاختبار الآن 🚀</button>
+                            <div class="stat-card__stat--18">
+                                <button class="btn stat-card__btn--primary-6" onclick="app.renderSelectionHub(); app.openModal('selection-modal')" title="خيارات اختيار متقدمة" data-i18n="quiz_custom">🛠️ تخصيص دقيق</button>
+                                <button class="btn stat-card__btn--primary-1_1" onclick="app.bridgeToExam('quiz')" data-i18n="quiz_bridge">🌐 محاكاة شاملة</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Active Phase -->
-                <div id="quiz-active" class="layout__quiz-active">
+                <div id="quiz-active" class="quiz__active quiz__active">
                     
-                    <div class="layout__item-1">
-                        <div class="layout__item-2">
-                            <div class="layout__item-3">
-                                <div class="layout__item-4">
-                                    <h3 id="quiz-timer" class="layout__quiz-timer">15:00</h3>
+                    <div class="quiz__card">
+                        <div class="quiz__card-header">
+                            <div class="quiz__timer-wrapper">
+                                <div class="quiz__progress-wrapper">
+                                    <h3 id="quiz-timer" class="quiz__timer">15:00</h3>
                                 </div>
-                                <div class="layout__item-1-1"><span data-i18n="quiz_q_prefix">السؤال</span> <span id="quiz-current-idx" class="layout__quiz-current-idx">1</span> <span data-i18n="quiz_q_of">من</span> <span id="quiz-total">10</span></div>
+                                <div class="quiz__question-header"><span data-i18n="quiz_q_prefix">السؤال</span> <span id="quiz-current-idx" class="quiz__current-idx">1</span> <span data-i18n="quiz_q_of">من</span> <span id="quiz-total">10</span></div>
                             </div>
-                            <div class="layout__item-1-2">
-                                <button class="btn layout__btn-zen-mode" id="btn-zen-mode" onclick="app.toggleZenMode()" title="وضع التركيز">🔲 تركيز</button>
+                            <div class="quiz__actions-row">
+                                <button class="btn quiz__btn--zen" id="btn-zen-mode" onclick="app.toggleZenMode()" title="وضع التركيز">🔲 تركيز</button>
                             </div>
                         </div>
-                        <div class="layout__item-1-3">
-                            <div id="quiz-progress-bar" class="layout__quiz-progress-bar"></div>
+                        <div class="quiz__progress-container">
+                            <div id="quiz-progress-bar" class="quiz__progress-bar"></div>
                         </div>
                     </div>
                     
-                    <div id="quiz-question-container" class="layout__quiz-question-container">
+                    <div id="quiz-question-container" class="quiz__question-container quiz__question-container">
                         <!-- Question rendered here -->
                     </div>
 
                     <!-- Floating Bottom Navigation Dock -->
                     <div class="quiz-nav-dock">
                         <!-- Reveal Row (Top part of dock) -->
-                        <div class="layout__item-5">
-                            <button class="btn layout__btn" onclick="app.quizRevealAnswer()" data-i18n="reveal_answer">كشف الإجابة 👁️</button>
-                            <button class="btn layout__btn" onclick="app.quizRevealExplanation()" data-i18n="reveal_explain">كشف التفسير 💡</button>
+                        <div class="quiz__options-wrapper">
+                            <button class="btn quiz__btn" onclick="app.quizRevealAnswer()" data-i18n="reveal_answer">كشف الإجابة 👁️</button>
+                            <button class="btn quiz__btn" onclick="app.quizRevealExplanation()" data-i18n="reveal_explain">كشف التفسير 💡</button>
                         </div>
                         <!-- Navigation Row (Bottom part of dock) -->
-                        <div class="layout__item-1-4">
-                            <button class="btn layout__btn-quiz-prev" id="btn-quiz-prev" onclick="app.quizNav(-1)" data-i18n="prev_arrow">« السابق</button>
-                            <button class="btn layout__btn-quiz-next" id="btn-quiz-next" onclick="app.quizNav(1)" data-i18n="next_arrow">التالي »</button>
-                            <button class="btn btn-danger layout__btn-2" onclick="app.submitQuiz()" data-i18n="quiz_finish">إنهاء 🏁</button>
+                        <div class="quiz__nav-row">
+                            <button class="btn quiz__btn--prev" id="btn-quiz-prev" onclick="app.quizNav(-1)" data-i18n="prev_arrow">« السابق</button>
+                            <button class="btn quiz__btn--next" id="btn-quiz-next" onclick="app.quizNav(1)" data-i18n="next_arrow">التالي »</button>
+                            <button class="btn btn-danger quiz__btn--danger" onclick="app.submitQuiz()" data-i18n="quiz_finish">إنهاء 🏁</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Result Phase -->
-                <div id="quiz-result" class="layout__quiz-result">
-                    <div class="layout__item-6">🏆</div>
-                    <h2 data-i18n="quiz_complete" class="layout__title">اكتمل الاختبار!</h2>
-                    <p data-i18n="quiz_result_desc" class="layout__text">إليك ملخص أدائك في هذا الاختبار.</p>
+                <div id="quiz-result" class="quiz__result quiz__result">
+                    <div class="quiz__result-wrapper">🏆</div>
+                    <h2 data-i18n="quiz_complete" class="quiz__title">اكتمل الاختبار!</h2>
+                    <p data-i18n="quiz_result_desc" class="quiz__text">إليك ملخص أدائك في هذا الاختبار.</p>
                     
-                    <div class="layout__item-1-5">
-                        <h1 id="quiz-score" class="layout__quiz-score">8 / 10</h1>
+                    <div class="quiz__score-container">
+                        <h1 id="quiz-score" class="quiz__score">8 / 10</h1>
                     </div>
                     
-                    <p id="quiz-feedback" class="layout__quiz-feedback"></p>
+                    <p id="quiz-feedback" class="quiz__feedback"></p>
                     
-                    <button class="btn layout__btn-1" onclick="document.getElementById('quiz-result').style.display='none'; document.getElementById('quiz-setup').style.display='block';" data-i18n="quiz_restart">إجراء اختبار جديد 🔄</button>
+                    <button class="btn quiz__btn--primary" onclick="document.getElementById('quiz-result').style.display='none'; document.getElementById('quiz-setup').style.display='block';" data-i18n="quiz_restart">إجراء اختبار جديد 🔄</button>
                 </div>
             </section>
 
             <!-- Settings View -->
             <section id="settings" class="view-section">
                 <!-- Group 1: Typography & Interface Language -->
-                <div class="settings-group-section settings__item">
-                    <h3 class="settings-group-title settings__title">
+                <div class="settings-group-section settings__group">
+                    <h3 class="settings-group-title settings__group-title">
                         <span>🌐</span> <span data-i18n="group_lang_typo">اللغة والمظهر البصري</span>
                     </h3>
-                    <div class="dashboard-grid settings__item-1">
+                    <div class="dashboard-grid settings__grid">
                         <!-- Font Size Control -->
-                        <div class="stat-card settings__item-2">
-                            <div class="stat-card__item-19">
-                                <div class="stat-card__item-20">Aa</div>
+                        <div class="stat-card settings__card-font">
+                            <div class="stat-card__stat_card">
+                                <div class="stat-card__watermark-20">Aa</div>
                                 <h3 data-i18n="font_size_title" class="stat-card__title-5">تحكم في حجم الخط</h3>
                             </div>
-                            <p data-i18n="font_size_desc" class="stat-card__text-6">اضبط حجم الخط ليناسب راحة عينك — مهم خصوصاً للعربي.</p>
-                            <div class="stat-card__item-1-7">
-                                <div class="stat-card__item-21">
-                                    <label for="font-size-slider" data-i18n="font_size_current" class="stat-card__item-22">حجم الخط الحالي</label>
+                            <p data-i18n="font_size_desc" class="stat-card__helper-text-6">اضبط حجم الخط ليناسب راحة عينك — مهم خصوصاً للعربي.</p>
+                            <div class="stat-card__stat_card--1_7">
+                                <div class="stat-card__label_for--21">
+                                    <label for="font-size-slider" data-i18n="font_size_current" class="stat-card__watermark-22">حجم الخط الحالي</label>
                                     <strong id="font-size-value" class="sidebar__icon">16px</strong>
                                 </div>
                                 <input type="range" id="font-size-slider" min="13" max="22" value="16" step="1" oninput="app.setFontSize(this.value)" class="stat-card__font-size-slider">
-                                <div class="stat-card__item-1-8">
+                                <div class="stat-card__font">
                                     <span data-i18n="font_size_small">13px صغير</span><span data-i18n="font_size_large">22px كبير</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Interface Direction Card -->
-                        <div class="stat-card settings__item-1-1">
-                            <div class="stat-card__item-23">
-                                <div class="stat-card__item-24">🌐</div>
+                        <div class="stat-card settings__card-language">
+                            <div class="stat-card__stat_card--23">
+                                <div class="stat-card__watermark-24">🌐</div>
                                 <h3 data-i18n="interface_lang" class="stat-card__title-5">تخصيص لغة الواجهة</h3>
                             </div>
-                            <p data-i18n="interface_desc" class="stat-card__text-7">تحكم في اتجاه نصوص الواجهة والأسئلة ليتناسب مع المادة العلمية (عربي/إنجليزي).</p>
-                            <div class="stat-card__item-1-9">
-                                <button class="btn stat-card__btn-dir-rtl" id="btn-dir-rtl" onclick="app.setLanguage('ar')" data-i18n="lang_ar">العربية (RTL)</button>
-                                <button class="btn stat-card__btn-dir-ltr" id="btn-dir-ltr" onclick="app.setLanguage('en')" data-i18n="lang_en">English (LTR)</button>
+                            <p data-i18n="interface_desc" class="stat-card__helper-text-7">تحكم في اتجاه نصوص الواجهة والأسئلة ليتناسب مع المادة العلمية (عربي/إنجليزي).</p>
+                            <div class="stat-card__stat--1_9">
+                                <button class="btn stat-card__btn--primary-dir-rtl" id="btn-dir-rtl" onclick="app.setLanguage('ar')" data-i18n="lang_ar">العربية (RTL)</button>
+                                <button class="btn stat-card__btn--primary-dir-ltr" id="btn-dir-ltr" onclick="app.setLanguage('en')" data-i18n="lang_en">English (LTR)</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Group 2: AI & Customization -->
-                <div class="settings-group-section settings__item">
-                    <h3 class="settings-group-title settings__title">
+                <div class="settings-group-section settings__group">
+                    <h3 class="settings-group-title settings__group-title">
                         <span>🎨</span> <span data-i18n="group_ai_custom">الذكاء الاصطناعي والتخصيص</span>
                     </h3>
-                    <div class="dashboard-grid settings__item-1">
+                    <div class="dashboard-grid settings__grid">
                         <!-- AI Assistant Card -->
-                        <div class="stat-card settings__item-3">
-                            <div class="stat-card__item-23">
-                                <div class="stat-card__item-25">🤖</div>
+                        <div class="stat-card settings__card-ai">
+                            <div class="stat-card__stat_card--23">
+                                <div class="stat-card__watermark-25">🤖</div>
                                 <h3 data-i18n="ai_assistant" class="stat-card__title-5">مساعد الذكاء الاصطناعي</h3>
                             </div>
-                            <p data-i18n="ai_desc" class="stat-card__text-7">قم بتوليد برومبتات (Prompts) مخصصة لأي ذكاء اصطناعي (مثل ChatGPT) لإنشاء أسئلة متوافقة تماماً مع بنية النظام.</p>
-                            <button class="btn stat-card__btn-7" onclick="app.openAiPromptModal()" data-i18n="ai_btn">
+                            <p data-i18n="ai_desc" class="stat-card__helper-text-7">قم بتوليد برومبتات (Prompts) مخصصة لأي ذكاء اصطناعي (مثل ChatGPT) لإنشاء أسئلة متوافقة تماماً مع بنية النظام.</p>
+                            <button class="btn stat-card__btn--primary-7" onclick="app.openAiPromptModal()" data-i18n="ai_btn">
                                 ✨ تخصيص البرومبت الذكي
                             </button>
                         </div>
@@ -614,61 +614,91 @@
 
 
                         <!-- Institution Identity -->
-                        <div class="stat-card settings__item-1-2">
-                            <div class="stat-card__item-19">
-                                <div class="stat-card__item-26">🏫</div>
+                        <div class="stat-card settings__card-export">
+                            <div class="stat-card__stat_card">
+                                <div class="stat-card__watermark-26">🏫</div>
                                 <h3 data-i18n="institution_title" class="stat-card__title-5">هوية المؤسسة</h3>
                             </div>
-                            <p data-i18n="institution_desc" class="stat-card__text-8">اسم المدرسة وشعارها يظهران تلقائياً في ترويسة كل PDF تطبعه.</p>
-                            <label for="institution-name" data-i18n="institution_title" class="stat-card__item-27">اسم المؤسسة</label>
+                            <p data-i18n="institution_desc" class="stat-card__pdf">اسم المدرسة وشعارها يظهران تلقائياً في ترويسة كل PDF تطبعه.</p>
+                            <label for="institution-name" data-i18n="institution_title" class="stat-card__watermark-27">اسم المؤسسة</label>
                             <input type="text" id="institution-name" class="form-control stat-card__institution-name" placeholder="اسم المدرسة / الجامعة / المؤسسة" data-i18n-placeholder="institution_name_placeholder">
                             <input type="file" id="institution-logo-upload" accept="image/*" onchange="app.handleInstitutionLogoUpload(event)" class="stat-card__institution-logo-upload">
                             <input type="hidden" id="institution-logo-b64">
-                            <div class="stat-card__item-1-10">
-                                <button class="btn btn-secondary stat-card__btn-8" onclick="document.getElementById('institution-logo-upload').click()" data-i18n="btn_upload_logo">📁 رفع شعار</button>
+                            <div class="stat-card__btn--primary">
+                                <button class="btn btn-secondary stat-card__btn--primary-8" onclick="document.getElementById('institution-logo-upload').click()" data-i18n="btn_upload_logo">📁 رفع شعار</button>
                                 <img id="institution-logo-preview" class="stat-card__institution-logo-preview">
                             </div>
-                            <div class="stat-card__item-2-4">
-                                <button class="btn stat-card__btn-9" onclick="app.saveInstitution()" data-i18n="btn_save_identity">💾 حفظ الهوية</button>
-                                <button class="btn btn-secondary stat-card__btn-1-2" onclick="app.clearInstitution()" data-i18n="btn_remove">🗑️ إزالة</button>
+                            <div class="stat-card__stat--2_4">
+                                <button class="btn stat-card__btn--primary-9" onclick="app.saveInstitution()" data-i18n="btn_save_identity">💾 حفظ الهوية</button>
+                                <button class="btn btn-secondary stat-card__btn--primary-1_2" onclick="app.clearInstitution()" data-i18n="btn_remove">🗑️ إزالة</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Group 3: Maintenance & Database tools -->
-                <div class="settings-group-section settings__item">
-                    <h3 class="settings-group-title settings__title">
+                <div class="settings-group-section settings__group">
+                    <h3 class="settings-group-title settings__group-title">
                         <span>🛠️</span> <span data-i18n="group_maintenance">الصيانة وقاعدة البيانات</span>
                     </h3>
-                    <div class="dashboard-grid settings__item-1">
+                    <div class="dashboard-grid settings__grid">
                         <!-- Maintenance Tools Card -->
-                        <div class="stat-card settings__item-4">
-                            <div class="stat-card__item-23">
-                                <div class="stat-card__item-28">🛠️</div>
+                        <div class="stat-card settings__card-maintenance">
+                            <div class="stat-card__stat_card--23">
+                                <div class="stat-card__watermark-28">🛠️</div>
                                 <h3 data-i18n="maintenance_tools" class="stat-card__title-5">أدوات الصيانة والدمج</h3>
                             </div>
-                            <p data-i18n="maintenance_desc" class="stat-card__text-7">تنظيف البيانات المكررة ودمج الوسوم والتصنيفات المتشابهة (مثلاً "كيمياء" و "كيميا") لضمان دقة البحث.</p>
-                            <div class="stat-card__item-1-11">
-                                <button class="btn btn-sm stat-card__btn-10" onclick="app.openTagNormalizer()" data-i18n="tag_normalizer">
+                            <p data-i18n="maintenance_desc" class="stat-card__helper-text-7">تنظيف البيانات المكررة ودمج الوسوم والتصنيفات المتشابهة (مثلاً "كيمياء" و "كيميا") لضمان دقة البحث.</p>
+                            <div class="stat-card__btn--primary--1_11">
+                                <button class="btn btn-sm stat-card__btn--primary-10" onclick="app.openTagNormalizer()" data-i18n="tag_normalizer">
                                     🏷️ تنظيف وتحسين الوسوم
                                 </button>
-                                <button class="btn btn-sm stat-card__btn-10" onclick="app.openCategoryNormalizer()" data-i18n="cat_normalizer">
+                                <button class="btn btn-sm stat-card__btn--primary-10" onclick="app.openCategoryNormalizer()" data-i18n="cat_normalizer">
                                     📂 تنظيف وتحسين التصنيفات
                                 </button>
                             </div>
                         </div>
 
                         <!-- Backup & Reset Card -->
-                        <div class="stat-card settings__item-1-3">
-                            <div class="stat-card__item-23">
-                                <div class="stat-card__item-29">💾</div>
+                        <div class="stat-card settings__card-institution">
+                            <div class="stat-card__stat_card--23">
+                                <div class="stat-card__watermark-29">💾</div>
                                 <h3 data-i18n="backup_title" class="stat-card__title-5">النسخ الاحتياطي</h3>
                             </div>
-                            <p data-i18n="backup_desc" class="stat-card__text-7">تصدير كافة بيانات البنك في ملف JSON واحد للنسخ الاحتياطي أو مشاركته مع الآخرين.</p>
-                            <div class="stat-card__item-1-9">
-                                <button class="btn stat-card__btn-11" onclick="app.exportToJSON()" data-i18n="export_json">تصدير النسخة 📁</button>
-                                <button class="btn stat-card__btn-1-3" onclick="app.clearAllData(this)" data-i18n="clear_all">حذف الكل 🗑️</button>
+                            <p data-i18n="backup_desc" class="stat-card__helper-text-7">تصدير كافة بيانات البنك في ملف JSON واحد للنسخ الاحتياطي أو مشاركته مع الآخرين.</p>
+                            <div class="stat-card__stat--1_9">
+                                <button class="btn stat-card__btn--primary-11" onclick="app.exportToJSON()" data-i18n="export_json">تصدير النسخة 📁</button>
+                                <button class="btn stat-card__btn--primary-1_3" onclick="app.clearAllData(this)" data-i18n="clear_all">حذف الكل 🗑️</button>
+                            </div>
+                        </div>
+
+                        <!-- Tiered Snapshots Card -->
+                        <div id="snapshots-panel" class="stat-card settings__card-maintenance snapshots-panel" style="grid-column: 1 / -1;">
+                            <div class="stat-card__stat_card--23">
+                                <div class="stat-card__watermark-29">📸</div>
+                                <h3 class="stat-card__title-5">اللقطات الزمنية (Snapshots)</h3>
+                            </div>
+                            <p class="stat-card__helper-text-7">احفظ نسخة من حالة النظام بمستويات مختلفة (الهوية البصرية، هيكل الدفاتر، أو كامل البيانات) لاستعادتها لاحقاً أو مقارنتها بالوضع الحالي.</p>
+
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label for="snapshot-label">تسمية اللقطة (اختياري)</label>
+                                <input type="text" id="snapshot-label" class="form-control" placeholder="مثال: قبل إضافة أسئلة الباطنة...">
+                            </div>
+
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+                                <button class="btn btn-sm" onclick="app.captureSnapshot(1)" style="background: #10b98122; color: #10b981; border: 1px solid #10b98133;">
+                                    🎨 المستوى 1: الهوية البصرية
+                                </button>
+                                <button class="btn btn-sm" onclick="app.captureSnapshot(2)" style="background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b33;">
+                                    🗂️ المستوى 2: هيكل الدفاتر
+                                </button>
+                                <button class="btn btn-sm" onclick="app.captureSnapshot(3)" style="background: #ef444422; color: #ef4444; border: 1px solid #ef444433;">
+                                    💾 المستوى 3: البيانات الكاملة
+                                </button>
+                            </div>
+
+                            <div id="snapshots-list" style="max-height: 350px; overflow-y: auto;">
+                                <div style="text-align:center; padding:20px; color:var(--text-secondary);">لا توجد لقطات محفوظة بعد.</div>
                             </div>
                         </div>
                     </div>
@@ -678,20 +708,20 @@
             <!-- Import Hub View -->
             <section id="import-hub" class="view-section">
                 <!-- Global Import Settings -->
-                <div class="stat-card import-hub__item">
-                    <div class="stat-card__item-30">
-                        <div class="stat-card__item-13">
-                            <span class="stat-card__label-6">⚙️</span>
+                <div class="stat-card import-hub__manual-card">
+                    <div class="stat-card__watermark-30">
+                        <div class="dashboard-info-banner__info">
+                            <span class="stat-card__sync-icon">⚙️</span>
                             <h3 data-i18n="import_settings" class="stat-card__title-5">إعدادات الاستيراد</h3>
                         </div>
-                        <div class="stat-card__item-1-12">
-                            <div class="import-notebook-select stat-card__item-31">
-                                <label for="import-notebook" data-i18n="nav_notebooks" class="stat-card__item-32">الدفتر المستهدف:</label>
+                        <div class="stat-card__import_notebook">
+                            <div class="import-notebook-select stat-card__label_for--31">
+                                <label for="import-notebook" data-i18n="nav_notebooks" class="stat-card__watermark-32">الدفتر المستهدف:</label>
                                 <select id="import-notebook" class="form-control stat-card__import-notebook"></select>
                             </div>
-                            <div class="stat-card__item-31">
+                            <div class="stat-card__label_for--31">
                                 <input type="checkbox" id="import-auto-distribute" checked="" class="stat-card__import-auto-distribute">
-                                <label for="import-auto-distribute" data-i18n="auto_distribute" class="stat-card__item-33">🧠 توزيع تلقائي للملفات</label>
+                                <label for="import-auto-distribute" data-i18n="auto_distribute" class="stat-card__watermark-33">🧠 توزيع تلقائي للملفات</label>
                             </div>
                         </div>
                     </div>
@@ -699,39 +729,39 @@
 
                 <div class="hub-grid">
                     <!-- Card 1: Smart Text & JSON Paste -->
-                    <div class="stat-card settings__item-1-3">
-                        <div class="stat-card__item-23">
-                            <span class="stat-card__label-7">📝</span>
+                    <div class="stat-card settings__card-institution">
+                        <div class="stat-card__stat_card--23">
+                            <span class="stat-card__icon-prefix--primary-7">📝</span>
                             <h3 data-i18n="import_paste_label" class="stat-card__title-5">استيراد نصي ذكي</h3>
                         </div>
-                        <p data-i18n="import_paste_desc" class="stat-card__text-9">ألصق نص JSON أو نصاً طبيعياً حرّاً وسيقوم النظام بتحليله آلياً.</p>
-                        <textarea id="import-paste-area" class="modern-textarea stat-card__import-paste-area" placeholder="[ { &quot;type&quot;: &quot;mcq&quot;, &quot;question&quot;: &quot;...&quot;, &quot;answer&quot;: &quot;...&quot; } ]"></textarea>
-                        <div class="stat-card__item-1-13">
-                            <button class="btn btn-primary stat-card__btn-12" onclick="app.importFromPaste()" data-i18n="import_json_btn">
+                        <p data-i18n="import_paste_desc" class="stat-card__json">ألصق نص JSON أو نصاً طبيعياً حرّاً وسيقوم النظام بتحليله آلياً.</p>
+                        <textarea id="import-paste-area" class="modern-textarea stat-card__import-paste-area" placeholder="[ { &quot;type&quot;: &quot;mcq&quot;, &quot;question&quot;: &quot;...&quot;, &quot;answer&quot;: &quot;...&quot;, &quot;reference&quot;: { &quot;book&quot;: &quot;...&quot;, &quot;page&quot;: &quot;...&quot; } } ]"></textarea>
+                        <div class="stat-card__btn--primary--1_13">
+                            <button class="btn btn-primary stat-card__json--12" onclick="app.importFromPaste()" data-i18n="import_json_btn">
                                 🚀 استيراد JSON
                             </button>
-                            <button class="btn btn-success stat-card__btn-1-4" onclick="app.smartTextImport()" data-i18n="import_smart_btn">
+                            <button class="btn btn-success stat-card__btn--primary-1_4" onclick="app.smartTextImport()" data-i18n="import_smart_btn">
                                 🧠 استيراد ذكي من النص
                             </button>
-                            <button class="btn btn-secondary stat-card__btn-copy-raw-structure" id="btn-copy-raw-structure" onclick="app.copyRawStructure()" title="نسخ كافة الأسئلة بصيغة JSON خام">
+                            <button class="btn btn-secondary stat-card__btn--primary-copy-raw-structure" id="btn-copy-raw-structure" onclick="app.copyRawStructure()" title="نسخ كافة الأسئلة بصيغة JSON خام">
                                 📋 <span data-i18n="btn_copy_raw_structure">نسخ الهيكل الخام</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Card 2: Certified Medical References -->
-                    <div class="stat-card settings__item-3">
-                        <div class="stat-card__item-23">
-                            <span class="stat-card__label-7">📚</span>
+                    <div class="stat-card settings__card-ai">
+                        <div class="stat-card__stat_card--23">
+                            <span class="stat-card__icon-prefix--primary-7">📚</span>
                             <h3 data-i18n="import_ref_title" class="stat-card__title-5">المصادر المعتمدة</h3>
                         </div>
-                        <p data-i18n="import_ref_desc" class="stat-card__text-10">حمّل بنوك أسئلة كاملة ومراجعة جاهزة لمناهج الزمالة والامتحانات الطبية.</p>
+                        <p data-i18n="import_ref_desc" class="stat-card__helper-text-10">حمّل بنوك أسئلة كاملة ومراجعة جاهزة لمناهج الزمالة والامتحانات الطبية.</p>
                         
-                        <div class="stat-card__item-1-14">
+                        <div class="stat-card__reference">
                             <select id="reference-selector" class="form-control stat-card__reference-selector">
                                 <option value="" data-i18n="select_ref_placeholder">--- اختر المرجع المطلوب ---</option>
                             </select>
-                            <button class="btn stat-card__btn-preview-ref" id="btn-preview-ref">
+                            <button class="btn stat-card__btn--primary-preview-ref" id="btn-preview-ref">
                                 <span data-i18n="btn_preview_ref">معاينة وفحص 📡</span>
                             </button>
                         </div>
@@ -741,7 +771,7 @@
                             <h4 id="ref-detail-name" class="stat-card__ref-detail-name"></h4>
                             <p id="ref-detail-desc" class="stat-card__ref-detail-desc"></p>
                             <span id="ref-detail-version" class="badge stat-card__ref-detail-version"></span>
-                            <button id="btn-copy-ref-link" class="stat-card__btn-copy-ref-link">
+                            <button id="btn-copy-ref-link" class="stat-card__btn--primary-copy-ref-link">
                                 <span data-i18n="btn_copy_share_link">نسخ رابط الاستيراد السريع 🔗</span>
                             </button>
                             
@@ -751,37 +781,43 @@
                             </div>
                         </div>
 
-                        <div class="stat-card__item-3-2">
-                            <button class="btn stat-card__btn-confirm-ref-import" id="btn-confirm-ref-import" disabled="">
+                        <div class="stat-card__stat--3_2">
+                            <button class="btn stat-card__btn--primary-confirm-ref-import" id="btn-confirm-ref-import" disabled="">
                                 <span data-i18n="btn_confirm_ref_import">تأكيد الاستيراد الآمن 🚀</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Card 3: URL Direct Download & Local Upload -->
-                    <div class="stat-card import-hub__item-2">
-                        <div class="stat-card__item-23">
-                            <span class="stat-card__label-7">🔗</span>
+                    <div class="stat-card import-hub__reference-card">
+                        <div class="stat-card__stat_card--23">
+                            <span class="stat-card__icon-prefix--primary-7">🔗</span>
                             <h3 data-i18n="direct_link" class="stat-card__title-5">الملفات والروابط</h3>
                         </div>
-                        <p data-i18n="import_url_hint" class="stat-card__text-11">قم باستيراد ملفات بنك الأسئلة محلياً أو حمّلها من رابط سحابي مباشر.</p>
+                        <p data-i18n="import_url_hint" class="stat-card__helper-text-11">قم باستيراد ملفات بنك الأسئلة محلياً أو حمّلها من رابط سحابي مباشر.</p>
                         
-                        <div class="stat-card__item-1-15">
+                        <div class="stat-card__input_type">
                             <input type="url" id="import-url" class="form-control stat-card__reference-selector" placeholder="https://example.com/questions.json">
-                            <button class="btn stat-card__btn-import-url" id="btn-import-url" onclick="app.importFromUrl(event)">
+                            <button class="btn stat-card__btn--primary-import-url" id="btn-import-url" onclick="app.importFromUrl(event)">
                                 <span data-i18n="import_fetch">جلب البيانات 📡</span>
                             </button>
                         </div>
 
-                        <div class="stat-card__item-1-13">
-                            <button class="btn btn-secondary stat-card__btn-copy-direct-link" id="btn-copy-direct-link">
+                        <div class="stat-card__btn--primary--1_13">
+                            <button class="btn btn-secondary stat-card__btn--primary-copy-direct-link" id="btn-copy-direct-link">
                                 <span data-i18n="btn_gen_direct_share_link">رابط استيراد مباشر 🔗</span>
                             </button>
                             
-                            <label for="import-file" class="btn btn-secondary stat-card__item-34">
+                            <label for="import-file" class="btn btn-secondary stat-card__import_fil">
                                 <span data-i18n="import_file_btn">📂 رفع ملف JSON/CSV</span>
                                 <input type="file" id="import-file" accept=".json,.csv,.gz,.json.gz,application/json,application/gzip,application/x-gzip" class="stat-card__institution-logo-upload">
                             </label>
+                        </div>
+                        <!-- Universal Drag-and-Drop Visual Zone -->
+                        <div id="drag-drop-zone" class="drag-drop-zone" style="border: 2px dashed var(--accent-color, #4361ee); border-radius: 12px; padding: 24px 15px; text-align: center; margin-top: 15px; cursor: pointer; transition: all 0.3s ease; background: rgba(67, 97, 238, 0.02); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                            <div style="font-size: 2.2rem; transform: translateY(-2px); transition: transform 0.2s ease;">📥</div>
+                            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);" data-i18n="drag_drop_title">اسحب وأفلت الملفات هنا للتلقيم المباشر</h4>
+                            <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary);" data-i18n="drag_drop_desc">يدعم ملفات JSON و GZ المضغوطة</p>
                         </div>
                     </div>
                 </div>
@@ -795,14 +831,14 @@
                 <div class="export-hub-grid">
                     
                     <!-- Left: Format & Scope Selection -->
-                    <div class="layout__item-7">
-                        <div class="stat-card layout__item-8">
-                            <div class="stat-card__item-35"></div>
-                            <h3 class="stat-card__title-6">
-                                <span class="stat-card__label-8">1</span>
+                    <div class="export-hub__layout-grid">
+                        <div class="stat-card export-hub__card">
+                            <div class="stat-card__watermark-35"></div>
+                            <h3 class="stat-card__stat_card--6">
+                                <span class="stat-card__icon-prefix--primary-8">1</span>
                                 <span data-i18n="export_format_title">اختر الصيغة النهائية</span>
                             </h3>
-                            <div class="stat-card__item-1-16">
+                            <div class="stat-card__export_format">
                                 <div class="export-format-card active" data-format="json" onclick="app.selectExportFormat('json')">
                                     <div class="format-icon">📄</div>
                                     <div class="format-name">JSON</div>
@@ -836,10 +872,10 @@
                             </div>
                         </div>
 
-                        <div class="stat-card layout__item-8">
-                            <div class="stat-card__item-36"></div>
-                            <h3 class="stat-card__title-6">
-                                <span class="stat-card__label-9">2</span>
+                        <div class="stat-card export-hub__card">
+                            <div class="stat-card__watermark-36"></div>
+                            <h3 class="stat-card__stat_card--6">
+                                <span class="stat-card__icon-prefix--primary-9">2</span>
                                 <span data-i18n="export_scope_title">تخصيص نطاق الأسئلة (Scope)</span>
                             </h3>
                             
@@ -887,35 +923,35 @@
                             </div>
                             <!-- Advanced Universal Selection Hub Trigger -->
                             <div id="export-custom-options" class="stat-card__export-custom-options">
-                                <div class="stat-card__item-14">
-                                    <div data-i18n="smart_selection_engine" class="stat-card__item-37">🎯 محرك الاختيار الذكي</div>
-                                    <p data-i18n="selection_engine_desc" class="stat-card__text-12">يمكنك تخصيص اختيارك بدقة بناءً على الدفاتر، الأوسمة، الصعوبة، أو أنواع الأسئلة.</p>
+                                <div class="stat-card__label_for">
+                                    <div data-i18n="smart_selection_engine" class="stat-card__watermark-37">🎯 محرك الاختيار الذكي</div>
+                                    <p data-i18n="selection_engine_desc" class="stat-card__helper-text-12">يمكنك تخصيص اختيارك بدقة بناءً على الدفاتر، الأوسمة، الصعوبة، أو أنواع الأسئلة.</p>
                                 </div>
                                 
-                                <div class="stat-card__item-1-17">
-                                    <div class="stat-card__item-38">
-                                        <div data-i18n="current_selection_count" class="stat-card__item-39">عدد الأسئلة المختارة حالياً:</div>
+                                <div class="stat-card__stat_card--1_17">
+                                    <div class="stat-card__cur">
+                                        <div data-i18n="current_selection_count" class="stat-card__watermark-39">عدد الأسئلة المختارة حالياً:</div>
                                         <div id="selection-main-count" class="stat-card__selection-main-count">0</div>
                                     </div>
                                     
-                                    <button class="btn btn-primary btn-lg stat-card__btn-13" onclick="app.renderSelectionHub(); app.openModal('selection-modal')">
-                                        <span class="stat-card__label-7">⚙️</span> <span data-i18n="smart_selection">فتح محرك الاختيار المتقدم</span>
+                                    <button class="btn btn-primary btn-lg stat-card__stat--13" onclick="app.renderSelectionHub(); app.openModal('selection-modal')">
+                                        <span class="stat-card__icon-prefix--primary-7">⚙️</span> <span data-i18n="smart_selection">فتح محرك الاختيار المتقدم</span>
                                     </button>
                                 </div>
 
                                 <!-- Intelligent Random Choice (Kept inside custom options) -->
-                                <div class="stat-card__item-2-5">
-                                    <label class="custom-checkbox stat-card__item-40" for="export-smart-random">
+                                <div class="stat-card__label_custom">
+                                    <label class="custom-checkbox stat-card__input_type--40" for="export-smart-random">
                                         <input type="checkbox" id="export-smart-random" onchange="app.updateExportSummary()">
-                                        <span class="checkmark stat-card__label-10"></span>
+                                        <span class="checkmark stat-card__icon-prefix--primary-10"></span>
                                         <div>
-                                            <strong data-i18n="smart_random" class="stat-card__item-41">🎲 اختيار عشوائي ذكي</strong>
-                                            <div data-i18n="smart_random_desc" class="stat-card__item-42">سيتم اختيار عدد محدد من الأسئلة عشوائياً من ضمن المعايير التي اخترتها في المحرك.</div>
+                                            <strong data-i18n="smart_random" class="stat-card__watermark-41">🎲 اختيار عشوائي ذكي</strong>
+                                            <div data-i18n="smart_random_desc" class="stat-card__watermark-42">سيتم اختيار عدد محدد من الأسئلة عشوائياً من ضمن المعايير التي اخترتها في المحرك.</div>
                                         </div>
                                     </label>
                                     <div id="export-random-count-container" class="stat-card__export-random-count-container">
-                                        <div class="stat-card__item-43">
-                                            <label for="export-random-count" data-i18n="random_count_label" class="stat-card__item-44">عدد الأسئلة المطلوب استخراجه:</label>
+                                        <div class="stat-card__label_for--43">
+                                            <label for="export-random-count" data-i18n="random_count_label" class="stat-card__watermark-44">عدد الأسئلة المطلوب استخراجه:</label>
                                             <input type="number" id="export-random-count" class="form-control stat-card__export-random-count" value="20" min="1" oninput="app.updateExportSummary()">
                                         </div>
                                     </div>
@@ -927,14 +963,14 @@
                     </div>
 
                     <!-- Right: Content & PDF Settings -->
-                    <div class="layout__item-7">
-                        <div class="stat-card layout__item-8">
-                            <div class="stat-card__item-45"></div>
-                            <h3 class="stat-card__title-6">
-                                <span class="stat-card__label-11">3</span>
+                    <div class="export-hub__layout-grid">
+                        <div class="stat-card export-hub__card">
+                            <div class="stat-card__watermark-45"></div>
+                            <h3 class="stat-card__stat_card--6">
+                                <span class="stat-card__icon-prefix--primary-11">3</span>
                                 <span data-i18n="content_options_title">خيارات المحتوى والترتيب</span>
                             </h3>
-                            <div class="stat-card__item-1-18">
+                            <div class="stat-card__watermark-1_18">
                                 <div class="form-group">
                                     <label for="export-sort-order" data-i18n="sort_order_label">ترتيب الأسئلة في الملف</label>
                                     <select id="export-sort-order" class="form-control" onchange="app.updateExportSummary()">
@@ -945,18 +981,18 @@
                                         <option value="difficulty" data-i18n="sort_difficulty">حسب مستوى الصعوبة</option>
                                     </select>
                                 </div>
-                                <div class="stat-card__item-1-19">
-                                    <label class="custom-checkbox stat-card__item-46" for="export-include-explain">
+                                <div class="stat-card__label_custom--1_19">
+                                    <label class="custom-checkbox stat-card__input_type--46" for="export-include-explain">
                                         <input type="checkbox" id="export-include-explain" checked="" onchange="app.updateExportSummary()">
                                         <span class="checkmark"></span>
                                         <span data-i18n="include_explain">تضمين الشرح والتعليقات التعليمية</span>
                                     </label>
-                                    <label class="custom-checkbox stat-card__item-46" for="export-include-images">
+                                    <label class="custom-checkbox stat-card__input_type--46" for="export-include-images">
                                         <input type="checkbox" id="export-include-images" checked="" onchange="app.updateExportSummary()">
                                         <span class="checkmark"></span>
                                         <span data-i18n="include_images">تضمين الصور التوضيحية</span>
                                     </label>
-                                    <label class="custom-checkbox stat-card__item-46" for="export-include-answers">
+                                    <label class="custom-checkbox stat-card__input_type--46" for="export-include-answers">
                                         <input type="checkbox" id="export-include-answers" checked="" onchange="app.updateExportSummary()">
                                         <span class="checkmark"></span>
                                         <span data-i18n="include_answers">تضمين الإجابات الصحيحة</span>
@@ -967,7 +1003,7 @@
 
                         <!-- PDF Advanced Options -->
                         <div class="stat-card layout__pdf-advanced-card" id="pdf-advanced-card">
-                            <h3 class="stat-card__title-7">
+                            <h3 class="stat-card__pdf_print">
                                 <span data-i18n="pdf_print_settings">📄 إعدادات الطباعة الاحترافية</span>
                             </h3>
                             <div class="grid-2-cols">
@@ -988,26 +1024,64 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label for="pdf-theme-selector" data-i18n="pdf_theme_label">🎨 اختر ثيم العرض والملف النهائي:</label>
+                                <select id="pdf-theme-selector" class="form-control">
+                                    <option value="الوضع الافتراضي" data-i18n="pdf_theme_default">🎨 الوضع الافتراضي (Default Mode)</option>
+                                    <option value="طابع تقني" data-i18n="pdf_theme_tech2023" selected>🚀 طابع تقني 2023</option>
+                                    <option value="ماين كرافت" data-i18n="pdf_theme_minecraft">🎮 ماين كرافت (Minecraft)</option>
+                                    <option value="هكر ترمنال" data-i18n="pdf_theme_terminal">💻 الترمنال الهكر (Terminal)</option>
+                                    <option value="ليلى فخم" data-i18n="pdf_theme_dark">🌌 الطابع الليلي الفخم (Deep Dark)</option>
+                                    <option value="ريترو" data-i18n="pdf_theme_retro">📜 الآلة الكاتبة الكلاسيكية (Retro)</option>
+                                    <option value="مانجا" data-i18n="pdf_theme_manga">💥 مانجا الأنمي (Manga & Comic)</option>
+                                    <option value="سايبربانك" data-i18n="pdf_theme_cyberpunk">👾 السايبربانك المضيء (Cyberpunk)</option>
+                                    <option value="باستيل" data-i18n="pdf_theme_pastel">🌸 الباستيل الهادئ (Pastel Minimal)</option>
+                                    <option value="غابات" data-i18n="pdf_theme_forest">🌿 طبيعة الغابة (Forest Organic)</option>
+                                    <option value="الجامعة الملكية" data-i18n="pdf_theme_academic">🏛️ الجامعة الملكية (Oxford)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="pdf-custom-header" data-i18n="header_title_label">عنوان رأس الصفحة (Header Title)</label>
                                 <input type="text" id="pdf-custom-header" class="form-control" placeholder="مثال: مادة الأحياء - الفترة الثانية" data-i18n-placeholder="header_title_placeholder">
                             </div>
                             <div class="grid-2-cols">
-                                <label class="custom-checkbox stat-card__item-46" for="pdf-show-images">
+                                <label class="custom-checkbox stat-card__input_type--46" for="pdf-show-images">
                                     <input type="checkbox" id="pdf-show-images" checked="">
                                     <span class="checkmark"></span>
                                     <span data-i18n="show_images_label">إظهار الصور</span>
                                 </label>
-                                <label class="custom-checkbox stat-card__item-46" for="pdf-two-columns">
+                                <label class="custom-checkbox stat-card__input_type--46" for="pdf-two-columns">
                                     <input type="checkbox" id="pdf-two-columns">
                                     <span class="checkmark"></span>
                                     <span data-i18n="two_columns_label">نظام العمودين (توفير ورق)</span>
                                 </label>
                             </div>
+                            <div class="form-group" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
+                                <label class="custom-checkbox" for="pdf-split-sessions" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
+                                    <input type="checkbox" id="pdf-split-sessions" onchange="document.getElementById('pdf-session-duration-container').style.display = this.checked ? 'block' : 'none'">
+                                    <span class="checkmark"></span>
+                                    <span data-i18n="pdf_split_sessions_label">تقسيم بنك الأسئلة إلى جلسات مذاكرة ذكية</span>
+                                </label>
+                                <div id="pdf-session-duration-container" style="display: none; margin-top: 10px; padding-left: 28px;">
+                                    <label for="pdf-session-duration" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; display: block;" data-i18n="pdf_session_duration_label">مدة الجلسة الواحدة (بالدقائق):</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="range" id="pdf-session-duration-slider" min="15" max="180" step="5" value="45" style="flex: 1;" oninput="document.getElementById('pdf-session-duration').value = this.value">
+                                        <input type="number" id="pdf-session-duration" value="45" min="5" max="300" class="form-control" style="width: 80px;" oninput="document.getElementById('pdf-session-duration-slider').value = this.value">
+                                        <span style="font-size: 0.9rem; font-weight: bold; color: var(--text-secondary);" data-i18n="minutes_label">دقيقة</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; padding: 12px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; display: flex; gap: 10px; align-items: start;">
+                                <span style="font-size: 1.25rem; line-height: 1;">💡</span>
+                                <div style="font-size: 0.8rem; color: var(--text-main); line-height: 1.5;">
+                                    <strong style="color: #d97706; display: block; margin-bottom: 2px;" data-i18n="pdf_bg_graphics_advice_title">نصيحة ClarifyMaster للحصول على جودة خارقة:</strong>
+                                    <span data-i18n="pdf_bg_graphics_advice_desc">عند حفظ ملف الـ PDF من نافذة الطباعة، تأكد دائماً من تفعيل خيار "رسومات الخلفية" (Background Graphics) لكي يستعرض المتصفح الألوان العميقة والخلفيات المذهلة للثيم في الملف المصدّر!</span>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Word Advanced Options -->
                         <div class="stat-card layout__pdf-advanced-card" id="word-advanced-card">
-                            <h3 class="stat-card__title-7">
+                            <h3 class="stat-card__pdf_print">
                                 <span data-i18n="pdf_print_settings">📄 إعدادات Word الاحترافية</span>
                             </h3>
                             <div class="grid-2-cols">
@@ -1032,12 +1106,12 @@
                                 <input type="text" id="word-custom-header" class="form-control" placeholder="مثال: مادة الرمد - بنك الأسئلة الشامل" data-i18n-placeholder="header_title_placeholder">
                             </div>
                             <div class="grid-2-cols">
-                                <label class="custom-checkbox stat-card__item-46" for="word-include-explain">
+                                <label class="custom-checkbox stat-card__input_type--46" for="word-include-explain">
                                     <input type="checkbox" id="word-include-explain" checked="">
                                     <span class="checkmark"></span>
                                     <span data-i18n="include_explain">تضمين الشرح</span>
                                 </label>
-                                <label class="custom-checkbox stat-card__item-46" for="word-bold-question">
+                                <label class="custom-checkbox stat-card__input_type--46" for="word-bold-question">
                                     <input type="checkbox" id="word-bold-question" checked="">
                                     <span class="checkmark"></span>
                                     <span data-i18n="bold_question_label">تغميق نص السؤال (Bold)</span>
@@ -1045,7 +1119,7 @@
                             </div>
                         </div>
                         
-                        <div id="btn-export-interactive-html" class="export-card group border-2 border-slate-200 dark:border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition-all hover:-translate-y-1 hover:shadow-xl bg-white dark:bg-slate-900 overflow-hidden relative stat-card__item-14">
+                        <div id="btn-export-interactive-html" class="export-card group border-2 border-slate-200 dark:border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition-all hover:-translate-y-1 hover:shadow-xl bg-white dark:bg-slate-900 overflow-hidden relative stat-card__label_for btn-export-interactive-html">
                           <div class="flex items-start justify-between gap-4">
                             <div class="flex items-center gap-4">
                               <div class="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-500 rounded-xl group-hover:scale-110 transition-transform font-bold text-xl shrink-0">
@@ -1062,9 +1136,39 @@
                           </div>
                         </div>
 
+                        <!-- Smart PDF Sessions Card -->
+                        <div class="stat-card layout__pdf-advanced-card" id="pdf-sessions-card">
+                            <h3 class="stat-card__pdf_print">
+                                <span>📘 جلسات المذاكرة الذكية (Smart PDF Sessions)</span>
+                            </h3>
+                            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:14px;">قسّم بنك الأسئلة تلقائياً إلى جلسات مذاكرة بملف PDF واحد مقسم داخلياً — تنزيل مباشر بدون نوافذ طباعة.</p>
+                            <div class="grid-2-cols" style="margin-bottom:12px;">
+                                <div class="form-group">
+                                    <label for="pdf-session-time">⏱️ مدة الجلسة (بالدقائق)</label>
+                                    <input type="number" id="pdf-session-time" class="form-control" value="45" min="5" max="180" step="5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pdf-session-qpm">📝 أسئلة / دقيقة</label>
+                                    <input type="number" id="pdf-session-qpm" class="form-control" value="3" min="0.5" max="10" step="0.5">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label for="pdf-session-header">📋 عنوان صفحات الأغلفة</label>
+                                <input type="text" id="pdf-session-header" class="form-control" placeholder="مثال: مادة الرمد - الفصل الأول" value="جلسات المذاكرة الذكية">
+                            </div>
+                            <label class="custom-checkbox stat-card__input_type--46" for="pdf-session-answers" style="margin-bottom:14px;">
+                                <input type="checkbox" id="pdf-session-answers" checked>
+                                <span class="checkmark"></span>
+                                <span>تضمين الإجابات والشرح في الجلسات</span>
+                            </label>
+                            <button class="btn btn-primary btn-lg" onclick="app.exportPdfSessions()" style="width:100%;">
+                                🚀 توليد وتنزيل PDF الجلسات الذكية
+                            </button>
+                        </div>
+
                         <div class="export-action-card">
                             <div id="export-summary" class="export-summary-text" data-i18n="loading">جاري تحليل البيانات...</div>
-                            <button class="btn btn-primary btn-lg layout__btn-3" onclick="app.executeExport()">
+                            <button class="btn btn-primary btn-lg quiz__btn--purple" onclick="app.executeExport()">
                                 <span data-i18n="start_export_btn">🚀 البدء في توليد الملف الآن</span>
                             </button>
                         </div>
@@ -1074,12 +1178,12 @@
 
             <!-- Topic Graph View -->
             <section id="topic-graph" class="view-section">
-                <div class="flex-between stat-card__item-14">
+                <div class="flex-between stat-card__label_for">
                     <div>
-                        <h2 data-i18n="nav_topic_graph" class="layout__title-1">الخريطة الشبكية لتصنيفات الأسئلة</h2>
-                        <p class="layout__text-1">عرض مرئي تفاعلي لتوزيع الأسئلة وفجوات التغطية بناءً على التصنيفات والوسوم.</p>
+                        <h2 data-i18n="nav_topic_graph" class="quiz__title-1">الخريطة الشبكية لتصنيفات الأسئلة</h2>
+                        <p class="quiz__text-1">عرض مرئي تفاعلي لتوزيع الأسئلة وفجوات التغطية بناءً على التصنيفات والوسوم.</p>
                     </div>
-                    <div class="layout__item-1-6">
+                    <div class="topic-graph__toolbar">
                         <button class="btn btn-secondary layout__graph-btn-reset" id="graph-btn-reset">
                             <span>🔄</span> <span data-i18n="reset">إعادة ضبط</span>
                         </button>
@@ -1089,20 +1193,20 @@
                     </div>
                 </div>
 
-                <div class="topic-graph-layout layout__item-1-7">
+                <div class="topic-graph-layout topic-graph__layout-row">
                     <!-- Left: Canvas Area -->
-                    <div class="stat-card graph-canvas-card layout__item-9">
+                    <div class="stat-card graph-canvas-card topic-graph__canvas-card">
                         <!-- Control & Filter Overlay at top of canvas -->
-                        <div class="graph-toolbar stat-card__item-47">
-                            <div class="stat-card__item-48">
-                                <label class="stat-card__item-49">
+                        <div class="graph-toolbar stat-card__stat_card--47">
+                            <div class="stat-card__label_stat">
+                                <label class="stat-card__watermark-49">
                                     <span>🔍 النطاق:</span>
                                     <select id="graph-scope-select" class="form-control stat-card__graph-scope-select">
                                         <option value="all" selected="">كل الأسئلة</option>
                                         <option value="filtered">المفلترة حالياً</option>
                                     </select>
                                 </label>
-                                <label class="stat-card__item-49">
+                                <label class="stat-card__watermark-49">
                                     <span>⚙️ التجميع:</span>
                                     <select id="graph-group-select" class="form-control stat-card__graph-group-select">
                                         <option value="tags" selected="">الوسوم (Tags)</option>
@@ -1116,50 +1220,50 @@
                         </div>
 
                         <!-- Canvas Container -->
-                        <div id="graph-canvas-container" class="stat-card__graph-canvas-container">
+                        <div id="graph-canvas-container" class="stat-card__graph-canvas-container graph-canvas-container">
                             <canvas id="topic-graph-canvas" class="stat-card__topic-graph-canvas"></canvas>
                         </div>
                     </div>
 
                     <!-- Right: Info Panel -->
-                    <div class="layout__item-1-8">
+                    <div class="topic-graph__sidebar">
                         <!-- Selected Node Info Card -->
-                        <div class="stat-card layout__item-10">
+                        <div class="stat-card topic-graph__details-card">
                             <h3 class="stat-card__title-8">
                                 <span>📊</span> <span id="graph-panel-title">تفاصيل العقدة</span>
                             </h3>
 
                             <div id="graph-panel-empty" class="stat-card__graph-panel-empty">
-                                <span class="stat-card__label-12">🩺</span>
-                                <p class="stat-card__text-13">قم بالمرور أو النقر فوق أي عقدة في الشبكة لعرض تفاصيل التغطية والأسئلة المرتبطة.</p>
+                                <span class="stat-card__icon-prefix--primary-12">🩺</span>
+                                <p class="stat-card__helper-text-13">قم بالمرور أو النقر فوق أي عقدة في الشبكة لعرض تفاصيل التغطية والأسئلة المرتبطة.</p>
                             </div>
 
                             <div id="graph-panel-details" class="stat-card__graph-panel-details">
-                                <div class="stat-card__item-50">
-                                    <div class="stat-card__item-51">اسم الوسم/التصنيف</div>
+                                <div class="stat-card__stat_card--50">
+                                    <div class="stat-card__watermark-51">اسم الوسم/التصنيف</div>
                                     <div id="graph-node-name" class="stat-card__graph-node-name"></div>
                                 </div>
 
-                                <div class="grid-2-cols stat-card__item-1-20">
-                                    <div class="stat-card__item-52">
-                                        <div class="stat-card__item-53">عدد الأسئلة</div>
+                                <div class="grid-2-cols stat-card__stat_card--1_20">
+                                    <div class="stat-card__stat--52">
+                                        <div class="stat-card__watermark-53">عدد الأسئلة</div>
                                         <div id="graph-node-count" class="stat-card__graph-node-count">0</div>
                                     </div>
-                                    <div class="stat-card__item-52">
-                                        <div class="stat-card__item-53">متوسط الصعوبة</div>
+                                    <div class="stat-card__stat--52">
+                                        <div class="stat-card__watermark-53">متوسط الصعوبة</div>
                                         <div id="graph-node-difficulty" class="stat-card__graph-node-difficulty">غير محدد</div>
                                     </div>
                                 </div>
 
                                 <!-- Difficulty Breakdown bars -->
-                                <div class="stat-card__item-2-6">
-                                    <div class="stat-card__item-54">توزيع الصعوبة:</div>
-                                    <div class="stat-card__item-1-21">
+                                <div class="stat-card__stat_card--2_6">
+                                    <div class="stat-card__watermark-54">توزيع الصعوبة:</div>
+                                    <div class="stat-card__graph_bar">
                                         <div id="graph-bar-easy" title="سهل" class="stat-card__graph-bar-easy"></div>
                                         <div id="graph-bar-medium" title="متوسط" class="stat-card__graph-bar-medium"></div>
                                         <div id="graph-bar-hard" title="صعب" class="stat-card__graph-bar-hard"></div>
                                     </div>
-                                    <div class="stat-card__item-2-7">
+                                    <div class="stat-card__watermark-2_7">
                                         <span>سهل: <span id="graph-txt-easy">0</span></span>
                                         <span>متوسط: <span id="graph-txt-medium">0</span></span>
                                         <span>صعب: <span id="graph-txt-hard">0</span></span>
@@ -1167,33 +1271,33 @@
                                 </div>
 
                                 <!-- Questions Preview List -->
-                                <div class="stat-card__item-3-3">
-                                    <div class="stat-card__item-55">الأسئلة المرتبطة:</div>
-                                    <div id="graph-node-questions" class="stat-card__graph-node-questions">
+                                <div class="stat-card__stat_card--3_3">
+                                    <div class="stat-card__watermark-55">الأسئلة المرتبطة:</div>
+                                    <div id="graph-node-questions" class="stat-card__graph-node-questions graph-node-questions">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Legend Card -->
-                        <div class="stat-card layout__item-1-9">
+                        <div class="stat-card topic-graph__stats-card">
                             <h4 class="stat-card__title-9">دليل الألوان (الصعوبة السائدة):</h4>
-                            <div class="stat-card__item-2-6">
-                                <div class="stat-card__item-56">
-                                    <span class="stat-card__label-13"></span>
-                                    <span class="stat-card__label-1-1">سهل (غالبية سهلة)</span>
+                            <div class="stat-card__stat_card--2_6">
+                                <div class="stat-card__stat_card--56">
+                                    <span class="stat-card__icon-prefix--primary-13"></span>
+                                    <span class="stat-card__icon-prefix--primary-1_1">سهل (غالبية سهلة)</span>
                                 </div>
-                                <div class="stat-card__item-56">
-                                    <span class="stat-card__label-14"></span>
-                                    <span class="stat-card__label-1-1">متوسط (غالبية متوسطة)</span>
+                                <div class="stat-card__stat_card--56">
+                                    <span class="stat-card__icon-prefix--primary-14"></span>
+                                    <span class="stat-card__icon-prefix--primary-1_1">متوسط (غالبية متوسطة)</span>
                                 </div>
-                                <div class="stat-card__item-56">
-                                    <span class="stat-card__label-15"></span>
-                                    <span class="stat-card__label-1-1">صعب (غالبية صعبة)</span>
+                                <div class="stat-card__stat_card--56">
+                                    <span class="stat-card__icon-prefix--primary-15"></span>
+                                    <span class="stat-card__icon-prefix--primary-1_1">صعب (غالبية صعبة)</span>
                                 </div>
-                                <div class="stat-card__item-56">
-                                    <span class="stat-card__label-16"></span>
-                                    <span class="stat-card__label-1-1">غير محدد الصعوبة</span>
+                                <div class="stat-card__stat_card--56">
+                                    <span class="stat-card__icon-prefix--primary-16"></span>
+                                    <span class="stat-card__icon-prefix--primary-1_1">غير محدد الصعوبة</span>
                                 </div>
                             </div>
                         </div>
@@ -1206,34 +1310,34 @@
 
     <!-- Universal Selection Modal (The Heart of Selection Engine) -->
     <div class="modal-overlay" id="selection-modal">
-        <div class="modal-content layout__item-11">
-            <div class="modal-header modal__item">
-                <h3 class="modal-title stat-card__label-6" data-i18n="selection_modal_title">🎯 محرك الاختيار المتقدم</h3>
-                <button class="close-modal modal__btn" onclick="app.closeModal('selection-modal')">×</button>
+        <div class="modal-content modal-content--selection">
+            <div class="modal-header modal__header">
+                <h3 class="modal-title stat-card__sync-icon" data-i18n="selection_modal_title">🎯 محرك الاختيار المتقدم</h3>
+                <button class="close-modal modal__btn" onclick="app.closeModal('selection-modal')" aria-label="إغلاق النافذة">×</button>
             </div>
             
-            <div class="modal-body modal__item-1">
+            <div class="modal-body modal__body">
                 <!-- Instructions Bar -->
-                <div class="modal__item-2">
-                    <span class="modal__label">💡</span>
+                <div class="modal__alert">
+                    <span class="modal__icon">💡</span>
                     <span data-i18n="how_to_use"><strong>كيف تستخدم النظام؟</strong> اختر المعايير من البطاقات بالأسفل، وسيتحدث العداد تلقائياً.</span>
                 </div>
 
                 <!-- Live Result Badge -->
-                <div class="modal__item-1-1">
-                    <div data-i18n="total_selected_qs" class="modal__item-3">إجمالي الأسئلة المختارة بناءً على فلاترك:</div>
-                    <div id="selection-live-count" class="modal__selection-live-count">0</div>
+                <div class="modal__sub-header">
+                    <div data-i18n="total_selected_qs" class="modal__description">إجمالي الأسئلة المختارة بناءً على فلاترك:</div>
+                    <div id="selection-live-count" class="modal__counter" aria-live="polite" role="status">0</div>
                 </div>
 
-                <div id="selection-hub-content" class="selection-hub modal__selection-hub-content">
+                <div id="selection-hub-content" class="selection-hub modal__hub-content">
                     
                     <!-- البطاقة 1: الدفاتر -->
-                    <div class="stat-card modal__item-4">
-                        <div class="group-header stat-card__item-57">
-                            <span data-i18n="select_notebooks" class="stat-card__label-17">📁 اختر من الدفاتر</span>
-                            <div class="group-actions stat-card__item-58">
-                                <button onclick="app.toggleGroupSelection('notebooks', true)" data-i18n="select_all" class="stat-card__btn-14">تحديد الكل</button> | 
-                                <button onclick="app.toggleGroupSelection('notebooks', false)" data-i18n="cancel" class="stat-card__btn-1-5">إلغاء</button>
+                    <div class="stat-card modal__criterion-card">
+                        <div class="group-header stat-card__noteboo">
+                            <span data-i18n="select_notebooks" class="stat-card__icon-prefix--primary-17">📁 اختر من الدفاتر</span>
+                            <div class="group-actions stat-card__toggle">
+                                <button onclick="app.toggleGroupSelection('notebooks', true)" data-i18n="select_all" class="stat-card__btn--primary-14">تحديد الكل</button> | 
+                                <button onclick="app.toggleGroupSelection('notebooks', false)" data-i18n="cancel" class="stat-card__btn--primary-1_5">إلغاء</button>
                             </div>
                         </div>
                         <label for="sel-nb-search" class="sr-only stat-card__institution-logo-upload">البحث في الدفاتر</label>
@@ -1242,56 +1346,56 @@
                     </div>
 
                     <!-- البطاقة 2: الأنواع -->
-                    <div class="stat-card modal__item-4">
-                        <div class="group-header stat-card__item-57">
-                            <span data-i18n="select_types" class="stat-card__label-17">📝 اختر حسب النوع</span>
-                            <div class="group-actions stat-card__item-58">
-                                <button onclick="app.toggleGroupSelection('types', true)" data-i18n="all" class="stat-card__btn-14">الكل</button> | 
-                                <button onclick="app.toggleGroupSelection('types', false)" data-i18n="cancel" class="stat-card__btn-1-5">إلغاء</button>
+                    <div class="stat-card modal__criterion-card">
+                        <div class="group-header stat-card__noteboo">
+                            <span data-i18n="select_types" class="stat-card__icon-prefix--primary-17">📝 اختر حسب النوع</span>
+                            <div class="group-actions stat-card__toggle">
+                                <button onclick="app.toggleGroupSelection('types', true)" data-i18n="all" class="stat-card__btn--primary-14">الكل</button> | 
+                                <button onclick="app.toggleGroupSelection('types', false)" data-i18n="cancel" class="stat-card__btn--primary-1_5">إلغاء</button>
                             </div>
                         </div>
                         <div id="sel-types" class="scrollable-selection-list stat-card__sel-notebooks">
-                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'mcq')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--59" onclick="app.toggleSelectionCriteria('types', 'mcq')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-type-mcq" class="stat-card__chk-type-mcq"> <span data-i18n="type_mcq_full">اختيار من متعدد (MCQ)</span>
                             </div>
-                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'boolean')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--59" onclick="app.toggleSelectionCriteria('types', 'boolean')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-type-boolean" class="stat-card__chk-type-mcq"> <span data-i18n="type_boolean_full">صح / خطأ (T/F)</span>
                             </div>
-                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'match')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--59" onclick="app.toggleSelectionCriteria('types', 'match')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-type-match" class="stat-card__chk-type-mcq"> <span data-i18n="type_match_full">مزاوجة (Match)</span>
                             </div>
-                            <div class="selection-item stat-card__item-59" onclick="app.toggleSelectionCriteria('types', 'written')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--59" onclick="app.toggleSelectionCriteria('types', 'written')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-type-written" class="stat-card__chk-type-mcq"> <span data-i18n="type_written">مقالي</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- البطاقة 3: الصعوبة -->
-                    <div class="stat-card modal__item-4">
-                        <div class="group-header stat-card__item-57">
-                            <span data-i18n="all_levels" class="stat-card__label-17">⚡ مستوى الصعوبة</span>
-                            <div class="group-actions stat-card__item-58">
-                            <button onclick="app.toggleGroupSelection('difficulties', true)" data-i18n="all" class="stat-card__btn-14">الكل</button> | 
-                                <button onclick="app.toggleGroupSelection('difficulties', false)" data-i18n="cancel" class="stat-card__btn-1-5">إلغاء</button>
+                    <div class="stat-card modal__criterion-card">
+                        <div class="group-header stat-card__noteboo">
+                            <span data-i18n="all_levels" class="stat-card__icon-prefix--primary-17">⚡ مستوى الصعوبة</span>
+                            <div class="group-actions stat-card__toggle">
+                            <button onclick="app.toggleGroupSelection('difficulties', true)" data-i18n="all" class="stat-card__btn--primary-14">الكل</button> | 
+                                <button onclick="app.toggleGroupSelection('difficulties', false)" data-i18n="cancel" class="stat-card__btn--primary-1_5">إلغاء</button>
                             </div>
                         </div>
                         <div id="sel-difficulties" class="scrollable-selection-list stat-card__sel-difficulties">
-                            <div class="selection-item stat-card__item-60" onclick="app.toggleSelectionCriteria('difficulties', 'easy')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--60" onclick="app.toggleSelectionCriteria('difficulties', 'easy')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-diff-easy" class="stat-card__chk-type-mcq"> <span data-i18n="difficulty_easy">سهل (Easy)</span>
                             </div>
-                            <div class="selection-item stat-card__item-60" onclick="app.toggleSelectionCriteria('difficulties', 'medium')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--60" onclick="app.toggleSelectionCriteria('difficulties', 'medium')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-diff-medium" class="stat-card__chk-type-mcq"> <span data-i18n="difficulty_medium">متوسط (Medium)</span>
                             </div>
-                            <div class="selection-item stat-card__item-60" onclick="app.toggleSelectionCriteria('difficulties', 'hard')" role="button" tabindex="0">
+                            <div class="selection-item stat-card__input_type--60" onclick="app.toggleSelectionCriteria('difficulties', 'hard')" role="button" tabindex="0">
                                 <input type="checkbox" id="chk-diff-hard" class="stat-card__chk-type-mcq"> <span data-i18n="difficulty_hard">صعب (Hard)</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- البطاقة 4: التصنيفات -->
-                    <div class="stat-card modal__item-4">
-                        <div class="group-header stat-card__item-57">
-                            <span data-i18n="stat_total_categories" class="stat-card__label-17">📦 التصنيفات</span>
+                    <div class="stat-card modal__criterion-card">
+                        <div class="group-header stat-card__noteboo">
+                            <span data-i18n="stat_total_categories" class="stat-card__icon-prefix--primary-17">📦 التصنيفات</span>
                         </div>
                         <label for="sel-cat-search" class="sr-only stat-card__institution-logo-upload">البحث في التصنيفات</label>
                         <input type="text" id="sel-cat-search" class="form-control stat-card__sel-nb-search" placeholder="بحث في التصنيفات..." data-i18n-placeholder="search_placeholder" oninput="app.state.selectionSearch.categories = this.value; app.renderSelectionHub()">
@@ -1299,10 +1403,10 @@
                     </div>
 
                     <!-- البطاقة 5: الوسوم (عريض) -->
-                    <div class="stat-card modal__item-4-1">
-                        <div class="group-header stat-card__item-57">
-                            <span data-i18n="all_tags" class="stat-card__label-17">🏷️ الوسوم (Tags)</span>
-                            <button onclick="app.toggleGroupSelection('tags', false)" data-i18n="cancel" class="stat-card__btn-15">إلغاء الكل</button>
+                    <div class="stat-card modal__preset-card">
+                        <div class="group-header stat-card__noteboo">
+                            <span data-i18n="all_tags" class="stat-card__icon-prefix--primary-17">🏷️ الوسوم (Tags)</span>
+                            <button onclick="app.toggleGroupSelection('tags', false)" data-i18n="cancel" class="stat-card__btn--primary-15">إلغاء الكل</button>
                         </div>
                         <label for="sel-tag-search" class="sr-only stat-card__institution-logo-upload">البحث في الوسوم</label>
                         <input type="text" id="sel-tag-search" class="form-control stat-card__sel-nb-search" placeholder="بحث في الوسوم..." oninput="app.state.selectionSearch.tags = this.value; app.renderSelectionHub()" data-i18n-placeholder="search_placeholder">
@@ -1311,26 +1415,26 @@
                 </div>
 
                 <!-- Presets Section -->
-                <div class="modal__item-3-1">
-                    <div class="stat-card__item-2">
-                        <span data-i18n="presets_title" class="modal__label-1">📋 قوالبك الجاهزة (Presets)</span>
-                        <button class="btn btn-sm btn-success modal__btn-1" onclick="app.saveSelectionPreset()" data-i18n="save_settings">💾 حفظ الإعدادات الحالية</button>
+                <div class="modal__presets-header">
+                    <div class="stat-card__header-row">
+                        <span data-i18n="presets_title" class="modal__presets-title">📋 قوالبك الجاهزة (Presets)</span>
+                        <button class="btn btn-sm btn-success modal__btn--save" onclick="app.saveSelectionPreset()" data-i18n="save_settings">💾 حفظ الإعدادات الحالية</button>
                     </div>
-                    <div id="sel-presets" class="modal__sel-presets">
+                    <div id="sel-presets" class="modal__presets-list">
                         <!-- سيتم التوليد هنا بواسطة JS -->
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer modal__item-2-1">
+            <div class="modal-footer modal__footer">
                 <div>
-                    <button class="btn btn-info modal__btn-2" onclick="app.applyCriteriaToSelection()" data-i18n="apply_to_main">
+                    <button class="btn btn-info modal__btn--apply" onclick="app.applyCriteriaToSelection()" data-i18n="apply_to_main">
                         🎯 حدد هذه الأسئلة في القائمة الرئيسية
                     </button>
                 </div>
-                <div class="modal__item-1-2">
-                    <button class="btn btn-secondary modal__btn-3" onclick="app.resetSelectionCriteria()" data-i18n="clear_all">🧹 مسح الكل</button>
-                    <button class="btn btn-primary modal__btn-1-1" onclick="app.bridgeToExam('smart'); app.closeModal('selection-modal')" data-i18n="confirm_start">✅ اعتماد البدء</button>
+                <div class="modal__footer-actions">
+                    <button class="btn btn-secondary modal__btn--reset" onclick="app.resetSelectionCriteria()" data-i18n="clear_all">🧹 مسح الكل</button>
+                    <button class="btn btn-primary modal__btn--confirm" onclick="app.bridgeToExam('smart'); app.closeModal('selection-modal')" data-i18n="confirm_start">✅ اعتماد البدء</button>
                 </div>
             </div>
         </div>
@@ -1342,7 +1446,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="notebook_details">تفاصيل الدفتر</h3>
-                <button class="close-modal">×</button>
+                <button class="close-modal" aria-label="إغلاق النافذة">×</button>
             </div>
             <form id="notebook-form">
                 <input type="hidden" id="notebook-id">
@@ -1368,41 +1472,41 @@
                     <label for="notebook-target-count" data-i18n="notebook_target_count_label">عدد الأسئلة المستهدف (اختياري)</label>
                     <input type="number" id="notebook-target-count" class="form-control" placeholder="مثال: 500" min="0">
                 </div>
-                <button type="submit" class="btn modal__btn-4" data-i18n="save_notebook">حفظ الدفتر</button>
+                <button type="submit" class="btn modal__btn--submit" data-i18n="save_notebook">حفظ الدفتر</button>
             </form>
         </div>
     </div>
 
     <!-- Add/Edit Question Modal -->
     <div class="modal-overlay" id="question-modal">
-        <div class="modal-content layout__item-12">
+        <div class="modal-content modal-content--notebook">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="question_details">تفاصيل السؤال</h3>
-                <button class="close-modal">×</button>
+                <button class="close-modal" aria-label="إغلاق النافذة">×</button>
             </div>
             <form id="question-form">
                 <input type="hidden" id="question-id">
                 
-                <div class="smart-fill-container modal__item-5">
-                    <div onclick="const b = document.getElementById('smart-fill-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';" class="modal__item-6">
-                        <span data-i18n="smart_fill" class="modal__label-2">
-                            <span class="modal__label">⚡</span> ملء تلقائي ذكي (JSON / CSV)
+                <div class="smart-fill-container modal__smart-fill-container">
+                    <div onclick="const b = document.getElementById('smart-fill-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';" class="modal__smart-fill-header">
+                        <span data-i18n="smart_fill" class="modal__smart-fill-title">
+                            <span class="modal__icon">⚡</span> ملء تلقائي ذكي (JSON / CSV)
                         </span>
-                        <span class="modal__label-1-1">▼</span>
+                        <span class="modal__arrow">▼</span>
                     </div>
                     <div id="smart-fill-body" class="modal__smart-fill-body">
-                        <textarea id="single-q-smart-fill" class="form-control modal__single-q-smart-fill" rows="3" placeholder="لصق كود JSON لسؤال واحد هنا...
+                        <textarea id="single-q-smart-fill" class="form-control modal__smart-fill-textarea" rows="3" placeholder="لصق كود JSON لسؤال واحد هنا...
 مثال: { &quot;question&quot;: &quot;السؤال؟&quot;, &quot;type&quot;: &quot;mcq&quot;, ... }" data-i18n-placeholder="smart_fill_placeholder"></textarea>
-                        <button type="button" class="btn btn-sm modal__btn-5" onclick="app.smartFillSingleQuestion()" data-i18n="smart_fill_btn">استخراج وتعبئة البيانات 🚀</button>
+                        <button type="button" class="btn btn-sm modal__btn--smart-extract" onclick="app.smartFillSingleQuestion()" data-i18n="smart_fill_btn">استخراج وتعبئة البيانات 🚀</button>
                     </div>
                 </div>
                 
-                <div class="flex-between stat-card__item-1-20">
-                    <div class="form-group modal__item-7">
+                <div class="flex-between stat-card__stat_card--1_20">
+                    <div class="form-group modal__form-group">
                         <label for="question-notebook" data-i18n="notebook_label">الدفتر</label>
                         <select id="question-notebook" class="form-control" required=""></select>
                     </div>
-                    <div class="form-group modal__item-7">
+                    <div class="form-group modal__form-group">
                         <label for="question-type" data-i18n="qtype_select_label">نوع السؤال</label>
                         <select id="question-type" class="form-control" required="">
                             <option value="mcq" data-i18n="qtype_mcq">اختيار من متعدد (MCQ)</option>
@@ -1418,21 +1522,21 @@
                     <textarea id="question-text" class="form-control" rows="3" required=""></textarea>
                 </div>
 
-                <div class="form-group modal__item-3-2">
-                    <label data-i18n="image_upload_label" class="modal__item-8">صورة توضيحية (اختياري - سيتم ضغطها تلقائياً)</label>
+                <div class="form-group modal__upload-group">
+                    <label data-i18n="image_upload_label" class="modal__upload-label">صورة توضيحية (اختياري - سيتم ضغطها تلقائياً)</label>
                     <input type="file" id="question-image-upload" class="form-control stat-card__institution-name" accept="image/png, image/jpeg, image/webp">
                     <input type="hidden" id="question-image-base64">
-                    <img id="question-image-preview" class="modal__question-image-preview">
+                    <img id="question-image-preview" class="modal__image-preview">
                     <button type="button" id="btn-remove-image" class="btn btn-danger btn-sm stat-card__institution-logo-upload" onclick="app.removeImage()" data-i18n="remove_image">إزالة الصورة</button>
                 </div>
 
                 <!-- Dynamic Fields Container -->
-                <div id="dynamic-fields-container" class="modal__dynamic-fields-container">
+                <div id="dynamic-fields-container" class="modal__dynamic-fields">
                     <!-- Populated by JS -->
                 </div>
 
-                <div class="flex-between stat-card__item-1-20">
-                    <div class="form-group modal__item-7">
+                <div class="flex-between stat-card__stat_card--1_20">
+                    <div class="form-group modal__form-group">
                         <label for="question-difficulty" data-i18n="difficulty_label">الصعوبة</label>
                         <select id="question-difficulty" class="form-control" required="">
                             <option value="easy">سهل (Easy)</option>
@@ -1440,7 +1544,7 @@
                             <option value="hard">صعب (Hard)</option>
                         </select>
                     </div>
-                    <div class="form-group modal__item-7">
+                    <div class="form-group modal__form-group">
                         <label for="question-category" data-i18n="category_label">التصنيف (Category)</label>
                         <input type="text" id="question-category" class="form-control" placeholder="مثال: جغرافيا، علوم..." required="">
                     </div>
@@ -1452,12 +1556,12 @@
                     <datalist id="tags-list"></datalist>
                 </div>
 
-                <div class="flex-between stat-card__item-1-20">
-                    <div class="form-group modal__item-7">
+                <div class="flex-between stat-card__stat_card--1_20">
+                    <div class="form-group modal__form-group">
                         <label for="question-reference-book" data-i18n="reference_book_label">كتاب المرجع (Reference Book)</label>
                         <input type="text" id="question-reference-book" class="form-control" placeholder="اسم الكتاب المرجعي">
                     </div>
-                    <div class="form-group modal__item-7">
+                    <div class="form-group modal__form-group">
                         <label for="question-reference-page" data-i18n="reference_page_label">رقم الصفحة (Page Number)</label>
                         <input type="text" id="question-reference-page" class="form-control" placeholder="رقم الصفحة">
                     </div>
@@ -1468,23 +1572,23 @@
                     <textarea id="question-explain" class="form-control" rows="2" placeholder="شرح يظهر للطالب بعد الإجابة"></textarea>
                 </div>
 
-                <button type="submit" class="btn modal__btn-4" data-i18n="save_question">حفظ السؤال</button>
-                <p data-i18n="auto_save_msg" class="modal__text">يتم حفظ المسودة تلقائياً (Auto-save) أثناء الكتابة.</p>
+                <button type="submit" class="btn modal__btn--submit" data-i18n="save_question">حفظ السؤال</button>
+                <p data-i18n="auto_save_msg" class="modal__helper-text">يتم حفظ المسودة تلقائياً (Auto-save) أثناء الكتابة.</p>
             </form>
         </div>
     </div>
 
     <!-- AI Prompt Modal -->
     <div class="modal-overlay" id="ai-prompt-modal">
-        <div class="modal-content layout__item-13">
+        <div class="modal-content modal-content--question">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="ai_assistant_title">🤖 مساعد الذكاء الاصطناعي</h3>
-                <button class="close-modal">×</button>
+                <button class="close-modal" aria-label="إغلاق النافذة">×</button>
             </div>
-            <p data-i18n="ai_instructions" class="modal__text-1">خصّص البرومبت أدناه ثم انسخه وأرسله لأي نموذج ذكاء اصطناعي (ChatGPT، Gemini، Claude...) للحصول على أسئلة جاهزة للاستيراد مباشرة.</p>
+            <p data-i18n="ai_instructions" class="modal__instructions">خصّص البرومبت أدناه ثم انسخه وأرسله لأي نموذج ذكاء اصطناعي (ChatGPT، Gemini، Claude...) للحصول على أسئلة جاهزة للاستيراد مباشرة.</p>
             
-            <div class="modal__item-1-3">
-                <div class="form-group modal__item-9">
+            <div class="modal__ai-options">
+                <div class="form-group modal__ai-option-group">
                     <label data-i18n="lbl_task_type">نوع المهمة الكبرى</label>
                     <select id="ai-task-type" class="form-control" onchange="app.regeneratePrompt()">
                         <option value="scratch" data-i18n="opt_task_scratch">توليد أسئلة جديدة من الصفر 🎯</option>
@@ -1514,29 +1618,29 @@
                         <option value="العربية">العربية</option>
                     </select>
                 </div>
-                <div class="form-group modal__item-9">
+                <div class="form-group modal__ai-option-group">
                     <label data-i18n="target_audience_label">الفئة المستهدفة / المستوى الدراسي</label>
                     <input type="text" id="ai-level" class="form-control" value="طلاب الجامعات" placeholder="مثال: طلاب الابتدائية، محترفين..." oninput="app.regeneratePrompt()">
                 </div>
             </div>
 
-            <div class="form-group stat-card__item-14">
+            <div class="form-group stat-card__label_for">
                 <label data-i18n="count_by_type_label">تحديد عدد الأسئلة لكل نوع:</label>
-                <div class="modal__item-10">
+                <div class="modal__ai-actions">
                     <div class="sidebar__item">
-                        <span class="modal__label-3">اختيار من متعدد (MCQ)</span>
+                        <span class="modal__mcq">اختيار من متعدد (MCQ)</span>
                         <input type="number" id="ai-count-mcq" class="form-control modal__ai-count-mcq" value="5" min="0" oninput="app.regeneratePrompt()">
                     </div>
                     <div class="sidebar__item">
-                        <span class="modal__label-3">صح / خطأ (Boolean)</span>
+                        <span class="modal__mcq">صح / خطأ (Boolean)</span>
                         <input type="number" id="ai-count-boolean" class="form-control modal__ai-count-mcq" value="2" min="0" oninput="app.regeneratePrompt()">
                     </div>
                     <div class="sidebar__item">
-                        <span class="modal__label-3">مزاوجة (Match)</span>
+                        <span class="modal__mcq">مزاوجة (Match)</span>
                         <input type="number" id="ai-count-match" class="form-control modal__ai-count-mcq" value="1" min="0" oninput="app.regeneratePrompt()">
                     </div>
                     <div class="sidebar__item">
-                        <span class="modal__label-3">مقالي (Written)</span>
+                        <span class="modal__mcq">مقالي (Written)</span>
                         <input type="number" id="ai-count-written" class="form-control modal__ai-count-mcq" value="2" min="0" oninput="app.regeneratePrompt()">
                     </div>
                 </div>
@@ -1547,10 +1651,10 @@
                 <textarea id="ai-prompt-text" class="form-control modal__ai-prompt-text" rows="18"></textarea>
             </div>
 
-            <button class="btn modal__btn-6" onclick="app.copyAiPrompt()" data-i18n="ai_btn">
+            <button class="btn modal__btn--ai-copy" onclick="app.copyAiPrompt()" data-i18n="ai_btn">
                 <span data-i18n="copy_prompt_btn">📋 نسخ البرومبت بالكامل</span>
             </button>
-            <p data-i18n="after_ai_msg" class="modal__text">بعد الحصول على الأسئلة من الـ AI، الصق النتيجة في قسم الاستيراد في الإعدادات.</p>
+            <p data-i18n="after_ai_msg" class="modal__helper-text">بعد الحصول على الأسئلة من الـ AI، الصق النتيجة في قسم الاستيراد في الإعدادات.</p>
         </div>
     </div>
 
@@ -1559,7 +1663,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="pdf_export_title">تصدير كـ PDF (الطباعة)</h3>
-                <button class="close-modal">×</button>
+                <button class="close-modal" aria-label="إغلاق النافذة">×</button>
             </div>
             <div class="form-group">
                 <label for="print-notebook" data-i18n="select_print_notebook">اختر الدفتر للطباعة</label>
@@ -1580,24 +1684,24 @@
                     <option value="exam-annex" data-i18n="pdf_layout_annex">أسئلة مع ملحق إجابات</option>
                 </select>
             </div>
-            <div class="form-group modal__item-4-2">
+            <div class="form-group modal__input_type">
                 <input type="checkbox" id="toggle-show-references" class="modal__toggle-show-references">
-                <label for="toggle-show-references" data-i18n="toggle_show_references" class="modal__item-11">إظهار المراجع الطبية الموثقة في ورقة الأسئلة</label>
+                <label for="toggle-show-references" data-i18n="toggle_show_references" class="modal__form-group-horizontal">إظهار المراجع الطبية الموثقة في ورقة الأسئلة</label>
             </div>
-            <p data-i18n="print_hint" class="modal__text-2">سيتم فتح نافذة الطباعة الافتراضية. اختر "Save as PDF" أو "حفظ بتنسيق PDF" من قائمة الطابعات للاحتفاظ بالملف.</p>
-            <button class="btn modal__btn-7" onclick="app.executePrint()" data-i18n="print_btn">تجهيز وطباعة المذكرة</button>
+            <p data-i18n="print_hint" class="modal__save_pdf">سيتم فتح نافذة الطباعة الافتراضية. اختر "Save as PDF" أو "حفظ بتنسيق PDF" من قائمة الطابعات للاحتفاظ بالملف.</p>
+            <button class="btn modal__btn--ai-close" onclick="app.executePrint()" data-i18n="print_btn">تجهيز وطباعة المذكرة</button>
         </div>
     </div>
 
     <!-- Duplicate Alert Modal -->
     <div class="modal-overlay layout__duplicate-modal" id="duplicate-modal">
-        <div class="modal-content layout__item-14">
+        <div class="modal-content modal-content--ai">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="duplicate_warning">⚠️ تحذير: سؤال مكرر</h3>
-                <button class="close-modal" onclick="document.getElementById('duplicate-modal').classList.remove('active')">×</button>
+                <button class="close-modal" onclick="document.getElementById('duplicate-modal').classList.remove('active')" aria-label="إغلاق النافذة">×</button>
             </div>
             <p id="duplicate-msg" class="modal__duplicate-msg"></p>
-            <div class="layout__item-1-2">
+            <div class="quiz__actions-row">
                 <button class="btn modal__btn-force-save" id="btn-force-save" data-i18n="save_anyway">حفظ على أي حال</button>
                 <button class="btn btn-danger modal__btn-force-save" onclick="document.getElementById('duplicate-modal').classList.remove('active')" data-i18n="cancel_save">إلغاء المتابعة</button>
             </div>
@@ -1605,29 +1709,29 @@
     </div>
 
     <!-- Hidden Print Container -->
-    <div id="print-container"></div>
+    <div id="print-container" class="print-container"></div>
 
     <!-- Floating Undo/Redo -->
-    <div class="layout__item-9-1">
-        <button id="btn-undo" class="btn layout__btn-undo" onclick="app.undo()" title="تراجع" data-i18n-title="msg_undo" data-i18n="undo">↩️ تراجع</button>
-        <button id="btn-redo" class="btn layout__btn-undo" onclick="app.redo()" title="إعادة" data-i18n-title="msg_redo" data-i18n="redo">↪️ إعادة</button>
+    <div class="floating-undo-redo">
+        <button id="btn-undo" class="btn floating-undo-redo__btn floating-undo-redo__btn--undo" onclick="app.undo()" title="تراجع" data-i18n-title="msg_undo" data-i18n="undo">↩️ تراجع</button>
+        <button id="btn-redo" class="btn floating-undo-redo__btn floating-undo-redo__btn--redo" onclick="app.redo()" title="إعادة" data-i18n-title="msg_redo" data-i18n="redo">↪️ إعادة</button>
     </div>
 
     <!-- Project Report / About Modal -->
     <div class="modal-overlay" id="project-report-modal">
-        <div class="modal-content layout__item-15">
+        <div class="modal-content modal-content--changelog">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="project_report_title">📄 تقرير المشروع والتعريف بالنظام</h3>
-                <button class="close-modal">×</button>
+                <button class="close-modal" aria-label="إغلاق النافذة">×</button>
             </div>
             
             <div id="project-report-content" class="modal__project-report-content">
                 <!-- ARABIC CONTENT -->
                 <div id="report-ar" class="lang-section ar" dir="rtl">
-                    <div class="modal__item-12">
+                    <div class="modal__changelog-header">
                         <h1 class="modal__title">QBank - نظام إدارة بنوك الأسئلة المتطور (v16.6.1)</h1>
-                        <div class="modal__item-13">الإصدار 16.6.1</div>
-                        <p class="modal__text-3">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
+                        <div class="modal__changelog-version">الإصدار 16.6.1</div>
+                        <p class="modal__helper-text-3">نظام متكامل لإدارة الأسئلة، الاختبارات، والتصدير الاحترافي. مصمم لخدمة الطلاب والمحاضرين لضمان أفضل تجربة تعليمية وتنظيمية.</p>
                     </div>
 
                     <h3>🚀 مقدمة</h3>
@@ -1703,26 +1807,26 @@
                     </div>
 
                     <div id="changelog-container" class="modal__changelog-container">
-                        <div class="modal__item-14">
-                            <div class="stat-card__item-43">
-                                <div class="modal__item-15">📜</div>
-                                <h3 class="modal__title-1">سجل التغييرات (CHANGELOG)</h3>
+                        <div class="modal__changelog-item">
+                            <div class="stat-card__label_for--43">
+                                <div class="modal__changelog-icon">📜</div>
+                                <h3 class="modal__changelog">سجل التغييرات (CHANGELOG)</h3>
                             </div>
-                            <span class="modal__label-4">تحديث تلقائي من النظام</span>
+                            <span class="modal__icon-4">تحديث تلقائي من النظام</span>
                         </div>
-                        <div id="changelog-content" class="modal__changelog-content">
+                        <div id="changelog-content" class="modal__changelog-body">
                             جاري تحميل سجل التغييرات من الملف... ⏳
                         </div>
-                        <p class="modal__text-4">يتم استيراد هذه البيانات ديناميكياً من ملف <code>CHANGELOG.md</code> لضمان الحداثة.</p>
+                        <p class="modal__changelog--4">يتم استيراد هذه البيانات ديناميكياً من ملف <code>CHANGELOG.md</code> لضمان الحداثة.</p>
                     </div>
                 </div>
 
                 <!-- ENGLISH CONTENT -->
                 <div id="report-en" class="lang-section en stat-card__institution-logo-upload" dir="ltr">
-                    <div class="modal__item-12">
+                    <div class="modal__changelog-header">
                         <h1 class="modal__title">QBank - Advanced Question Bank Manager (V16.6.1)</h1>
-                        <div class="modal__item-13">Version 16.6.1</div>
-                        <p class="modal__text-3">A complete system for managing questions, quizzes, and professional exports. Designed for students and lecturers to ensure the best educational and organizational experience.</p>
+                        <div class="modal__changelog-version">Version 16.6.1</div>
+                        <p class="modal__helper-text-3">A complete system for managing questions, quizzes, and professional exports. Designed for students and lecturers to ensure the best educational and organizational experience.</p>
                     </div>
 
                     <h3>🚀 Introduction</h3>
@@ -1797,44 +1901,44 @@
                     </div>
 
                     <div id="changelog-container-en" class="modal__changelog-container">
-                        <div class="modal__item-14">
-                            <div class="stat-card__item-43">
-                                <div class="modal__item-15">📜</div>
-                                <h3 class="modal__title-1">Changelog</h3>
+                        <div class="modal__changelog-item">
+                            <div class="stat-card__label_for--43">
+                                <div class="modal__changelog-icon">📜</div>
+                                <h3 class="modal__changelog">Changelog</h3>
                             </div>
-                            <span class="modal__label-4">System Auto-update</span>
+                            <span class="modal__icon-4">System Auto-update</span>
                         </div>
-                        <div id="changelog-content-en" class="modal__changelog-content">
+                        <div id="changelog-content-en" class="modal__changelog-body">
                             Loading changelog from file... ⏳
                         </div>
-                        <p class="modal__text-4">This data is dynamically imported from <code>CHANGELOG.md</code> to ensure accuracy.</p>
+                        <p class="modal__changelog--4">This data is dynamically imported from <code>CHANGELOG.md</code> to ensure accuracy.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="modal__item-2-2">
-                <button class="btn stat-card__btn-8" onclick="app.copyProjectReport()" data-i18n="copy_report">📋 نسخ التقرير للنص</button>
-                <button class="btn modal__btn-1-2" onclick="app.closeModal('project-report-modal')" data-i18n="close">إغلاق</button>
+            <div class="modal__duplicate-footer">
+                <button class="btn stat-card__btn--primary-8" onclick="app.copyProjectReport()" data-i18n="copy_report">📋 نسخ التقرير للنص</button>
+                <button class="btn modal__btn-1_2" onclick="app.closeModal('project-report-modal')" data-i18n="close">إغلاق</button>
             </div>
         </div>
     </div>
 
     <div id="tag-normalizer-modal" class="modal-overlay">
-        <div class="modal-content layout__item-16">
+        <div class="modal-content modal-content--loading">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="tag_normalizer_title">🏷️ تنظيف وتحسين الوسوم</h3>
-                <button class="close-modal" onclick="app.closeModal('tag-normalizer-modal')">×</button>
+                <button class="close-modal" onclick="app.closeModal('tag-normalizer-modal')" aria-label="إغلاق النافذة">×</button>
             </div>
             <div class="modal-body">
-                <p data-i18n="tag_normalizer_desc" class="modal__text-5">
+                <p data-i18n="tag_normalizer_desc" class="modal__helper-text-5">
                     <span data-i18n="tag_normalizer_desc">يقوم هذا المحرك باكتشاف الوسوم المتشابهة (مثل "كيمياء" و "كيميا") واقتراح دمجها لتجنب التكرار.</span>
                 </p>
-                <div class="modal__item-16">
+                <div class="modal__loading-spinner">
                     <button class="btn btn-sm modal__btn-force-save" onclick="app.toggleAllNormalizer('tag-normalizer-modal', true)" data-i18n="select_all">تحديد الكل</button>
                     <button class="btn btn-sm btn-secondary modal__btn-force-save" onclick="app.toggleAllNormalizer('tag-normalizer-modal', false)" data-i18n="deselect_all">إلغاء التحديد</button>
                 </div>
                 <div id="tag-suggestions-container" class="modal__tag-suggestions-container">
-                    <div data-i18n="norm_analyzing" class="modal__item-17">جاري تحليل الوسوم... ⏳</div>
+                    <div data-i18n="norm_analyzing" class="modal__loading-text">جاري تحليل الوسوم... ⏳</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1846,21 +1950,21 @@
     
     <!-- Category Normalizer Modal -->
     <div id="category-normalizer-modal" class="modal-overlay">
-        <div class="modal-content layout__item-16">
+        <div class="modal-content modal-content--loading">
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="cat_normalizer_title">📂 تنظيف وتحسين التصنيفات</h3>
-                <button class="close-modal" onclick="app.closeModal('category-normalizer-modal')">×</button>
+                <button class="close-modal" onclick="app.closeModal('category-normalizer-modal')" aria-label="إغلاق النافذة">×</button>
             </div>
             <div class="modal-body">
-                <p data-i18n="cat_normalizer_desc" class="modal__text-5">
+                <p data-i18n="cat_normalizer_desc" class="modal__helper-text-5">
                     <span data-i18n="cat_normalizer_desc">دمج التصنيفات المتشابهة لضمان دقة التنظيم (مثلاً: "جراحة" و "جراحه").</span>
                 </p>
-                <div class="modal__item-16">
+                <div class="modal__loading-spinner">
                     <button class="btn btn-sm modal__btn-force-save" onclick="app.toggleAllNormalizer('category-normalizer-modal', true)" data-i18n="select_all">تحديد الكل</button>
                     <button class="btn btn-sm btn-secondary modal__btn-force-save" onclick="app.toggleAllNormalizer('category-normalizer-modal', false)" data-i18n="deselect_all">إلغاء التحديد</button>
                 </div>
                 <div id="category-suggestions-container" class="modal__tag-suggestions-container">
-                    <div data-i18n="norm_analyzing" class="modal__item-17">جاري تحليل التصنيفات... ⏳</div>
+                    <div data-i18n="norm_analyzing" class="modal__loading-text">جاري تحليل التصنيفات... ⏳</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1872,27 +1976,27 @@
 
 
     <!-- Finding 7: AI Generate Floating Action Button (Questions view only) -->
-    <button id="fab-ai-generate" onclick="app.openAiPromptModal()" title="توليد أسئلة بالذكاء الاصطناعي" aria-label="Generate with AI">
+    <button id="fab-ai-generate" onclick="app.openAiPromptModal()" title="توليد أسئلة بالذكاء الاصطناعي" aria-label="Generate with AI" class="fab-ai-generate">
         ✨
         <span class="fab-tooltip">توليد بالذكاء الاصطناعي</span>
     </button>
 
     <!-- Finding 3: Mobile Filter Drawer -->
-    <div id="filter-drawer-overlay" onclick="app.closeFilterDrawer()"></div>
-    <div id="filter-drawer" role="dialog" aria-label="فلاتر البحث">
+    <div id="filter-drawer-overlay" onclick="app.closeFilterDrawer()" class="filter-drawer-overlay"></div>
+    <div id="filter-drawer" role="dialog" aria-label="فلاتر البحث" class="filter-drawer">
         <div class="filter-drawer-handle"></div>
         <div class="filter-drawer-title" data-i18n="filter_title">🔍 فلاتر البحث</div>
         <div class="filter-drawer-grid">
-            <div class="layout__item-17">
-                <label data-i18n="filter_search" class="layout__item-18">البحث</label>
+            <div class="filter-drawer__form">
+                <label data-i18n="filter_search" class="filter-drawer__label">البحث</label>
                 <input type="text" id="filter-search-drawer" class="form-control" placeholder="ابحث هنا..." oninput="const fs=document.getElementById('filter-search'); if(fs){fs.value=this.value; fs.dispatchEvent(new Event('input'));}">
             </div>
             <div>
-                <label data-i18n="filter_notebook" class="layout__item-18">الدفتر</label>
+                <label data-i18n="filter_notebook" class="filter-drawer__label">الدفتر</label>
                 <select id="filter-notebook-drawer" class="form-control" onchange="document.getElementById('filter-notebook').value=this.value; app.renderQuestions();"></select>
             </div>
             <div>
-                <label data-i18n="filter_type" class="layout__item-18">النوع</label>
+                <label data-i18n="filter_type" class="filter-drawer__label">النوع</label>
                 <select id="filter-type-drawer" class="form-control" onchange="document.getElementById('filter-type').value=this.value; app.renderQuestions();">
                     <option value="" data-i18n="all_types">كل الأنواع</option>
                     <option value="mcq" data-i18n="type_mcq">اختيار متعدد</option>
@@ -1902,7 +2006,7 @@
                 </select>
             </div>
             <div>
-                <label data-i18n="filter_difficulty" class="layout__item-18">الصعوبة</label>
+                <label data-i18n="filter_difficulty" class="filter-drawer__label">الصعوبة</label>
                 <select id="filter-difficulty-drawer" class="form-control" onchange="document.getElementById('filter-difficulty').value=this.value; app.renderQuestions();">
                     <option value="" data-i18n="all_levels">كل المستويات</option>
                     <option value="easy" data-i18n="difficulty_easy">سهل</option>
@@ -1911,18 +2015,18 @@
                 </select>
             </div>
             <div>
-                <label data-i18n="filter_category" class="layout__item-18">التصنيف</label>
+                <label data-i18n="filter_category" class="filter-drawer__label">التصنيف</label>
                 <select id="filter-category-drawer" class="form-control" onchange="document.getElementById('filter-category').value=this.value; app.renderQuestions();"></select>
             </div>
         </div>
-        <div class="layout__item-3-1">
+        <div class="filter-drawer__footer">
             <button class="btn modal__btn-force-save" onclick="app.closeFilterDrawer()" data-i18n="apply_changes">تطبيق</button>
             <button class="btn btn-secondary modal__btn-force-save" onclick="document.querySelectorAll('#filter-notebook,#filter-type,#filter-difficulty,#filter-category').forEach(s=>s.value=''); app.renderQuestions(); app.closeFilterDrawer();" data-i18n="reset">إعادة ضبط</button>
         </div>
     </div>
 
     <!-- Finding 8: Keyboard Shortcut Overlay -->
-    <div id="keyboard-overlay" role="dialog" aria-label="اختصارات لوحة المفاتيح">
+    <div id="keyboard-overlay" role="dialog" aria-label="اختصارات لوحة المفاتيح" class="keyboard-overlay">
         <div class="keyboard-panel">
             <h3>⌨️ <span data-i18n="keyboard_shortcuts">اختصارات لوحة المفاتيح</span></h3>
             <div class="shortcut-grid">
@@ -1939,12 +2043,12 @@
 
 
     <!-- ── Command Palette ── -->
-    <div id="command-palette-overlay" onclick="if(event.target.id==='command-palette-overlay') app.closeCommandPalette()">
+    <div id="command-palette-overlay" onclick="if(event.target.id==='command-palette-overlay') app.closeCommandPalette()" class="command-palette-overlay">
         <div class="command-palette-panel">
             <div class="cmd-search-wrap">
                 <span class="cmd-search-icon">⌘</span>
                 <input id="cmd-search" type="text" placeholder="ابحث عن أمر أو سؤال..." autocomplete="off" oninput="app._renderCommands(this.value)" onkeydown="if(event.key==='Escape') app.closeCommandPalette(); if(event.key==='ArrowDown'){event.preventDefault(); document.querySelector('.cmd-item')?.focus();}">
-                <kbd class="layout__item-19">Esc</kbd>
+                <kbd class="keyboard-overlay__kbd">Esc</kbd>
             </div>
             <div id="cmd-results" class="cmd-results"></div>
         </div>
@@ -1952,15 +2056,15 @@
 
     <!-- Duplicate Manager Modal -->
     <div class="modal-overlay" id="duplicates-modal">
-        <div class="modal-content layout__item-20">
-            <div class="modal-header modal__item-18">
+        <div class="modal-content modal-content--ai-generate">
+            <div class="modal-header modal__duplicate-header">
                 <h3 class="modal-title modal__title-2" data-i18n="dup_manager_title">منظم التكرارات الذكي</h3>
-                <button class="close-modal modal__title-2" onclick="app.closeModal('duplicates-modal')">×</button>
+                <button class="close-modal modal__title-2" onclick="app.closeModal('duplicates-modal')" aria-label="إغلاق النافذة">×</button>
             </div>
             
-            <div class="modal-body modal__item-1-4">
+            <div class="modal-body modal__duplicate-body">
                 <div id="duplicates-loading" class="modal__duplicates-loading">
-                    <div class="spinner stat-card__item-5"></div>
+                    <div class="spinner stat-card__vulnerability-header"></div>
                     <p id="duplicates-progress-text" data-i18n="loading_msg">جاري معالجة البيانات... ⏳</p>
                     <div id="duplicates-progress-bar" class="modal__duplicates-progress-bar">
                         <div id="duplicates-progress-fill" class="modal__duplicates-progress-fill"></div>
@@ -1968,9 +2072,9 @@
                 </div>
 
                 <div id="duplicates-empty" class="modal__duplicates-loading">
-                    <div class="layout__item-6">✨</div>
+                    <div class="quiz__result-wrapper">✨</div>
                     <h2 data-i18n="dup_no_found" class="modal__title-3">رائع! لا توجد أسئلة مكررة حالياً.</h2>
-                    <p class="modal__text-6">بنك الأسئلة الخاص بك نظيف ومنظم تماماً.</p>
+                    <p class="modal__helper-text-6">بنك الأسئلة الخاص بك نظيف ومنظم تماماً.</p>
                     <button class="btn btn-primary" onclick="DuplicatesUI.scan()" data-i18n="dup_scan_btn">بدء فحص التكرارات</button>
                 </div>
 
@@ -1983,14 +2087,14 @@
 
     <!-- ── QR Code Modal ── -->
     <div class="modal-overlay" id="qr-modal">
-        <div class="modal-content layout__item-21">
+        <div class="modal-content modal-content--command-palette">
             <div class="modal-header">
                 <h3 data-i18n="qr_modal_title">▣ QR Code للسؤال</h3>
                 <button class="close-modal" onclick="app.closeModal('qr-modal')">✕</button>
             </div>
-            <div class="modal-body modal__item-1-5">
+            <div class="modal-body modal__notebook-body">
                 <p id="qr-question-text" class="modal__qr-question-text"></p>
-                <div class="form-group modal__item-19">
+                <div class="form-group modal__notebook-color-group">
                     <select id="qr-content-mode" class="form-control" onchange="app.generateQRForMode()">
                         <option value="q_only" data-i18n="qr_q_only">السؤال فقط</option>
                         <option value="q_options" data-i18n="qr_q_options">السؤال + الخيارات (إن وجدت)</option>
@@ -1999,7 +2103,7 @@
                     </select>
                 </div>
                 <div id="qr-code-container" class="modal__qr-code-container"></div>
-                <p data-i18n="qr_hint" class="modal__text-1-1">الطالب يصور الكود بالموبايل ليقرأ التفاصيل فوراً</p>
+                <p data-i18n="qr_hint" class="modal__helper-text-1_1">الطالب يصور الكود بالموبايل ليقرأ التفاصيل فوراً</p>
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="app.downloadQRCode()" data-i18n="btn_download">⬇️ تحميل الصورة</button>
@@ -2010,14 +2114,14 @@
 
     <!-- ── JSON Fixer Modal ── -->
     <div class="modal-overlay" id="json-fixer-modal">
-        <div class="modal-content layout__item-22">
+        <div class="modal-content modal-content--topic-graph">
             <div class="modal-header">
                 <h3 data-i18n="json_fixer_title">🔧 مصلح ملف JSON</h3>
                 <button class="close-modal" onclick="app.closeModal('json-fixer-modal')">✕</button>
             </div>
-            <div class="modal-body modal__item-1-6">
+            <div class="modal-body modal__references-body">
                 <div id="json-fixer-error" class="modal__json-fixer-error"></div>
-                <p data-i18n="json_fixer_hint" class="modal__text-7">عدّل الملف مباشرةً ثم اضغط «تحقق واستورد»:</p>
+                <p data-i18n="json_fixer_hint" class="modal__helper-text-7">عدّل الملف مباشرةً ثم اضغط «تحقق واستورد»:</p>
                 <textarea id="json-fixer-editor" spellcheck="false" class="modal__json-fixer-editor"></textarea>
             </div>
             <div class="modal-footer">

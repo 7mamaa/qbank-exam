@@ -513,6 +513,13 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
       line-height: 1.5;
       text-align: start;
     }
+    @media print {
+      .review-item, .explain-box, .pdf-question-block, .question-card, .question-item, .explanation-box, .print-question, .answer-box {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        position: relative;
+      }
+    }
   </style>
 </head>
 <body class="dark" dir="rtl">
@@ -577,7 +584,8 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
   </div>
 
   <script>
-    const EXAM_DATA = JSON.parse(decodeURIComponent('__EXAM_DATA_PLACEHOLDER__'));
+    const MOCK_QUIZ_DATA = __EXAM_DATA_PLACEHOLDER__;
+    const EXAM_DATA = MOCK_QUIZ_DATA;
     
     // فرز الأسئلة تسلسلياً حسب النوع: written -> mcq -> boolean -> match
     const TYPE_WEIGHTS = { 'written': 1, 'mcq': 2, 'boolean': 3, 'match': 4 };
@@ -1010,10 +1018,9 @@ export function generateCleanQuizOnlyHtml(questions, settings, theme, title) {
 </body>
 </html>`;
 
-  const jsonSpecs = JSON.stringify(sortedQuestions);
-  const encodedSpecs = encodeURIComponent(jsonSpecs);
+  const jsonSpecs = JSON.stringify(sortedQuestions).replace(/<\/script/ig, '<\\/script');
 
   return htmlTemplate
     .replace(/__QUIZ_TITLE__/g, title)
-    .replace('__EXAM_DATA_PLACEHOLDER__', encodedSpecs);
+    .replace('__EXAM_DATA_PLACEHOLDER__', jsonSpecs);
 }

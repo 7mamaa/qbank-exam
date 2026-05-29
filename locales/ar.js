@@ -402,6 +402,7 @@ export const ar = {
 8. "notebookId": المعرف الفريد للدفتر الأب الذي سينتمي إليه هذا السؤال (مثال: "{topic}").
 9. "qNumber": ترقيم تسلسلي رقمي صريح يبدأ من 1 لكل دفتر.
 10. "options": مصفوفة خيارات لأسئلة MCQ فقط، وتكون فارغة [] للبقية.
+11. "reference": كائن يحتوي على كتاب المرجع "book" (مثال: "Ophthalmology Companion") ورقم الصفحة "page" (مثال: "142").
 
 قواعد البيانات لكل نوع:
 - (mcq): يتطلب "options" (4 خيارات نصية) و "answer" (نص مطابق تماماً للخيار الصحيح).
@@ -500,7 +501,7 @@ export const ar = {
     "unpin": "إلغاء التثبيت",
     "export_pdf_theme": "قالب التصميم التفاعلي",
     "pdf_theme_classic": "القالب الكلاسيكي الموحد",
-    "pdf_theme_minecraft": "قالب ماينكرافت (Minecraft)",
+    "pdf_theme_minecraft": "🎮 ماين كرافت (Minecraft)",
     "pdf_theme_modern": "القالب الحديث (Modern)",
     "btn_preview_ref": "فحص ومعاينة المرجع 📡",
     "btn_confirm_ref_import": "تأكيد الاستيراد الآمن 🚀",
@@ -623,5 +624,43 @@ export const ar = {
     "zen_mode_btn": "وضع التركيز (Zen Mode)",
     "flashcard_flip_btn": "اقلب البطاقة",
     "bookmark_question": "تثبيت السؤال الحالي",
-    "due_today_filter": "المراجعات المستحقة اليوم"
+    "due_today_filter": "المراجعات المستحقة اليوم",
+
+    // v17.2 — Viewport & Translation Fixes
+    "drag_drop_title": "سحب وإفلات الملفات",
+    "drag_drop_desc": "اسحب ملف JSON أو CSV هنا للاستيراد الفوري",
+    "pdf_split_sessions_label": "تقسيم بنك الأسئلة إلى جلسات مذاكرة ذكية",
+    "pdf_session_duration_label": "مدة الجلسة الواحدة (بالدقائق):",
+    "minutes_label": "دقيقة",
+    "msg_import_success_forced": "تم استيراد الأسئلة وتوزيعها بنجاح! 🚀",
+    "msg_import_success_floating": "تم استيراد الأسئلة كعناصر عائمة بنجاح! 🚀",
+    "msg_import_fixed_success": "تم إصلاح واستيراد ملف JSON التالف بنجاح! 🔧✅",
+    "err_decompression_failed": "فشل فك ضغط الملف! تأكد من سلامة البيانات.",
+    "pause": "إيقاف مؤقت",
+    "play": "تشغيل",
+    "msg_copy_failed_retry": "فشلت عملية النسخ، يرجى المحاولة يدوياً.",
+    "confirm_delete_btn": "تأكيد الحذف نهائياً 🗑️",
+    "json_advanced_settings": "⚙️ إعدادات JSON المتقدمة",
+    "export_opt_beautify": "تنسيق الملف الجمالي (Beautify)",
+    "export_opt_compress": "تفعيل ضغط GZIP",
+    "msg_export_success": "تم تصدير وحفظ الملف بنجاح! 📁✅",
+    "default_word_header": "بنك الأسئلة الطبي المعتمد",
+    "select_ref_first": "يرجى اختيار مرجع طبي أولاً.",
+    "err_fetch_ref_failed": "تعذر جلب بيانات المرجع من الخادم.",
+    "msg_import_success": "تم الاستيراد بنجاح!",
+    
+    // v17.2 — PDF Export Themes
+    "pdf_theme_label": "🎨 اختر ثيم العرض والملف النهائي:",
+    "pdf_theme_default": "🎨 الوضع الافتراضي (Default Mode)",
+    "pdf_theme_tech2023": "🚀 طابع تقني 2023",
+    "pdf_theme_terminal": "💻 الترمنال الهكر (Terminal)",
+    "pdf_theme_dark": "🌌 الطابع الليلي الفخم (Deep Dark)",
+    "pdf_theme_retro": "📜 الآلة الكاتبة الكلاسيكية (Retro)",
+    "pdf_theme_manga": "💥 مانجا الأنمي (Manga & Comic)",
+    "pdf_theme_cyberpunk": "👾 السايبربانك المضيء (Cyberpunk)",
+    "pdf_theme_pastel": "🌸 الباستيل الهادئ (Pastel Minimal)",
+    "pdf_theme_forest": "🌿 طبيعة الغابة (Forest Organic)",
+    "pdf_theme_academic": "🏛️ الجامعة الملكية (Oxford)",
+    "pdf_bg_graphics_advice_title": "نصيحة ClarifyMaster للحصول على جودة خارقة:",
+    "pdf_bg_graphics_advice_desc": "عند حفظ ملف الـ PDF من نافذة الطباعة، تأكد دائماً من تفعيل خيار \"رسومات الخلفية\" (Background Graphics) لكي يستعرض المتصفح الألوان العميقة والخلفيات المذهلة للثيم في الملف المصدّر!"
 };

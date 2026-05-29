@@ -334,6 +334,10 @@ export const QuestionModule = {
         const tagSelect = document.getElementById('filter-tag');
         if (!catSelect || !tagSelect) return;
 
+        // Force clear container options before rebuild to prevent DOM cumulative injections
+        catSelect.innerHTML = "";
+        tagSelect.innerHTML = "";
+
         const categories = [...new Set(state.questions.map(q => q.category))].filter(Boolean).sort((a, b) => {
             const valA = typeof a === 'object' ? (a.order ?? a.id ?? a) : a;
             const valB = typeof b === 'object' ? (b.order ?? b.id ?? b) : b;
@@ -635,7 +639,7 @@ export const QuestionModule = {
                         </span>
                         ${tagsHtml}
                     </div>
-                    <div class="q-compact-title" style="font-weight: 600; color: var(--text-title);">${sQuestion}</div>
+                    <div class="q-compact-title" title="${sQuestion}" style="font-weight: 600; color: var(--text-title);">${sQuestion}</div>
                     ${q.answer ? `<div class="q-answer-preview">${Helpers.sanitize(q.answer)}</div>` : ''}
                 </div>
 

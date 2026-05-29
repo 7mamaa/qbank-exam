@@ -2,7 +2,7 @@ import { Logger } from '../utils/logger.js?v=16.6.1';
 
 // --- Database Wrapper (Vanilla IndexedDB) ---
 const DB_NAME = 'QBankDB';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 export const db = {
     // استخدام النطاق العالمي لضمان نسخة واحدة دائماً (Global Singleton)
@@ -32,6 +32,13 @@ export const db = {
                 if (!database.objectStoreNames.contains('quiz_history')) {
                     const store = database.createObjectStore('quiz_history', { keyPath: 'id', autoIncrement: true });
                     store.createIndex('date', 'date', { unique: false });
+                }
+
+                // V4: Tiered Snapshots store
+                if (!database.objectStoreNames.contains('snapshots')) {
+                    const store = database.createObjectStore('snapshots', { keyPath: 'id' });
+                    store.createIndex('level', 'level', { unique: false });
+                    store.createIndex('createdAt', 'createdAt', { unique: false });
                 }
             };
 
@@ -182,7 +189,7 @@ export const db = {
      * Clears all data from all stores.
      */
     async clearAll() {
-        const stores = ['notebooks', 'questions', 'quiz_history'];
+        const stores = ['notebooks', 'questions', 'quiz_history', 'snapshots'];
         for (const s of stores) {
             await new Promise((resolve) => {
                 const tx = this.instance.transaction([s], 'readwrite');

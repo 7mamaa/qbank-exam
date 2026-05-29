@@ -1,4 +1,4 @@
-/* global pako */
+/* global pako, html2pdf */
 import { i18n } from './src/core/i18n.js?v=16.6.1';
 import { db } from './src/core/db.js?v=16.6.1';
 import { Migrations } from './src/core/migrations.js?v=16.6.1';
@@ -13,6 +13,7 @@ import { ExportModule } from './src/modules/export.js?v=16.6.1';
 import { generateCleanQuizOnlyHtml } from './src/modules/standaloneHtmlGenerator.js?v=16.6.1';
 import { AIModule } from './src/modules/ai.js?v=16.6.1';
 import DuplicatesUI from './src/modules/duplicates-ui.js?v=16.6.1';
+import { SnapshotsEngine, SnapshotLevel } from './src/core/snapshots.js?v=16.6.1';
 import { UIComponents } from './src/ui/components.js?v=16.6.1';
 import { Helpers } from './src/utils/helpers.js?v=16.6.1';
 import { Logger } from './src/utils/logger.js?v=16.6.1';
@@ -108,6 +109,11 @@ export const app = {
         // Cross-tab communication for data integrity
         this.syncChannel = new BroadcastChannel('qbank_sync_channel');
         this.syncChannel.onmessage = (event) => {
+            // Brake: suppress sync during snapshot comparison to prevent UI crashes
+            if (state.isComparing) {
+                console.log('[BroadcastChannel] Sync suppressed — snapshot comparison in progress.');
+                return;
+            }
             if (event.data === 'sync') {
                 console.log("External sync detected. Refreshing state...");
                 this.syncData(false);
@@ -143,6 +149,12 @@ export const app = {
             const refId = urlParams.get('import_ref');
             if (refId) {
                 this.handleAutoImport(refId);
+            }
+
+            // Auto-import from direct url (?direct_url=...)
+            const directUrl = urlParams.get('direct_url');
+            if (directUrl) {
+                this.handleDirectUrlImport(directUrl);
             }
 
             // Global keydown listener for Developer Diagnostics tool (Ctrl + Shift + E)
@@ -206,6 +218,83 @@ export const app = {
                 this.hideLoading();
             }
         }, 800);
+    },
+
+    async handleDirectUrlImport(directUrl) {
+        try {
+            const decodedUrl = decodeURIComponent(directUrl);
+            const cleanUrl = decodedUrl.split('?')[0].split('#')[0].toLowerCase();
+            
+            // Security check: Must end with .json or .json.gz
+            if (!cleanUrl.endsWith('.json') && !cleanUrl.endsWith('.json.gz')) {
+                UIComponents.showToast("الرابط الممرر غير صالح! يجب أن ينتهي بـ .json أو .json.gz لمنع التداخل ⚠️", 'warning');
+                globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
+                return;
+            }
+
+            this.showLoading(i18n.t('loading') || "جاري جلب البيانات...");
+
+            let text = await Helpers.fetchUrlWithProxy(decodedUrl);
+            if (!text) {
+                throw new Error("Empty response from server");
+            }
+
+            // HTML injection barrier
+            const trimmedText = text.trim();
+            if (trimmedText.startsWith('<!DOCTYPE') || trimmedText.startsWith('<html') || trimmedText.startsWith('<')) {
+                UIComponents.showToast("الرابط الممرر يؤدي لصفحة ويب وليس لملف أسئلة JSON صالح! ⚠️", 'warning');
+                globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
+                return;
+            }
+
+            // Decompress in memory if GZIP format detected
+            let finalJsonText = text;
+            if (text.length >= 2) {
+                const charCodeArray = new Uint8Array(text.length);
+                for (let i = 0; i < text.length; i++) {
+                    charCodeArray[i] = text.charCodeAt(i) & 0xff;
+                }
+                if (charCodeArray[0] === 0x1f && charCodeArray[1] === 0x8b) {
+                    if (typeof DecompressionStream !== 'undefined') {
+                        const stream = new ReadableStream({
+                            start(controller) {
+                                controller.enqueue(charCodeArray);
+                                controller.close();
+                            }
+                        });
+                        const decompressionStream = new DecompressionStream('gzip');
+                        const decompressedStream = stream.pipeThrough(decompressionStream);
+                        finalJsonText = await new Response(decompressedStream).text();
+                    } else if (typeof pako !== 'undefined') {
+                        finalJsonText = pako.ungzip(charCodeArray, { to: 'string' });
+                    } else {
+                        throw new Error("GZIP decompression is not supported in this browser.");
+                    }
+                }
+            }
+
+            const parsedData = ExportModule.parseIncomingString(finalJsonText);
+            await ExportModule.processStrictImport(parsedData, async (floatingCount, autoDistribute) => {
+                if (typeof this.syncData === 'function') {
+                    await this.syncData();
+                    this.renderSelectionHub();
+                    this.updateExportScopeCounts();
+                }
+                if (!autoDistribute) {
+                    UIComponents.showToast(i18n.t('msg_import_success_forced'), 'success');
+                } else if (floatingCount > 0) {
+                    UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+                } else {
+                    UIComponents.showToast(i18n.t('msg_import_fixed_success') || "تم الاستيراد بنجاح وبدون أي تكرار!", 'success');
+                }
+                globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
+            });
+        } catch (e) {
+            this.handleError(e, "Direct URL Import Error");
+            globalThis.history.replaceState({}, document.title, globalThis.location.pathname);
+        } finally {
+            this.hideLoading();
+        }
     },
 
     /**
@@ -436,6 +525,253 @@ export const app = {
     /** Returns institution data from localStorage */
     getInstitution() {
         return JSON.parse(localStorage.getItem('qbank_institution') || '{}');
+    },
+
+    // ── Snapshot System ──────────────────────────────────────────────────────
+
+    /**
+     * Captures a snapshot at the given level.
+     * @param {number} level - 1 (UI), 2 (Structure), 3 (Raw Data)
+     */
+    async captureSnapshot(level) {
+        try {
+            const labelInput = document.getElementById('snapshot-label');
+            const label = labelInput?.value?.trim() || '';
+            this.showLoading('جاري التقاط اللقطة...');
+            await SnapshotsEngine.capture(level, label);
+            if (labelInput) labelInput.value = '';
+            this.showToast(`✅ تم حفظ اللقطة (المستوى ${level}) بنجاح`, 'success');
+            this.renderSnapshotsList();
+        } catch (err) {
+            this.handleError(err, 'Snapshot Capture Error');
+        } finally {
+            this.hideLoading();
+        }
+    },
+
+    /**
+     * Renders the snapshots list in the settings UI.
+     */
+    async renderSnapshotsList() {
+        const container = document.getElementById('snapshots-list');
+        if (!container) return;
+
+        const snapshots = await SnapshotsEngine.list();
+
+        if (snapshots.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">لا توجد لقطات محفوظة بعد.</div>';
+            return;
+        }
+
+        const levelLabels = { 1: '🎨 الهوية البصرية', 2: '🗂️ هيكل الدفاتر', 3: '💾 البيانات الخام' };
+        const levelColors = { 1: '#10b981', 2: '#f59e0b', 3: '#ef4444' };
+
+        container.innerHTML = snapshots.map(s => {
+            const date = new Date(s.createdAt).toLocaleString(state.language === 'ar' ? 'ar-EG' : 'en-US');
+            return `<div class="snapshot-item" style="border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:12px; background:rgba(255,255,255,0.03);">
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:700; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Helpers.sanitize(s.label)}</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); display:flex; gap:10px; flex-wrap:wrap;">
+                        <span style="background:${levelColors[s.level]}22; color:${levelColors[s.level]}; padding:2px 8px; border-radius:6px; font-weight:700; font-size:0.75rem;">${levelLabels[s.level] || 'L' + s.level}</span>
+                        <span>📅 ${date}</span>
+                        ${s.totalQuestions != null ? `<span>📝 ${s.totalQuestions} سؤال</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex; gap:6px; flex-shrink:0;">
+                    <button class="btn btn-sm" onclick="app.compareSnapshot('${s.id}')" title="مقارنة" style="padding:6px 10px; font-size:0.8rem;">🔍</button>
+                    <button class="btn btn-sm" onclick="app.restoreSnapshot('${s.id}')" title="استعادة" style="padding:6px 10px; font-size:0.8rem;">♻️</button>
+                    <button class="btn btn-sm btn-secondary" onclick="app.deleteSnapshot('${s.id}')" title="حذف" style="padding:6px 10px; font-size:0.8rem;">🗑️</button>
+                </div>
+            </div>`;
+        }).join('');
+    },
+
+    async compareSnapshot(snapshotId) {
+        try {
+            this.showLoading('جاري تحليل الفروقات...');
+            const delta = await SnapshotsEngine.compare(snapshotId);
+
+            let report = '';
+            if (delta.isIdentical) {
+                report = '✅ الحالة الحالية مطابقة تماماً لهذه اللقطة — لا توجد فروقات.';
+            } else {
+                const lines = [];
+                if (delta.added.length) lines.push(`🟢 عناصر مضافة: ${delta.added.length}`);
+                if (delta.removed.length) lines.push(`🔴 عناصر محذوفة: ${delta.removed.length}`);
+                if (delta.changed.length) lines.push(`🟡 تغييرات: ${delta.changed.length}`);
+                report = lines.join('\n');
+            }
+            alert(report);
+        } catch (err) {
+            this.handleError(err, 'Snapshot Comparison');
+        } finally {
+            this.hideLoading();
+        }
+    },
+
+    async restoreSnapshot(snapshotId) {
+        if (!confirm('⚠️ سيتم استعادة البيانات من هذه اللقطة. هل أنت متأكد؟')) return;
+        try {
+            this.showLoading('جاري الاستعادة...');
+            await SnapshotsEngine.restore(snapshotId);
+            await this.syncData();
+            this.showToast('✅ تمت الاستعادة بنجاح!', 'success');
+
+            // If L1, re-init theme/font/direction
+            const snap = await SnapshotsEngine.get(snapshotId);
+            if (snap?.level === SnapshotLevel.LEVEL_1_GLOBAL_UI) {
+                this.initTheme();
+                this.initFontSize();
+                this.initDirection();
+                this.initLanguage();
+                this.initInstitution();
+            }
+        } catch (err) {
+            this.handleError(err, 'Snapshot Restore');
+        } finally {
+            this.hideLoading();
+        }
+    },
+
+    async deleteSnapshot(snapshotId) {
+        if (!confirm('هل تريد حذف هذه اللقطة نهائياً؟')) return;
+        await SnapshotsEngine.remove(snapshotId);
+        this.renderSnapshotsList();
+        this.showToast('تم حذف اللقطة.', 'info');
+    },
+
+    // ── Smart PDF Sessions (Zero-Popup) ──────────────────────────────────────
+
+    /**
+     * Exports the current question pool as a PDF divided into timed study sessions.
+     * Uses html2pdf.js loaded from CDN on first use. No window.print() or popups.
+     */
+    async exportPdfSessions() {
+        try {
+            const pool = this.getQueryPool();
+            if (!pool || pool.length === 0) {
+                this.showToast('لا توجد أسئلة للتصدير.', 'warning');
+                return;
+            }
+
+            // Session configuration from UI
+            const targetMinutes = parseInt(document.getElementById('pdf-session-time')?.value) || 45;
+            const questionsPerMinute = parseFloat(document.getElementById('pdf-session-qpm')?.value) || 3;
+            const questionsPerSession = Math.max(1, Math.round(targetMinutes * questionsPerMinute));
+            const customHeader = document.getElementById('pdf-session-header')?.value || 'جلسات المذاكرة الذكية';
+            const direction = document.getElementById('pdf-direction')?.value || 'rtl';
+            const showAnswers = document.getElementById('pdf-session-answers')?.checked ?? true;
+
+            this.showLoading('جاري توليد ملف PDF الذكي...');
+
+            // Dynamically load html2pdf.js if not already present
+            if (typeof html2pdf === 'undefined') {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js';
+                    script.onload = resolve;
+                    script.onerror = () => reject(new Error('فشل تحميل مكتبة html2pdf.js'));
+                    document.head.appendChild(script);
+                });
+            }
+
+            // Split pool into sessions
+            const sessions = [];
+            for (let i = 0; i < pool.length; i += questionsPerSession) {
+                sessions.push(pool.slice(i, i + questionsPerSession));
+            }
+
+            // Build a single HTML document with session cover pages
+            const institution = this.getInstitution();
+            const logoHtml = institution.logo
+                ? `<img src="${institution.logo}" style="height:50px; max-width:140px; object-fit:contain; margin-bottom:8px;">`
+                : '';
+            const institutionHtml = institution.name
+                ? `<div style="font-size:0.9rem; font-weight:700; color:#555;">${Helpers.sanitize(institution.name)}</div>`
+                : '';
+
+            let fullHtml = `<div dir="${direction}" style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size:14px; color:#222; line-height:1.7;">`;
+
+            sessions.forEach((sessionQuestions, sessionIdx) => {
+                // Session cover page — CSS enforces page-break-before for internal splitting
+                fullHtml += `
+                    <div class="session-cover-page" style="page-break-before: always; break-before: page; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 3px solid #4361ee; border-radius: 16px; padding: 40px;">
+                        ${logoHtml}
+                        ${institutionHtml}
+                        <h1 style="font-size: 2rem; color: #4361ee; margin: 20px 0 10px;">📘 ${Helpers.sanitize(customHeader)}</h1>
+                        <h2 style="font-size: 1.4rem; color: #333;">الجلسة ${sessionIdx + 1} من ${sessions.length}</h2>
+                        <div style="font-size: 1.1rem; color: #666; margin-top: 10px;">
+                            عدد الأسئلة: ${sessionQuestions.length} | الوقت المقدر: ~${targetMinutes} دقيقة
+                        </div>
+                        <div style="margin-top: 20px; font-size: 0.85rem; color: #999;">${new Date().toLocaleDateString(state.language === 'ar' ? 'ar-EG' : 'en-US')}</div>
+                    </div>`;
+
+                // Session questions
+                const labels = direction === 'rtl' ? ['أ', 'ب', 'ج', 'د', 'هـ', 'و'] : ['A', 'B', 'C', 'D', 'E', 'F'];
+                sessionQuestions.forEach((q, qIdx) => {
+                    const sQuestion = Helpers.sanitize(q.question);
+                    fullHtml += `<div style="page-break-inside: avoid; border: 1px solid #e2e8f0; padding: 14px 18px; margin: 12px 0; border-radius: 10px; background: #fafafa;">`;
+                    fullHtml += `<h3 style="margin:0 0 8px; font-size:1rem; font-weight:700; color:#1e293b;">س${qIdx + 1}. ${sQuestion}</h3>`;
+
+                    if (q.type === 'mcq') {
+                        fullHtml += '<ul style="list-style:none; padding:0; margin:8px 0;">';
+                        (q.options || []).forEach((opt, oi) => {
+                            const isCorrect = showAnswers && opt === q.answer;
+                            fullHtml += `<li style="padding:4px 10px; margin:3px 0; border-radius:6px; ${isCorrect ? 'background:#d1fae5; font-weight:700; color:#047857;' : ''}">${labels[oi] || oi + 1}) ${Helpers.sanitize(opt)}</li>`;
+                        });
+                        fullHtml += '</ul>';
+                    } else if (q.type === 'boolean') {
+                        const ansText = q.answer ? 'صواب (True)' : 'خطأ (False)';
+                        fullHtml += `<p style="margin:6px 0;">( صواب / خطأ )</p>`;
+                        if (showAnswers) fullHtml += `<p style="color:#047857; font-weight:700;">الإجابة: ${ansText}</p>`;
+                    } else if (q.type === 'written') {
+                        if (showAnswers && q.answer) {
+                            fullHtml += `<p style="color:#047857;"><strong>الإجابة:</strong> ${Helpers.sanitize(String(q.answer))}</p>`;
+                        } else {
+                            fullHtml += '<div style="height:70px; border-bottom:1px dashed #999; margin:10px 0;"></div>';
+                        }
+                    } else if (q.type === 'match') {
+                        fullHtml += '<table style="width:100%;border-collapse:collapse;margin:8px 0;">';
+                        (q.pairs || []).forEach((p, pi) => {
+                            fullHtml += `<tr><td style="border:1px solid #ccc;padding:6px;">${pi + 1}. ${Helpers.sanitize(p.left)}</td><td style="border:1px solid #ccc;padding:6px;">${showAnswers ? Helpers.sanitize(p.right) : '...........'}</td></tr>`;
+                        });
+                        fullHtml += '</table>';
+                    }
+
+                    if (showAnswers && q.explain) {
+                        fullHtml += `<p style="margin-top:8px; padding:8px 12px; background:#eff6ff; border-radius:8px; font-size:0.85rem; color:#475569;">💡 ${Helpers.sanitize(q.explain)}</p>`;
+                    }
+                    fullHtml += '</div>';
+                });
+            });
+
+            fullHtml += '</div>';
+
+            // Generate PDF via html2pdf.js in-memory (zero popups)
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = '210mm';
+            tempContainer.innerHTML = fullHtml;
+            document.body.appendChild(tempContainer);
+
+            await html2pdf().set({
+                margin: [10, 10, 10, 10],
+                filename: `qbank_sessions_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.92 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css'] }
+            }).from(tempContainer).save();
+
+            tempContainer.remove();
+            this.showToast(`✅ تم توليد PDF ذكي (${sessions.length} جلسة، ${pool.length} سؤال)`, 'success');
+        } catch (err) {
+            this.handleError(err, 'PDF Session Export');
+        } finally {
+            this.hideLoading();
+        }
     },
 
 
@@ -691,7 +1027,10 @@ export const app = {
                 this.updateNotebookDropdowns();
                 this.applyReferenceHubHints();
             },
-            'settings': () => this.updateNotebookDropdowns()
+            'settings': () => {
+                this.updateNotebookDropdowns();
+                this.renderSnapshotsList();
+            }
         };
 
         if (viewInitializers[viewId]) viewInitializers[viewId]();
@@ -714,6 +1053,7 @@ export const app = {
         this.bindFormEvents();
         this.bindFilterEvents();
         this.bindBulkEvents();
+        this.bindDragDropEvents();
     },
 
     /** @private */
@@ -840,14 +1180,22 @@ export const app = {
         const catMain   = document.getElementById('filter-category');
         if (catDrawer && catMain) catDrawer.innerHTML = catMain.innerHTML;
 
-        document.getElementById('filter-drawer')?.classList.add('open');
-        document.getElementById('filter-drawer-overlay')?.classList.add('active');
+        const drawer = document.getElementById('filter-drawer');
+        const overlay = document.getElementById('filter-drawer-overlay');
+        
+        drawer?.classList.add('open');
+        overlay?.classList.add('active');
+        
+        if (drawer) {
+            UIComponents.FocusTrap.init(drawer);
+        }
     },
 
     /** Closes the mobile filter drawer. */
     closeFilterDrawer() {
         document.getElementById('filter-drawer')?.classList.remove('open');
         document.getElementById('filter-drawer-overlay')?.classList.remove('active');
+        UIComponents.FocusTrap.destroy();
     },
 
     /** @private */
@@ -1100,6 +1448,96 @@ export const app = {
             }
             e.target.value = '';
             this.syncCustomDropdown('bulk-notebook-move');
+        });
+    },
+
+    /** @private */
+    bindDragDropEvents() {
+        const zone = document.getElementById('drag-drop-zone');
+        if (!zone) return;
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            zone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Highlight drag area on hover
+        ['dragenter', 'dragover'].forEach(eventName => {
+            zone.addEventListener(eventName, () => {
+                zone.style.borderColor = 'var(--accent-color, #4361ee)';
+                zone.style.background = 'rgba(67, 97, 238, 0.05)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            zone.addEventListener(eventName, () => {
+                zone.style.borderColor = 'var(--border-color, #cbd5e1)';
+                zone.style.background = 'rgba(67, 97, 238, 0.02)';
+            }, false);
+        });
+
+        // Handle dropped files
+        zone.addEventListener('drop', async (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length === 0) return;
+
+            const file = files[0];
+            try {
+                this.showLoading(i18n.t('loading') || "جاري جلب ومعالجة الملف...");
+                let fileContent;
+                if (file.name.endsWith('.gz') || file.name.endsWith('.gzip')) {
+                    if (typeof DecompressionStream !== 'undefined') {
+                        const decompressionStream = new DecompressionStream('gzip');
+                        const fileStream = typeof file.stream === 'function' ? file.stream() : new ReadableStream({
+                            async start(controller) {
+                                controller.enqueue(new Uint8Array(await file.arrayBuffer()));
+                                controller.close();
+                            }
+                        });
+                        const decompressedStream = fileStream.pipeThrough(decompressionStream);
+                        fileContent = await new Response(decompressedStream).text();
+                    } else if (typeof pako !== 'undefined') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const uint8Array = new Uint8Array(arrayBuffer);
+                        fileContent = pako.ungzip(uint8Array, { to: 'string' });
+                    } else {
+                        throw new Error("GZIP decompression is not supported in this browser.");
+                    }
+                } else {
+                    fileContent = await file.text();
+                }
+
+                const parsedData = ExportModule.parseIncomingString(fileContent);
+                await ExportModule.processStrictImport(parsedData, async (floatingCount, autoDistribute) => {
+                    if (typeof this.syncData === 'function') {
+                        await this.syncData();
+                        this.renderSelectionHub();
+                        this.updateExportScopeCounts();
+                    }
+                    if (!autoDistribute) {
+                        UIComponents.showToast(i18n.t('msg_import_success_forced'), 'success');
+                    } else if (floatingCount > 0) {
+                        UIComponents.showToast(i18n.t('msg_import_success_floating', { count: floatingCount }), 'success');
+                    } else {
+                        UIComponents.showToast(i18n.t('msg_import_fixed_success') || "تم الاستيراد بنجاح وبدون أي تكرار!", 'success');
+                    }
+                });
+
+            } catch (error) {
+                Logger.error('DragDropSystem', 'Critical failure during dropped file decompression/parsing', error);
+                UIComponents.showToast(i18n.t('err_decompression_failed') || "فشل الاستيراد: تأكد من سلامة الملف.", 'error');
+            } finally {
+                this.hideLoading();
+            }
+        });
+
+        // Clicking the zone opens the file dialog
+        zone.addEventListener('click', () => {
+            document.getElementById('import-file')?.click();
         });
     },
 
@@ -2270,7 +2708,11 @@ export const app = {
                     "explain": "شرح تعليمي للإجابة الصحيحة",
                     "pairs": [],
                     "keywords": [],
-                    "image": null
+                    "image": null,
+                    "reference": {
+                        "book": "اسم الكتاب المرجعي",
+                        "page": "رقم الصفحة أو الفصل"
+                    }
                 },
                 {
                     "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
@@ -2286,7 +2728,11 @@ export const app = {
                     "explain": "شرح لماذا الإجابة صح أو خطأ",
                     "pairs": [],
                     "keywords": [],
-                    "image": null
+                    "image": null,
+                    "reference": {
+                        "book": "اسم الكتاب المرجعي",
+                        "page": "رقم الصفحة أو الفصل"
+                    }
                 },
                 {
                     "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
@@ -2302,7 +2748,11 @@ export const app = {
                     "explain": "شرح تفصيلي للإجابة النموذجية",
                     "pairs": [],
                     "keywords": ["كلمة مفتاحية 1", "كلمة مفتاحية 2"],
-                    "image": null
+                    "image": null,
+                    "reference": {
+                        "book": "اسم الكتاب المرجعي",
+                        "page": "رقم الصفحة أو الفصل"
+                    }
                 },
                 {
                     "id": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
@@ -2318,7 +2768,11 @@ export const app = {
                     "explain": "شرح العلاقة بين الأزواج",
                     "pairs": [{"left": "العنصر 1", "right": "النظير 1"}, {"left": "العنصر 2", "right": "النظير 2"}],
                     "keywords": [],
-                    "image": null
+                    "image": null,
+                    "reference": {
+                        "book": "اسم الكتاب المرجعي",
+                        "page": "رقم الصفحة أو الفصل"
+                    }
                 }
             ];
             

@@ -402,6 +402,7 @@ The following steel-grade structure must be strictly followed for every question
 8. "notebookId": unique identifier of the parent notebook this question belongs to.
 9. "qNumber": explicit sequential numeric numbering starting from 1 per notebook.
 10. "options": array of options for MCQ questions only, empty array [] for all other types.
+11. "reference": an object containing the reference book name "book" (e.g., "Ophthalmology Companion") and page number "page" (e.g., "142").
 
 Database rules for each type:
 - (mcq): requires "options" (4 text options) and "answer" (text exactly matching the correct option).
@@ -500,7 +501,7 @@ Important technical notes for standard JSON compliance:
     "unpin": "Unpin",
     "export_pdf_theme": "Interactive Design Theme",
     "pdf_theme_classic": "Unified Classic Theme",
-    "pdf_theme_minecraft": "Minecraft Theme",
+    "pdf_theme_minecraft": "🎮 Minecraft Theme",
     "pdf_theme_modern": "Modern Theme",
     "btn_preview_ref": "Preview Reference 📡",
     "btn_confirm_ref_import": "Confirm Safe Import 🚀",
@@ -623,5 +624,43 @@ Important technical notes for standard JSON compliance:
     "zen_mode_btn": "Zen Mode",
     "flashcard_flip_btn": "Flip Card",
     "bookmark_question": "Bookmark Question",
-    "due_today_filter": "Due Today"
+    "due_today_filter": "Due Today",
+
+    // v17.2 — Viewport & Translation Fixes
+    "drag_drop_title": "Drag & Drop Files",
+    "drag_drop_desc": "Drag a JSON or CSV file here to import instantly",
+    "pdf_split_sessions_label": "Split question bank into smart study sessions",
+    "pdf_session_duration_label": "Session duration (in minutes):",
+    "minutes_label": "min",
+    "msg_import_success_forced": "Questions imported and distributed successfully! 🚀",
+    "msg_import_success_floating": "Questions imported as floating items successfully! 🚀",
+    "msg_import_fixed_success": "Malformed JSON file repaired and imported successfully! 🔧✅",
+    "err_decompression_failed": "File decompression failed! Check data integrity.",
+    "pause": "Pause",
+    "play": "Play",
+    "msg_copy_failed_retry": "Copy failed, please copy manually.",
+    "confirm_delete_btn": "Confirm permanent deletion 🗑️",
+    "json_advanced_settings": "⚙️ Advanced JSON Settings",
+    "export_opt_beautify": "Beautify JSON",
+    "export_opt_compress": "Enable GZIP Compression",
+    "msg_export_success": "File exported and saved successfully! 📁✅",
+    "default_word_header": "Approved Medical Question Bank",
+    "select_ref_first": "Please select a medical reference first.",
+    "err_fetch_ref_failed": "Could not fetch reference data from server.",
+    "msg_import_success": "Import completed successfully!",
+    
+    // v17.2 — PDF Export Themes
+    "pdf_theme_label": "🎨 Choose Layout & Print Theme:",
+    "pdf_theme_default": "🎨 Default Clean Mode",
+    "pdf_theme_tech2023": "🚀 Tech 2023 Theme",
+    "pdf_theme_terminal": "💻 Hacker Terminal",
+    "pdf_theme_dark": "🌌 Deep Dark Theme",
+    "pdf_theme_retro": "📜 Classic Retro",
+    "pdf_theme_manga": "💥 Manga & Comic Theme",
+    "pdf_theme_cyberpunk": "👾 Cyberpunk Neon",
+    "pdf_theme_pastel": "🌸 Pastel Minimalist",
+    "pdf_theme_forest": "🌿 Forest Organic Theme",
+    "pdf_theme_academic": "🏛️ Oxford Academic",
+    "pdf_bg_graphics_advice_title": "ClarifyMaster Pro Tip for Maximum Quality:",
+    "pdf_bg_graphics_advice_desc": "When saving the PDF from the print dialog, always make sure to enable the \"Background Graphics\" option in your browser print settings. This ensures the deep theme backgrounds, color accents, and layouts are preserved perfectly!"
 };

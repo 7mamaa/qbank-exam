@@ -6,7 +6,72 @@ import { app } from '../../app.js?v=16.6.1';
  * @module UIComponents
  * @description Shared UI components and logic for custom dropdowns and notifications.
  */
+
+const focusableElementsSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+export const FocusTrap = {
+    activeTrap: null,
+    
+    init(modalEl) {
+        if (!modalEl) return;
+        this.destroy();
+        
+        const focusableElements = Array.from(modalEl.querySelectorAll(focusableElementsSelector));
+        if (focusableElements.length === 0) return;
+        
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+        
+        const previousActiveElement = document.activeElement;
+        
+        setTimeout(() => firstFocusable.focus(), 50);
+        
+        const handleKeyDown = (e) => {
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        lastFocusable.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        firstFocusable.focus();
+                        e.preventDefault();
+                    }
+                }
+            } else if (e.key === 'Escape') {
+                const closeBtn = modalEl.querySelector('.close-modal');
+                if (closeBtn) {
+                    closeBtn.click();
+                } else {
+                    app.closeModal(modalEl.id);
+                }
+                e.preventDefault();
+            }
+        };
+        
+        modalEl.addEventListener('keydown', handleKeyDown);
+        
+        this.activeTrap = {
+            modalEl,
+            handleKeyDown,
+            previousActiveElement
+        };
+    },
+    
+    destroy() {
+        if (!this.activeTrap) return;
+        const { modalEl, handleKeyDown, previousActiveElement } = this.activeTrap;
+        modalEl.removeEventListener('keydown', handleKeyDown);
+        if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+            previousActiveElement.focus();
+        }
+        this.activeTrap = null;
+    }
+};
+
 export const UIComponents = {
+    FocusTrap,
     /**
      * Initializes all custom V8 dropdowns in the application.
      */
@@ -19,18 +84,40 @@ export const UIComponents = {
         ];
         selects.forEach(id => {
             const selectEl = document.getElementById(id);
-            if (!selectEl || document.getElementById(`v8-dd-${id}`)) return;
+            if (!selectEl) return;
+
+            // Remove existing custom dropdown wrapper to prevent duplication and memory leaks
+            const existingWrapper = document.getElementById(`v8-dd-${id}`);
+            if (existingWrapper) {
+                existingWrapper.remove();
+            }
+
+            // Also search parent for any orphaned V8 dropdown next to this element
+            let sibling = selectEl.nextSibling;
+            while (sibling) {
+                const next = sibling.nextSibling;
+                if (sibling.classList && sibling.classList.contains('v8-dropdown')) {
+                    sibling.remove();
+                }
+                sibling = next;
+            }
 
             const wrapper = document.createElement('div');
             wrapper.className = 'v8-dropdown';
             wrapper.id = `v8-dd-${id}`;
-            wrapper.tabIndex = 1;
+            wrapper.tabIndex = 0;
+            wrapper.setAttribute('role', 'combobox');
+            wrapper.setAttribute('aria-expanded', 'false');
+            wrapper.setAttribute('aria-haspopup', 'listbox');
+            wrapper.setAttribute('aria-controls', `v8-dd-menu-${id}`);
             
             const span = document.createElement('span');
             span.textContent = selectEl.options[selectEl.selectedIndex]?.text || i18n.t('select_dot');
             
             const ul = document.createElement('ul');
             ul.className = `dropdown-menu dd-type-${id}`;
+            ul.id = `v8-dd-menu-${id}`;
+            ul.setAttribute('role', 'listbox');
 
             wrapper.appendChild(span);
             wrapper.appendChild(ul);
@@ -40,25 +127,139 @@ export const UIComponents = {
 
             wrapper.addEventListener('click', (e) => {
                 const isActive = wrapper.classList.contains('active');
-                document.querySelectorAll('.v8-dropdown').forEach(d => d.classList.remove('active'));
-                if (!isActive) wrapper.classList.add('active');
+                document.querySelectorAll('.v8-dropdown').forEach(d => {
+                    d.classList.remove('active');
+                    d.setAttribute('aria-expanded', 'false');
+                });
+                if (!isActive) {
+                    wrapper.classList.add('active');
+                    wrapper.setAttribute('aria-expanded', 'true');
+                    highlightedIdx = selectEl.selectedIndex;
+                    updateHighlight();
+                    UIComponents.governDropdownViewportBounds(ul, wrapper);
+                } else {
+                    wrapper.classList.remove('active');
+                    wrapper.setAttribute('aria-expanded', 'false');
+                }
                 e.stopPropagation();
+            });
+
+            let highlightedIdx = selectEl.selectedIndex;
+            const updateHighlight = () => {
+                const lis = ul.querySelectorAll('li');
+                lis.forEach((li, idx) => {
+                    if (idx === highlightedIdx) {
+                        li.classList.add('highlighted');
+                        li.scrollIntoView({ block: 'nearest' });
+                    } else {
+                        li.classList.remove('highlighted');
+                    }
+                });
+            };
+
+            wrapper.addEventListener('keydown', (e) => {
+                const lis = ul.querySelectorAll('li');
+                const isOpen = wrapper.classList.contains('active');
+
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!isOpen) {
+                        document.querySelectorAll('.v8-dropdown').forEach(d => {
+                            d.classList.remove('active');
+                            d.setAttribute('aria-expanded', 'false');
+                        });
+                        wrapper.classList.add('active');
+                        wrapper.setAttribute('aria-expanded', 'true');
+                        highlightedIdx = selectEl.selectedIndex;
+                        updateHighlight();
+                        UIComponents.governDropdownViewportBounds(ul, wrapper);
+                    } else {
+                        if (lis[highlightedIdx]) {
+                            lis[highlightedIdx].click();
+                        }
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!isOpen) {
+                        wrapper.classList.add('active');
+                        wrapper.setAttribute('aria-expanded', 'true');
+                        highlightedIdx = selectEl.selectedIndex;
+                        UIComponents.governDropdownViewportBounds(ul, wrapper);
+                    } else {
+                        highlightedIdx = (highlightedIdx + 1) % lis.length;
+                    }
+                    updateHighlight();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (!isOpen) {
+                        wrapper.classList.add('active');
+                        wrapper.setAttribute('aria-expanded', 'true');
+                        highlightedIdx = selectEl.selectedIndex;
+                        UIComponents.governDropdownViewportBounds(ul, wrapper);
+                    } else {
+                        highlightedIdx = (highlightedIdx - 1 + lis.length) % lis.length;
+                    }
+                    updateHighlight();
+                } else if (e.key === 'Escape' || e.key === 'Tab') {
+                    if (isOpen) {
+                        wrapper.classList.remove('active');
+                        wrapper.setAttribute('aria-expanded', 'false');
+                        if (e.key === 'Escape') {
+                            e.preventDefault();
+                            wrapper.focus();
+                        }
+                    }
+                }
             });
 
             this.syncCustomDropdown(id);
         });
 
-        // Close dropdowns on outside click
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.v8-dropdown').forEach(d => d.classList.remove('active'));
-        });
+        // Close dropdowns on outside click (Once)
+        if (!this._outsideClickListenerAdded) {
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.v8-dropdown').forEach(d => {
+                    d.classList.remove('active');
+                    d.setAttribute('aria-expanded', 'false');
+                });
+            });
+            this._outsideClickListenerAdded = true;
+        }
 
-        // Setup listener for language changes to sync dropdown text
+        // Setup listener for language changes to sync dropdown text (Once)
         if (!this._i18nListenerAdded) {
             document.addEventListener('languageChanged', () => {
                 selects.forEach(id => this.syncCustomDropdown(id));
             });
             this._i18nListenerAdded = true;
+        }
+
+        // Setup global listener for action dropdown hover/focus bounds check (Once)
+        if (!this._viewportBoundsListenersAdded) {
+            document.addEventListener('mouseover', (e) => {
+                const dropdown = e.target.closest('.q-action-dropdown');
+                if (dropdown) {
+                    const menu = dropdown.querySelector('.q-action-menu');
+                    if (menu) {
+                        UIComponents.governDropdownViewportBounds(menu, dropdown);
+                    }
+                }
+            }, { passive: true });
+
+            document.addEventListener('focusin', (e) => {
+                const dropdown = e.target.closest('.q-action-dropdown');
+                if (dropdown) {
+                    const menu = dropdown.querySelector('.q-action-menu');
+                    if (menu) {
+                        UIComponents.governDropdownViewportBounds(menu, dropdown);
+                    }
+                }
+            }, { passive: true });
+
+            window.addEventListener('resize', () => UIComponents.governActiveDropdowns(), { passive: true });
+            window.addEventListener('scroll', () => UIComponents.governActiveDropdowns(), { capture: true, passive: true });
+
+            this._viewportBoundsListenersAdded = true;
         }
     },
 
@@ -79,8 +280,12 @@ export const UIComponents = {
         Array.from(selectEl.options).forEach((opt, idx) => {
             const li = document.createElement('li');
             li.dataset.value = opt.value;
+            li.setAttribute('role', 'option');
             if (idx === selectEl.selectedIndex) {
                 li.classList.add('selected');
+                li.setAttribute('aria-selected', 'true');
+            } else {
+                li.setAttribute('aria-selected', 'false');
             }
 
             if (selectId === 'theme-selector') {
@@ -133,6 +338,126 @@ export const UIComponents = {
 
 
     /**
+     * Governs the viewport bounds of a dropdown menu, adjusting its alignment and overflow.
+     * @param {HTMLElement} menuEl - The dropdown menu container (.dropdown-menu or .q-action-menu).
+     * @param {HTMLElement} wrapperEl - The wrapper element (.v8-dropdown or .q-action-dropdown).
+     */
+    governDropdownViewportBounds(menuEl, wrapperEl) {
+        if (!menuEl || !wrapperEl) return;
+
+        // Reset custom styles so we can measure the element's natural bounds
+        menuEl.style.left = '';
+        menuEl.style.right = '';
+        menuEl.style.top = '';
+        menuEl.style.bottom = '';
+        menuEl.style.transform = '';
+        menuEl.style.maxHeight = '';
+
+        const isQAction = menuEl.classList.contains('q-action-menu');
+
+        // Measure elements and screen
+        const menuRect = menuEl.getBoundingClientRect();
+        const wrapperRect = wrapperEl.getBoundingClientRect();
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+        const margin = 12; // Safety boundary margin
+
+        // 1. Horizontal Bounds & RTL Adaptation
+        const isRtl = document.documentElement.dir === 'rtl' || document.body.dir === 'rtl';
+
+        if (isQAction) {
+            // q-action-menu is centered by default using left: 50% & transform: translateX(-50%)
+            let currentLeft = wrapperRect.left + (wrapperRect.width / 2) - (menuRect.width / 2);
+            if (currentLeft + menuRect.width > viewWidth - margin) {
+                // Overflows right: align to right edge
+                menuEl.style.left = 'auto';
+                menuEl.style.right = '0';
+                menuEl.style.transform = 'none';
+            } else if (currentLeft < margin) {
+                // Overflows left: align to left edge
+                menuEl.style.left = '0';
+                menuEl.style.right = 'auto';
+                menuEl.style.transform = 'none';
+            } else {
+                // Centered is fine, restore defaults
+                menuEl.style.left = '50%';
+                menuEl.style.right = 'auto';
+                menuEl.style.transform = 'translateX(-50%)';
+            }
+        } else {
+            // Standard dropdown (.v8-dropdown)
+            if (menuRect.right > viewWidth - margin) {
+                // Overflows right edge: align menu right edge with wrapper right edge
+                menuEl.style.left = 'auto';
+                menuEl.style.right = '0';
+            } else if (menuRect.left < margin) {
+                // Overflows left edge: align menu left edge with wrapper left edge
+                menuEl.style.left = '0';
+                menuEl.style.right = 'auto';
+            } else {
+                // Align naturally based LTR/RTL
+                if (isRtl) {
+                    menuEl.style.left = 'auto';
+                    menuEl.style.right = '0';
+                } else {
+                    menuEl.style.left = '0';
+                    menuEl.style.right = 'auto';
+                }
+            }
+        }
+
+        // 2. Vertical Bounds (Upward/Downward Adaptive Opening)
+        const spaceBelow = viewHeight - wrapperRect.bottom;
+        const spaceAbove = wrapperRect.top;
+
+        // Open upwards if it overflows bottom and we have more space above than below
+        if (menuRect.bottom > viewHeight - margin && spaceAbove > spaceBelow) {
+            menuEl.style.top = 'auto';
+            menuEl.style.bottom = 'calc(100% + 6px)';
+            wrapperEl.classList.add('open-upward');
+            
+            // Constrain max-height dynamically to prevent vertical overflow
+            const maxAvailableHeight = wrapperRect.top - margin * 2;
+            menuEl.style.maxHeight = `${Math.max(150, maxAvailableHeight)}px`;
+            menuEl.style.overflowY = 'auto';
+        } else {
+            menuEl.style.top = 'calc(100% + 6px)';
+            menuEl.style.bottom = 'auto';
+            wrapperEl.classList.remove('open-upward');
+            
+            // Constrain max-height dynamically to prevent vertical overflow
+            const maxAvailableHeight = viewHeight - wrapperRect.bottom - margin * 2;
+            menuEl.style.maxHeight = `${Math.max(150, maxAvailableHeight)}px`;
+            menuEl.style.overflowY = 'auto';
+        }
+    },
+
+    /**
+     * Scans and governs all currently active/visible dropdown menus.
+     */
+    governActiveDropdowns() {
+        // Govern V8 custom dropdowns
+        document.querySelectorAll('.v8-dropdown.active').forEach(wrapper => {
+            const menu = wrapper.querySelector('.dropdown-menu');
+            if (menu) {
+                this.governDropdownViewportBounds(menu, wrapper);
+            }
+        });
+
+        // Govern card action menus
+        document.querySelectorAll('.q-action-dropdown').forEach(dropdown => {
+            const menu = dropdown.querySelector('.q-action-menu');
+            if (menu) {
+                const isVisible = window.getComputedStyle(menu).display !== 'none';
+                if (isVisible) {
+                    this.governDropdownViewportBounds(menu, dropdown);
+                }
+            }
+        });
+    },
+
+
+    /**
      * Opens a modal by ID.
      * @param {string} id 
      * @param {Function} [playSoundCallback] 
@@ -142,6 +467,7 @@ export const UIComponents = {
         if (modal) {
             modal.classList.add('active');
             if (playSoundCallback) playSoundCallback('modal');
+            FocusTrap.init(modal);
         }
     },
 
@@ -155,6 +481,7 @@ export const UIComponents = {
         if (modal) {
             modal.classList.remove('active');
             if (playSoundCallback) playSoundCallback('nav');
+            FocusTrap.destroy();
         }
     },
 
@@ -626,6 +953,7 @@ export const UIComponents = {
     createToastContainer() {
         const container = document.createElement('div');
         container.id = 'toast-container';
+        container.className = 'toast-container';
         document.body.appendChild(container);
         return container;
     },
