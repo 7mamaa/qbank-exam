@@ -1,14 +1,22 @@
 {
-  "name": "exam-q-bank-manegar",
-  "version": "1.0.0",
-  "description": "نظام متكامل واحترافي لإدارة بنوك الأسئلة، مصمم لتسهيل عملية إنشاء، تنظيم، وتصدير الأسئلة الامتحانية بمختلف أنواعها. يتميز النظام بهيكلية معيارية (Modular) تدعم التوسع والمرونة العالية.",
+  "name": "qbank-exam",
+  "version": "17.1.3",
+  "description": "نظام متكامل واحترافي لإدارة بنوك الأسئلة، مصمم للعمل بشكل كامل (Offline-First) داخل المتصفح، لتسهيل عملية إنشاء، تنظيم، وتصدير الأسئلة الامتحانية بمختلف أنواعها بهيكلية معيارية نظيفة.",
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "qbank",
+    "question-bank",
+    "vanilla-js",
+    "esm",
+    "offline-first"
+  ],
+  "author": "Ahmed Adel",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -17,13 +25,10 @@
     "stylelint": "^17.11.1",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-formatter-html": "^1.0.1",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "wrangler": "^4.95.0"
   },
   "dependencies": {
-    "@react-pdf/renderer": "^4.5.1",
-    "bidi-js": "^1.0.3",
-    "esbuild": "^0.28.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "pako": "^2.1.0"
   }
 }
