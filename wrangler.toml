@@ -1,0 +1,16 @@
+name = "qbank-exam"
+compatibility_date = "2026-05-31"
+compatibility_flags = [ "nodejs_compat" ]
+
+[assets]
+directory = "."
+exclude = [
+  "node_modules",
+  ".git",
+  ".github",
+  "scratch",
+  "temp"
+]
+
+[observability]
+enabled = true
